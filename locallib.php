@@ -1117,6 +1117,8 @@ function local_kaltura_get_kdp_code($entry_obj, $uiconf_id = 0, $courseid = 0, $
     $host       = local_kaltura_get_host();
     $flash_vars = local_kaltura_get_kdp_flashvars($courseid, $session);
 
+    $flash_vars .= '&amp;streamerType=rtmp';
+
     if (empty($uiconf_id)) {
         $uiconf = local_kaltura_get_player_uiconf('player');
     } else {
