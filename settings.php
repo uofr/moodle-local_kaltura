@@ -364,6 +364,13 @@ if ($hassiteconfig) {
                        get_string('filter_custom_desc', 'local_kaltura'), '', PARAM_INT);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
+    
+    // add option for audio player
+    
+    $adminsetting = new admin_setting_configselect('player_filter_audio', get_string('player_filter_audio', 'local_kaltura'),
+                       get_string('player_filter_audio_desc', 'local_kaltura'), KALTURA_PLAYER_PLAYERAUDIO, $choices);
+    $adminsetting->plugin = KALTURA_PLUGIN_NAME;
+    $settings->add($adminsetting);
 
     $settings->add(new admin_setting_heading('kaltura_general_heading',
                    get_string('kaltura_general', 'local_kaltura'), ''));

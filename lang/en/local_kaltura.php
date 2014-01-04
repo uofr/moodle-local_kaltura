@@ -69,6 +69,9 @@ $string['filter_custom_desc'] = 'Only used if you have a custom player for embed
 $string['player_filter'] =  'Embedded player';
 $string['player_filter_desc'] =  'Player used by the Kaltura filter plug-in when embedding video on the page';
 $string['kaltura_filter_title'] = 'Embedded player used via the File Picker (Kaltura Filter) settings';
+$string['player_filter_audio'] =  'Embedded player (Audio)';
+$string['player_filter_audio_desc'] =  'Player used by the Kaltura filter plug-in when embedding audio on the page';
+
 $string['assign_uploader_desc'] = 'Uploader widget when a user is uploading a submission';
 $string['res_uploader_desc'] = 'Uploader widget when a user is uploading a video resource';
 $string['pres_uploader_desc'] = 'Uploader widget when a user is uploading a video resource';

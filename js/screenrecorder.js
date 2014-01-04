@@ -11,7 +11,7 @@ function removeDescAndTags(objOptions) {
 }
 
 // setting callback to override some kaltura options
-kalturaScreenRecord.setModifyKalturaOptionsCallback(removeDescAndTags);
+if (typeof kalturaScreenRecord != 'undefined') kalturaScreenRecord.setModifyKalturaOptionsCallback(removeDescAndTags);
 
 kalturaScreenRecord.UploadCompleteCallBack = function(entryId) {
     var data      = new Array();

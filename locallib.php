@@ -38,6 +38,9 @@ define('KALTURA_PLAYER_MYMEDIA_UPLOADER',               8464961); // KCW
 define('KALTURA_PLAYER_MYMEDIA_SCREEN_RECORDER',        9780761); // KSR
 define('KALTURA_PLAYER_KSU',                            1002613); // KSU
 
+
+define('KALTURA_PLAYER_PLAYERAUDIO',              11170258); // UofR Audio player
+
 define('KALTURA_FILTER_VIDEO_WIDTH', 400);
 define('KALTURA_FILTER_VIDEO_HEIGHT', 300);
 
@@ -1128,7 +1131,7 @@ function local_kaltura_get_kdp_code($entry_obj, $uiconf_id = 0, $courseid = 0, $
     $output =
         "<object id=\"kaltura_player_{$uid}\" name=\"kaltura_player_{$uid}\"
         type=\"application/x-shockwave-flash\" allowFullScreen=\"true\" allowNetworking=\"all\"
-        allowScriptAccess=\"always\" height=\"{$entry_obj->height}\" width=\"{$entry_obj->width}\"
+        allowScriptAccess=\"always\" height=\"".(($entry_obj->mediaType == 5)?"30":"{$entry_obj->height}")."\" width=\"{$entry_obj->width}\"
         xmlns:dc=\"http://purl.org/dc/terms/\" xmlns:media=\"http://search.yahoo.com/searchmonkey/media/\"
         rel=\"media:{$entry_obj->mediaType}\" resource=\"{$host}/index.php/kwidget/wid/_{$entry_obj->partnerId}/uiconf_id/{$uiconf}/entry_id/{$entry_obj->id}\"
         data=\"{$host}/index.php/kwidget/wid/_{$entry_obj->partnerId}/uiconf_id/{$uiconf}/entry_id/{$entry_obj->id}\">
@@ -1146,7 +1149,7 @@ function local_kaltura_get_kdp_code($entry_obj, $uiconf_id = 0, $courseid = 0, $
         <span property=\"dc:description\" content=\"{$entry_obj->description}\"></span>
         <span property=\"media:title\" content=\"{$entry_obj->name}\"></span>
         <span property=\"media:width\" content=\"{$entry_obj->width}\"></span>
-        <span property=\"media:height\" content=\"{$entry_obj->height}\"></span>
+        <span property=\"media:height\" content=\"".(($entry_obj->mediaType == 5)?"30":"{$entry_obj->height}")."\"></span>
         <span property=\"media:type\" content=\"application/x-shockwave-flash\"></span>
         <span property=\"media:duration\" content=\"{$entry_obj->duration}\"></span>
         </object>";

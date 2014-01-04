@@ -23,6 +23,7 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once($CFG->dirroot.'/course/lib.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '/local/kaltura/locallib.php');
 
 $entry_id   = required_param('entry_id', PARAM_TEXT);
@@ -59,12 +60,30 @@ if (0 == strcmp($widget, 'kdp')) {
 
         // Create the user KS session
         $session  = local_kaltura_generate_kaltura_session(array($entry_obj->id));
+        
+        if ($entry_obj->mediaType ==2) {
+            
+            $data->markup = html_writer::tag('img', '', array('src'=>'http://kaltura.cc.uregina.ca/p/106/sp/10600/raw/entry_id/'.$entry_obj->id.'/version/100000'));
+            
+        } else if ($entry_obj->mediaType == 5) {
+            // mediaType 5 = audio?
+            //die(print_r($entry_obj,1));
+            
+            //$audio_link = html_writer::tag('a','Link text',array('href'=>'http://kaltura.cc.uregina.ca/p/106/sp/10600/playManifest/entryId/'.$entry_obj->id.'/format/url/flavorParamId/0/audio.mp3'));
+            $mediarenderer = $PAGE->get_renderer('core', 'media');
+            $data->markup = $mediarenderer->embed_url(new moodle_url('http://kaltura.cc.uregina.ca/p/106/sp/10600/playManifest/entryId/'.$entry_obj->id.'/format/url/flavorParamId/0/audio.mp3'));
+            
+            //$data->markup = html_writer::tag('a','Link text',array('href'=>'http://kaltura.cc.uregina.ca/p/106/sp/10600/playManifest/entryId/'.$entry_obj->id.'/format/url/flavorParamId/0/audio.mp3'));
+            
+        } else {
+        
+            $data->markup = local_kaltura_get_kdp_code($entry_obj, $uiconfid, $courseid, $session);
 
-        $data->markup = local_kaltura_get_kdp_code($entry_obj, $uiconfid, $courseid, $session);
-
-        if (local_kaltura_has_mobile_flavor_enabled() && local_kaltura_get_enable_html5()) {
-            $data->script = 'kAddedScript = false; kCheckAddScript();';
+            if (local_kaltura_has_mobile_flavor_enabled() && local_kaltura_get_enable_html5()) {
+                $data->script = 'kAddedScript = false; kCheckAddScript();';
+            }
         }
+        
 
     } else {
         switch ((string) $entry_obj->status) {
