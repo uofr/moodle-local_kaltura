@@ -1,7 +1,7 @@
 <?php
 
 // Kaltura settings and generic messages
-$string['pluginname'] = 'Kaltura package libraries';
+$string['pluginname'] = 'Kaltura CE package libraries';
 $string['hostedconn'] = 'Kaltura Hosted Solution (SaaS)';
 $string['ceconn'] = 'Kaltura CE';
 $string['conn_heading_title'] = 'Kaltura hosted and CE settings';
@@ -18,8 +18,8 @@ $string['hosted_password_desc'] = 'Password that is used to log into the Kaltura
 $string['player_regular_light'] = 'Player light (6709421)';
 $string['player_regular_dark'] = 'Player dark (6709411)';
 $string['custom_player'] = 'Custom player';
-$string['kaltura_player_resource'] = 'Kaltura resource player';
-$string['kaltura_player_resource_desc'] = 'Player used to play back video for Video Resources.  This player will appear as the default player for new Video Resources.'.
+$string['kaltura_player_resource'] = 'Kaltura CE resource player';
+$string['kaltura_player_resource_desc'] = 'Player used to play back video for Video Resources.  This player will appear as the default player for new Media (Kaltura CE) Resources.'.
 ' However it may be overridden if the <b>Override video resource player setting</b> is unchecked';
 $string['kaltura_player_resource_custom'] = 'Custom UIConf';
 $string['kaltura_player_resource_custom_desc'] = 'Only used if you have a custom resource player UIConf ID';
@@ -46,7 +46,7 @@ $string['flashminimum'] = 'Flash player version 9 and above is required. '.
                           '<a href=\"http://get.adobe.com/flashplayer/\">Upgrade your flash version</a>';
 $string['upload_successful'] = 'Video uploaded successfully.  Remember to save/submit.';
 $string['video_converting'] = 'The video is still converting.  Please check the status of the video at a later time.';
-$string['conn_failed_alt'] = 'Connection with Kaltura is currently unavailable.  Please inform your administrator.';
+$string['conn_failed_alt'] = 'Connection with Kaltura CE is currently unavailable.  Please inform your administrator.';
 $string['player_resource_override'] = 'Override video resource player setting';
 $string['player_resource_override_desc'] = 'Check this option to override the individual Video Resource player selection.  This will force all Video Resource activities to use the selected <b>Kaltura resource player</b>';
 $string['enable_html5'] = 'Enable HTML5 flavour';
@@ -110,7 +110,7 @@ $string['kaltura_simple_uploader_cust_desc'] = 'Only used if you have a custom s
 $string['kaltura_simple_uploader_cust'] = 'Custom Kaltura Simple Uploader UIConf ID';
 $string['simple_uploader'] = 'Simple Uploader (1002613)';
 $string['enable_reports'] = 'Enable reports';
-$string['enable_reports_desc'] = 'Kaltura reports are only compatible with Kaltura version Falcon or above';
+$string['enable_reports_desc'] = 'Kaltura reports are only compatible with Kaltura CE version Falcon or above';
 $string['enable_screen_recorder'] = 'Enable screen recorder';
 $string['enable_screen_recorder_desc'] = 'A global setting to enable the screen recorder across all Kaltura plug-ins (My Media, Video resource, Video presentation and Video assignment).  This option overrides any specific capability settings.';
 
@@ -138,4 +138,4 @@ $string['recent_courses_display_limit_desc'] = 'The limit of the number of recen
 $string['search'] = 'Search';
 $string['search_courses_display_limit'] = 'Course search display limit';
 $string['search_courses_display_limit_desc'] = 'The limit of the number of courses to display from a search';
-$string['repo_not_installed'] = 'The Kaltura repository needs to be installed to view this file';
+$string['repo_not_installed'] = 'The Kaltura CE repository needs to be installed to view this file';
