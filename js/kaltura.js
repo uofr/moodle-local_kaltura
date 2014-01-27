@@ -13,7 +13,7 @@ M.local_kaltura.show_loading = function () {
                                                    });
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="https://urcourses.uregina.ca/local/kaltura/pix/rel_interstitial_loading.gif" />');
     loading_panel.render();
 
     loading_panel.show();
@@ -627,7 +627,7 @@ M.local_kaltura.video_assignment = function (Y, conversion_script, panel_markup,
                                                    );
 
         loading_panel.setHeader("Loading, please wait..."); 
-        loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+        loading_panel.setBody('<img src="https://urcourses.uregina.ca/local/kaltura/pix/rel_interstitial_loading.gif" />');
         loading_panel.render();
 
         
@@ -697,7 +697,7 @@ M.local_kaltura.video_assignment = function (Y, conversion_script, panel_markup,
                 loading_panel.hide();
                 
                 var data = Y.JSON.parse(o.responseText);
-
+                
                 img_tag = Y.one("#video_thumbnail");
                 
                 if (data.thumbnailUrl != img_tag.get("src")) {
@@ -762,7 +762,7 @@ M.local_kaltura.video_asignment_submission_view = function (Y, conversion_script
                                                );
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="https://urcourses.uregina.ca/local/kaltura/pix/rel_interstitial_loading.gif" />');
     loading_panel.render();
 
 
@@ -1229,7 +1229,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
                                                );
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="https://urcourses.uregina.ca/local/kaltura/pix/rel_interstitial_loading.gif" />');
     loading_panel.render();
 
     // Create preview panel
@@ -1275,7 +1275,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
           // Cannot initialize iframe_editor at the beginning of the script because the 
           // editor iframe seems to be the last element loaded on the page 
           var iframe_editor = Y.one("#id_introeditor_ifr");
-
+          
           if (null !== iframe_editor) {
             iframe_editor.setStyle("display", "none");
           }
@@ -1286,7 +1286,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
           var height      = Y.one("#height").get("value") + "px";
           var uiconf_id   = Y.one("#uiconf_id").get("value");
           var video_title = Y.one("#video_title").get("value");
-
+          
           Y.io(conversion_script + entry_id + "&" +
                "width=" + width + "&" +
                "height=" + height + "&" +
@@ -1319,7 +1319,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
             if (data.thumbnailUrl != img_tag.get("src")) {
                 img_tag.set("src", data.thumbnailUrl);
             }
-
+            
             // If the video markup property is not empty then set the body of the popup panel
             // and resize the panel to the size of the video
             if (undefined !== data.markup) {
@@ -1497,7 +1497,7 @@ M.local_kaltura.video_presentation = function (Y, conversion_script,
                                                );
 
     loading_panel.setHeader("Loading, please wait..."); 
-    loading_panel.setBody('<img src="http://l.yimg.com/a/i/us/per/gr/gp/rel_interstitial_loading.gif" />');
+    loading_panel.setBody('<img src="https://urcourses.uregina.ca/local/kaltura/pix/rel_interstitial_loading.gif" />');
     loading_panel.render();
 
     // YUI IO context and callbacks.  Also create preview panel
