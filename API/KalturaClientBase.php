@@ -267,17 +267,14 @@ class KalturaClientBase
 			if ($this->config->format == self::KALTURA_SERVICE_FORMAT_PHP)
 			{
 				$result = @unserialize($postResult);
-                //die(print_r($postResult,1));
+
 				if ($result === false && serialize(false) !== $postResult)
 				{
-					//throw new KalturaClientException("failed to unserialize server result\n$postResult", KalturaClientException::ERROR_UNSERIALIZE_FAILED);
-                    $this->log("KalturaClientException:failed to unserialize server result\n".$postResult);
-				} else {
-    				$dump = print_r($result, true);
-    //				if(strlen($dump) < 1024)
-    					$this->log("result (object dump): " . $dump);
+					throw new KalturaClientException("failed to unserialize server result\n$postResult", KalturaClientException::ERROR_UNSERIALIZE_FAILED);
 				}
-				
+				$dump = print_r($result, true);
+//				if(strlen($dump) < 1024)
+					$this->log("result (object dump): " . $dump);
 			}
 			else
 			{
