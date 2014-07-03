@@ -882,20 +882,20 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
         kcw_panel       = Y.one("#id_add_video");
         entry_element   = Y.one("#entry_id");
 
-        video_property_name     = Y.one("#vid_prop_name");
+        //video_property_name     = Y.one("#vid_prop_name");
         video_hidden_name       = Y.one("#video_title");
-        video_property_player   = Y.one("#vid_prop_player");
-        video_hidden_player     = Y.one("#uiconf_id");
-        video_property_dimen    = Y.one("#vid_prop_dimensions");
+        //video_property_player   = Y.one("#vid_prop_player");
+        //video_hidden_player     = Y.one("#uiconf_id");
+        //video_property_dimen    = Y.one("#vid_prop_dimensions");
         video_hidden_dimen      = Y.one("#widescreen");
-        video_property_size     = Y.one("#vid_prop_size");
+        //video_property_size     = Y.one("#vid_prop_size");
         video_hidden_width      = Y.one("#width");
         video_hidden_height     = Y.one("#height");
-        video_property_width    = Y.one("#vid_prop_width");
-        video_property_height   = Y.one("#vid_prop_height");
+        //video_property_width    = Y.one("#vid_prop_width");
+        //video_property_height   = Y.one("#vid_prop_height");
 
         // Set width of video property drop down
-        video_property_player.setStyle("width", "285");
+        //video_property_player.setStyle("width", "285");
         
         // Add padding to preview panel height and width
         preview_panel_width  = parseInt(video_hidden_width.get("value")) + 50;
@@ -1064,7 +1064,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
     }; 
     
     var handle_cancel = function() {
-
+        /*
         var set_value = video_hidden_name.get("value");
         video_property_name.set("value", set_value);
 
@@ -1074,7 +1074,9 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
         } else {
             video_property_player.set("value", default_player_uiconf);
         }
+        */
         
+        /*
         set_value = video_hidden_dimen.get("value");
         video_property_dimen.set("value", set_value);
 
@@ -1138,7 +1140,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
                 video_property_height.set("disabled", "");
                 break;
         }
-
+        */
         prop_panel.hide();
     }; 
 
@@ -1173,7 +1175,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
 
         }
     }
-    
+    /*
     // Listen to the 'change' for the player size and player dimensions drop down
     Y.on("change", vid_prop_player_callback,
          [Y.Node.getDOMNode(video_property_size), Y.Node.getDOMNode(video_property_dimen)]); 
@@ -1214,7 +1216,7 @@ M.local_kaltura.video_resource = function (Y, conversion_script,
             
     // Listen to the close event (when the X is pressed) and call the cancel call back
     prop_panel.hideEvent.subscribe(handle_cancel);
-
+    */
     // Create loading panel
     var loading_panel =  new Y.YUI2.widget.Panel("wait", { width:"240px",
                                                           fixedcenter:true,
