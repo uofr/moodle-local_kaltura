@@ -141,7 +141,7 @@ function onContributionWizardClose() {
  * This function also enables the two save buttons.
  */
 function enable_video_res_buttons() {
-    document.getElementById("id_video_properties").style.display = '';
+    //document.getElementById("id_video_properties").style.display = '';
     document.getElementById("id_video_preview").style.display = '';
     
     document.getElementById("id_submitbutton").disabled = '';
