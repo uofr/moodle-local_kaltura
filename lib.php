@@ -28,7 +28,7 @@ require_once(dirname(__FILE__) . '/locallib.php');
  * @param object - navigation_node
  * @return - nothing
  */
-function local_kaltura_extends_navigation($navigation) {
+function local_kaltura_extend_navigation($navigation) {
     global $USER, $PAGE, $CFG, $SITE;
 
     if (!file_exists($CFG->dirroot.'/repository/kaltura/locallib.php')) {
