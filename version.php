@@ -17,16 +17,19 @@
  * Kaltura video assignment grade preferences form
  *
  * @package    local_kaltura
+ * @subpackage kaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    // It must be included from a Moodle page.
+    die('Direct access to this script is forbidden.');
 }
 
-$plugin->version = 2014010901;
+$plugin->version = 2017081600;
 $plugin->component = 'local_kaltura';
-$plugin->release = 'Kaltura release 3.1.02 (RL: 2.6.1.1)';
-$plugin->requires = 2013111800;
+$plugin->release = 'YU Video Package 1.0.0';
+$plugin->requires = 2016052300;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->system_version = 2.1; // Used to send information to Kaltura
+$plugin->system_version = 2.1; // Used to send information to Kaltura.

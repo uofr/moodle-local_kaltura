@@ -14,11 +14,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura check video conversion status AND returns the embedded video markup
+ * Kaltura check media conversion status AND returns the embedded media markup
  *
  *
  * @package    local
  * @subpackage kaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +31,7 @@ $entry_id   = required_param('entry_id', PARAM_TEXT);
 $height     = optional_param('height', 0, PARAM_INT);
 $width      = optional_param('width', 0, PARAM_INT);
 $uiconfid   = optional_param('uiconf_id', 0, PARAM_INT);
-$title      = optional_param('video_title', '', PARAM_TEXT);
+$title      = optional_param('media_title', '', PARAM_TEXT);
 $widget     = optional_param('widget', 'kdp', PARAM_TEXT);
 $courseid   = required_param('courseid', PARAM_INT);
 
@@ -88,20 +89,19 @@ if (0 == strcmp($widget, 'kdp')) {
     } else {
         switch ((string) $entry_obj->status) {
             case KalturaEntryStatus::ERROR_IMPORTING:
-                $data->markup = get_string('video_error', 'local_kaltura');
+                $data->markup = get_string('media_error', 'local_kaltura');
                 break;
             case KalturaEntryStatus::ERROR_CONVERTING:
-                $data->markup = get_string('video_error', 'local_kaltura');
+                $data->markup = get_string('media_error', 'local_kaltura');
                 break;
             case KalturaEntryStatus::INFECTED:
-                $data->markup = get_string('video_bad', 'local_kaltura');
+                $data->markup = get_string('media_bad', 'local_kaltura');
                 break;
         }
     }
 
-} elseif (0 == strcmp($widget, 'kpdp')) {
-// If request is for a kaltura presentation dynamic player, get the entry object only
-// when it is ready
+} else if (0 == strcmp($widget, 'kpdp')) {
+    // If request is for a kaltura presentation dynamic player, get the entry object only when it is ready.
     $entry_obj  = local_kaltura_get_ready_entry_object($entry_id);
 
     $admin_mode = optional_param('admin_mode', 0, PARAM_INT);
@@ -109,7 +109,7 @@ if (0 == strcmp($widget, 'kdp')) {
 
     $data->markup = local_kaltura_get_kdp_presentation_player($entry_obj, $admin_mode);
 
-    // Pre-set the height and width of the video presentation popup panel
+    // Pre-set the height and width of the media presentation popup panel.
     $data->height = 400;
     $data->width  = 780;
 

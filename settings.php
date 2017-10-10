@@ -17,14 +17,18 @@
  * Kaltura video assignment grade preferences form
  *
  * @package    local_kaltura
+ * @subpackage kaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
-
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
+
+if (!defined('MOODLE_INTERNAL')) {
+    // It must be included from a Moodle page.
+    die('Direct access to this script is forbidden.');
+}
 
 global $PAGE;
 
@@ -121,13 +125,13 @@ if ($hassiteconfig) {
         $session = local_kaltura_login(true, '', KALTURA_SESSION_LENGTH, true);
 
         if (!empty($session)) {
-            $settings->add(new admin_setting_heading('conn_status', get_string('conn_status_title', 'local_kaltura'),
-                                                     get_string('conn_success', 'local_kaltura')));
+            $settings->add(new admin_setting_heading('conn_status', get_string('conn_status_title', 'local_kaltura'),'<div class="alert alert-success">'.get_string('conn_success', 'local_kaltura').'</div>'));
         } else {
-            $settings->add(new admin_setting_heading('conn_status', get_string('conn_status_title', 'local_kaltura'),
-                                                     get_string('conn_failed', 'local_kaltura')));
+            $settings->add(new admin_setting_heading('conn_status', get_string('conn_status_title', 'local_kaltura'),'<div class="alert alert-success">'.get_string('conn_failed', 'local_kaltura').'</div>'));
         }
     }
+	
+	$settings->add(new admin_setting_heading('conn_settings', get_string('conn_settings_title', 'local_kaltura'),''));
 
     // Server Connection
     $choices = array('hosted' => get_string('hostedconn', 'local_kaltura'),
@@ -191,8 +195,8 @@ if ($hassiteconfig) {
                  0 => get_string('custom_player_upload', 'local_kaltura'));
 
     // Kaltura regular player selection
-    $settings->add(new admin_setting_heading('kaltura_kalvidassign_heading',
-                   get_string('kaltura_kalvidassign_title', 'local_kaltura'), ''));
+    $settings->add(new admin_setting_heading('kaltura_kalmediaassign_heading',
+                   get_string('kaltura_kalmediaassign_title', 'local_kaltura'), ''));
 
 
     $choices = array(KALTURA_PLAYER_PLAYERREGULARDARK  => get_string('player_regular_dark', 'local_kaltura'),
@@ -230,14 +234,14 @@ if ($hassiteconfig) {
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
-    $adminsetting = new admin_setting_configtext('kalvidassign_player_height', get_string('kalvidassign_player_height', 'local_kaltura'),
-            get_string('kalvidassign_player_height_desc', 'local_kaltura'), '365', PARAM_INT);
+    $adminsetting = new admin_setting_configtext('kalmediaassign_player_height', get_string('kalvidassign_player_height', 'local_kaltura'),
+            get_string('kalmediaassign_player_height_desc', 'local_kaltura'), '365', PARAM_INT);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
     // Kaltura resource regular player
-    $settings->add(new admin_setting_heading('kaltura_kalvidres_heading',
-                   get_string('kaltura_kalvidres_title', 'local_kaltura'), ''));
+    $settings->add(new admin_setting_heading('kaltura_kalmediares_heading',
+                   get_string('kaltura_kalmediares_title', 'local_kaltura'), ''));
 
     $adminsetting = new admin_setting_configselect('player_resource', get_string('kaltura_player_resource', 'local_kaltura'),
                        get_string('kaltura_player_resource_desc', 'local_kaltura'), KALTURA_PLAYER_PLAYERREGULARDARK, $choices);
@@ -266,8 +270,8 @@ if ($hassiteconfig) {
     $settings->add($adminsetting);
 
     // Kaltura presentation player selection
-    $settings->add(new admin_setting_heading('kaltura_kalvidpres_heading',
-                   get_string('kaltura_kalvidpres_title', 'local_kaltura'), ''));
+    $settings->add(new admin_setting_heading('kaltura_kalemdiapres_heading',
+                   get_string('kaltura_kalmediapres_title', 'local_kaltura'), ''));
 
     $pres_choices = array(KALTURA_PLAYER_PLAYERVIDEOPRESENTATION => get_string('player_presentation', 'local_kaltura'),
                      0 => get_string('custom_player', 'local_kaltura'));

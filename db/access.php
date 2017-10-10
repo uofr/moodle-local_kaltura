@@ -15,10 +15,18 @@
 /**
  * Kaltura local plug-in access.php
  *
- * @package    local
+ * @package    local_kaltura
  * @subpackage kaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+
+if (!defined('MOODLE_INTERNAL')) {
+    // It must be included from a Moodle page.
+    die('Direct access to this script is forbidden.');
+}
 
 $capabilities = array(
 
@@ -28,6 +36,22 @@ $capabilities = array(
         'archetypes' => array(
             'manager' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW
+        )
+    ),
+
+    'local/kaltura:view_selector' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => array(
+            'user' => CAP_ALLOW
+        )
+    ),
+
+    'local/kaltura:search_selector' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => array(
+            'user' => CAP_ALLOW
         )
     )
 );

@@ -17,17 +17,19 @@
 /**
  * Kaltura Post installation and migration code.
  *
- * @package    local
+ * @package    local_kaltura
  * @subpackage kaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once(dirname(dirname(__FILE__)) . '/locallib.php');
 
+// It must be included from a Moodle page
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
-
 
 
 function xmldb_local_kaltura_install() {
@@ -35,11 +37,10 @@ function xmldb_local_kaltura_install() {
     // Copy plug configuration data
     migrate_configuration_data();
 
-    // Create new Kaltura video resource/presentations from old resource types
+    // Create new Kaltura media resource/presentations from old resource types
     migrate_resource_data();
 
-
-    // Create new Kaltura video assignment from old assignment type and update all
+    // Create new Kaltura media assignment from old assignment type and update all,
     // user data pertaining to that assignment
     migrate_assignment_data();
 
@@ -47,12 +48,12 @@ function xmldb_local_kaltura_install() {
 }
 
 /**
- * This function migrates old video assignment type data and creates new Kaltura
- * video assignment modules from the old data.  Updates the course modules table
- * to refer to the newly created video assignment module.  Updates the
+ * This function migrates old media assignment type data and creates new Kaltura
+ * media assignment modules from the old data.  Updates the course modules table
+ * to refer to the newly created media assignment module.  Updates the
  * grade_items table to refer to the newly created assignment module.  If grades
- * are found in the grade_grades table, create a new video assignment submission
- * record using the data from the old video assignment submission record and
+ * are found in the grade_grades table, create a new media assignment submission
+ * record using the data from the old media assignment submission record and
  * remove the old assignment submission data.  Lastly the old assignment record
  * is remove.
  */
@@ -169,10 +170,10 @@ function migrate_assignment_data() {
     
                 }
             }
-        } catch (Exception $exp) {
-            add_to_log(SITEID, 'local_kaltura', 'Data migration error', '', $exp->getMessage());
+        } catch (Exception $ex) {
+            $errormessage = 'Data migration error(' .  $ex->getMessage() . ')';
+            print_error($errormessage, 'local_kaltura');
         }
-    
     }
     
     foreach ($rebuild_courses as $courseid) {
@@ -182,7 +183,7 @@ function migrate_assignment_data() {
 }
 
 /**
- * Updates the calendar event entry to refer to the new video assignment
+ * Updates the calendar event entry to refer to the new media assignment
  * instance
  *
  * @param int - Id of new assignment instance
@@ -205,8 +206,8 @@ function update_calendar_event($new_assignment_id, $old_assignment_id) {
 
 /**
  * This function migrates old resource data from the resource_old table and
- * creates new kaltura video resource/presentations modules with the old data.
- * Updates the course modules table to point to the new video
+ * creates new kaltura media resource/presentations modules with the old data.
+ * Updates the course modules table to point to the new media
  * resource/presentation modules.  Removes old resource data from the
  * resource_old table as well as from the resource table
  *
@@ -362,6 +363,7 @@ function migrate_configuration_data() {
             case 'kaltura_secret':
             case 'kaltura_adminsecret':
             case 'kaltura_partner_id':
+            case 'internal_ipaddress':
 
                 $name = $record->name;
 
@@ -488,11 +490,12 @@ function create_new_kalvidres($old_resource) {
     $kalvidres->intro        = $old_resource->intro;
     $kalvidres->introformat  = $old_resource->introformat;
     $kalvidres->entry_id     = $old_resource->alltext;
-    $kalvidres->video_title  = $old_resource->name;
+    $kalvidres->media_title  = $old_resource->name;
     $kalvidres->uiconf_id    = KALTURA_PLAYER_PLAYERREGULARDARK;
     $kalvidres->widescreen   = 0;
     $kalvidres->height       = 365;
     $kalvidres->width        = 400;
+	$kalvidres->access       = KALTURA_INTERNAL_IPADDRESS_ANY;
 
     return $kalvidres;
 }
@@ -515,7 +518,7 @@ function create_new_kalvidpres($old_resource) {
     $kalvidpres->entry_id       = $old_resource->alltext;
     $kalvidpres->video_entry_id = $old_resource->alltext;
     $kalvidpres->doc_entry_id   = $old_resource->alltext;
-    $kalvidpres->video_title    = $old_resource->name;
+    $kalvidpres->media_title    = $old_resource->name;
     $kalvidpres->uiconf_id      = KALTURA_PLAYER_PLAYERVIDEOPRESENTATION;
     $kalvidpres->widescreen     = 0;
     $kalvidpres->height         = 365;

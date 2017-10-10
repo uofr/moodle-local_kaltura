@@ -13,9 +13,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video assignment locallib
+ * Kaltura media assignment locallib
  *
  * @package    local_kaltura
+ * @subpackage kaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,13 +39,13 @@ $string['hosted_password_desc'] = 'Password that is used to log into the Kaltura
 $string['player_regular_light'] = 'Player light (6709421)';
 $string['player_regular_dark'] = 'Player dark (6709411)';
 $string['custom_player'] = 'Custom player';
-$string['kaltura_player_resource'] = 'Kaltura CE resource player';
-$string['kaltura_player_resource_desc'] = 'Player used to play back video for Video Resources.  This player will appear as the default player for new Media (Kaltura CE) Resources.'.
-' However it may be overridden if the <b>Override video resource player setting</b> is unchecked';
+$string['kaltura_player_resource'] = 'Kaltura resource player';
+$string['kaltura_player_resource_desc'] = 'Player used to play back media for Media Resources.  This player will appear as the default player for new Media Resources.'.
+' However it may be overridden if the <b>Override media resource player setting</b> is unchecked';
 $string['kaltura_player_resource_custom'] = 'Custom UIConf';
 $string['kaltura_player_resource_custom_desc'] = 'Only used if you have a custom resource player UIConf ID';
 $string['kaltura_player'] = 'Kaltura player';
-$string['kaltura_player_desc'] = 'Player used to play back video for Video Assignments';
+$string['kaltura_player_desc'] = 'Player used to play back media for Media Assignments';
 $string['kaltura_player_custom'] = 'Custom UIConf';
 $string['kaltura_player_custom_desc'] = 'Only used if you have a custom assignment player UIConf ID';
 $string['player_mymedia_uploader'] = 'Default upload widget (8464961)';
@@ -58,25 +60,27 @@ $string['kaltura_presentation_custom_desc'] = 'Only used if you have a custom Pr
 $string['conn_status_title'] = 'Connection status';
 $string['conn_success'] = 'Successfully logged in with credentials';
 $string['conn_failed'] = 'Unable to login.  Please verify your credentials and connection settings and try again';
+$string['conn_settings_title'] = 'Connection settings';
 $string['test_connection'] = 'Test connection to Kaltura server';
 $string['click_test_button'] = 'Click button to test the connection';
 $string['start'] = 'Start';
 $string['flashminimum'] = 'Flash player version 9 and above is required. '.
                           '<a href=\"http://get.adobe.com/flashplayer/\">Upgrade your flash version</a>';
-$string['upload_successful'] = 'Video uploaded successfully.  Remember to save/submit.';
-$string['video_converting'] = 'The video is still converting.  Please check the status of the video at a later time.';
+$string['upload_successful'] = 'Media uploaded successfully.  Remember to save/submit.';
+$string['media_converting'] = 'The media is still converting.  Please check the status of the media at a later time.';
+$string['media_converting'] = 'The media is still converting.  Please check the status of the media at a later time.';
 $string['conn_failed_alt'] = 'Connection with Kaltura CE is currently unavailable.  Please inform your administrator.';
-$string['player_resource_override'] = 'Override video resource player setting';
-$string['player_resource_override_desc'] = 'Check this option to override the individual Video Resource player selection.  This will force all Video Resource activities to use the selected <b>Kaltura resource player</b>';
+$string['player_resource_override'] = 'Override media resource player setting';
+$string['player_resource_override_desc'] = 'Check this option to override the individual Media Resource player selection.  This will force all Media Resource activities to use the selected <b>Kaltura resource player</b>';
 $string['enable_html5'] = 'Enable HTML5 flavour';
-$string['enable_html5_desc'] = 'Check this setting to enable to use of the HTML5 flavours when viewing videos';
-$string['video_error'] = 'There was an error processing this video.  Please try another video';
-$string['video_bad'] = 'Please do not use this video';
+$string['enable_html5_desc'] = 'Check this setting to enable to use of the HTML5 flavours when viewing media';
+$string['media_error'] = 'There was an error processing this media.  Please try another media';
+$string['media_bad'] = 'Please do not use this media';
 $string['kaltura_general'] = 'General Settings';
-$string['kaltura_kalvidpres_title'] = 'Kaltura Video Presentation Settings';
+$string['kaltura_kalmediapres_title'] = 'Kaltura Media Presentation Settings';
 $string['kaltura_kcw_title'] = 'Kaltura Content Wizard (KCW) Settings';
-$string['kaltura_kalvidres_title'] = 'Kaltura Video Resource Settings';
-$string['kaltura_kalvidassign_title'] = 'Kaltura Video Assignment Settings';
+$string['kaltura_kalmediares_title'] = 'Kaltura Media Resource Settings';
+$string['kaltura_kalmediaassign_title'] = 'Kaltura Media Assignment Settings';
 $string['filter_player_width'] = 'Embedded player width';
 $string['filter_player_width_desc'] = 'Width of the embedded player';
 $string['filter_player_height'] = 'Embedded player height';
@@ -84,9 +88,9 @@ $string['filter_player_height_desc'] = 'Height of the embedded player';
 $string['filter_player'] = 'Embedded player height';
 $string['filter_player_desc'] = 'Height of the embedded player';
 $string['filter_custom'] = 'Custom embedded UIConf ID';
-$string['filter_custom_desc'] = 'Only used if you have a custom player for embedding video';
-$string['player_filter'] =  'Embedded player';
-$string['player_filter_desc'] =  'Player used by the Kaltura filter plug-in when embedding video on the page';
+$string['filter_custom_desc'] = 'Only used if you have a custom player for embedding media';
+$string['player_filter'] = 'Embedded player';
+$string['player_filter_desc'] = 'Player used by the Kaltura filter plug-in when embedding media on the page';
 $string['kaltura_filter_title'] = 'Embedded player used via the File Picker (Kaltura Filter) settings';
 $string['player_filter_audio'] =  'Embedded player (Audio)';
 $string['player_filter_audio_desc'] =  'Player used by the Kaltura filter plug-in when embedding audio on the page';
@@ -107,8 +111,20 @@ $string['twentyone'] = '21';
 $string['twentyfour'] = '24';
 $string['twentyseven'] = '27';
 $string['thirty'] = '30';
-$string['mymedia_items_per_page'] = 'Videos per page';
-$string['mymedia_items_per_page_desc'] = 'The number of videos to display on a single page';
+$string['mymedia_items_per_page'] = 'Media per page';
+$string['mymedia_items_per_page_desc'] = 'The number of media to display on a single page';
+$string['mymedia_limited_access'] = 'Limited access';
+$string['mymedia_limited_access_desc'] = 'Set a limit to access My Media.';
+$string['mymedia_access_rule'] = 'Access check rule';
+$string['mymedia_access_rule_desc'] = 'Selected rule is used to check access permission to My Media.';
+$string['mymedia_contain_firstname'] = 'Contains keyword in firstname';
+$string['mymedia_not_contain_firstname'] = 'Not contain keyword in firstname';
+$string['mymedia_contain_lastname'] = 'Contains keyword in lastname';
+$string['mymedia_not_contain_lastname'] = 'Not contain keyword in lastname';
+$string['mymedia_contain_email'] = 'Contains keyword in mail address';
+$string['mymedia_not_contain_email'] = 'Not contain keyword in mail address';
+$string['mymedia_access_keyword'] = 'Keyword';
+$string['mymedia_access_keyword_desc'] = 'Users who contains (or do not contains) this keyword are allowed to use My Media.';
 $string['application_name'] = 'Application name';
 $string['application_name_desc'] = 'The application name is the name reported back to the Kaltura server to be used for aggregation by application in the user level reports';
 $string['player_mymedia_screen_recorder'] = 'Default screen recorder widget (9780761)';
@@ -132,19 +148,68 @@ $string['kalvidassign_player_height_desc'] = 'Adjust this setting if your Kaltur
 $string['kalvidassign_player_width'] = 'Player width';
 $string['kalvidassign_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or viewing video submissions.';
 $string['simple_uploader'] = 'Simple Uploader (1002613)';
+
+$string['kalmediaassign_player_width'] = 'Player width';
+$string['kalmediaassign_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or viewing media submissions.';
+
+$string['kalmediaassign_popup_player_height'] = 'Popup player height';
+$string['kalmediaassign_popup_player_height_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or popup viewing media submissions.';
+$string['kalmediaassign_popup_player_width'] = 'Popup player width';
+$string['kalmediaassign_popup_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or popup viewing media submissions.';
+
 $string['enable_reports'] = 'Enable reports';
 $string['enable_reports_desc'] = 'Kaltura reports are only compatible with Kaltura CE version Falcon or above';
 $string['enable_screen_recorder'] = 'Enable screen recorder';
 $string['enable_screen_recorder_desc'] = 'A global setting to enable the screen recorder across all Kaltura plug-ins (My Media, Video resource, Video presentation and Video assignment).  This option overrides any specific capability settings.';
 
-// Screen recorder
+$string['internal_ipaddress'] = 'Internal IP Address';
+$string['internal_ipaddress_desc'] = 'A global setting to internal IP address / subnet used in your organization. For example, the IP address is writtern like 192.168.1.1, and the subnet is written like 192.168.1.0/24. If You need multiple IP address and subnet, those must be separated by whitespace(s).';
+
+// Copy string from repository.
+$string['connection_status'] = 'Connection Status';
+$string['connected'] = 'Connection to Kaltura successful';
+$string['not_connected'] = 'Connection to Kaltura failed';
+$string['rootcategory'] = 'Root category path';
+$string['rootcategory_desc'] = '<p>Set the root category path to create a category/sub-category structure, in the KMC, to organize all of the Moodle course categories.  '.
+                               'For example: <b>Sites>My Moodle Site</b>, will create a KMC category called "Sites" and a sub category called "My Moodle Site".  '.
+                               'All of your Moodle course categories will created as a sub directories of "My Moodle Site".</p>';
+$string['rootcategory_warning'] = 'The root category has already been set.  If you change the name all Moodle course category related data on the KMC will be lost';
+$string['rootcategory_created'] = 'Root category created with the following structure <b>{$a}</b>';
+$string['rootcategory_create'] = 'Please specify a root category.';
+$string['unable_to_create'] = 'Unable to create root category as <b>{$a}</b>.  Please Choose another name(s) for the root category';
+$string['resetroot'] = 'Reset category location';
+$string['confirm_category_reset'] = '<p>Are you sure you want to reset the root category location?</p><p>If you perform this action, all media course sharing and usage information in Moodle will be lost.</p>'.
+                                    '<p>If you accidentially click "continue", it is possible to get your information back, but only if you set the category path back to the <b>original</b> value.</p>'.
+                                    '<p>Choose wisely.</p>';
+$string['category_reset_complete'] = '<b>Root category has been reset</b>';
+
+// Troubles.
+$string['no_media'] = 'No media found';
+$string['problem_viewing'] = 'There is a problem displaying the page.  Please try again or contact your site administrator';
+$string['permission_disable'] = 'You don\'t have permission to use kaltura media.';
+
+// Screen recorder.
 $string['screenrecorder'] = 'Screen Recording';
 $string['loadingwait'] = 'Loading. This may take a few minutes.';
 
 // Capabilities
 $string['kaltura:view_report'] = 'View Kaltura reports';
+$string['kaltura:view_selector'] = 'View media';
+$string['kaltura:search_selector'] = 'Search media';
 
-// Kaltura reports
+// Search.
+$string['search'] = 'Search';
+$string['search_clear'] = 'Clear';
+$string['search_text_tooltip'] = 'Enter media name or tags';
+
+// Sorting.
+$string['sortby'] = 'Sort by';
+$string['mostrecent'] = 'Most recent';
+$string['oldest'] = 'Oldest';
+$string['medianameasc'] = 'Media name (ascending)';
+$string['medianamedesc'] = 'Media name (descending)';
+
+// Kaltura reports.
 $string['kaltura_report_navbar'] = 'Kaltura Course Media Reports';
 $string['header_kaltura_reports'] = 'Kaltura Reports';
 $string['no_capability'] = 'You don\'t have the capability to view this report';

@@ -15,16 +15,20 @@
 /**
  * Moodle course unit test for Kaltura
  *
- * @package    local
- * @subpackage tests
- * @author     Remote-Learner Inc
- * @copyright  (C) 2008-2013 http://www.remote-learner.net
+ * @package    local_kaltura
+ * @subpackage kaltura
+ * @copyright  (C) 2008-2013 Remote-Learner Inc http://www.remote-learner.net
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
+require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/local/kaltura/locallib.php');
+
+if (!defined('MOODLE_INTERNAL')) {
+    // It must be included from a Moodle page.
+    die('Direct access to this script is forbidden.');
+}
 
 class kaltura_course_testcase extends advanced_testcase {
 

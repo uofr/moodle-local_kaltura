@@ -16,13 +16,19 @@
 /**
  * Kaltura video assignment grade preferences form
  *
- * @package    moodle-local_kaltura
+ * @package    local_kaltura
+ * @subpackage kaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/API/KalturaClient.php');
+require_once(dirname(__FILE__) . '/kaltura_entries.class.php');
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    // It must be included from a Moodle page.
+    die('Direct access to this script is forbidden.');
 }
 
 define('KALTURA_PLUGIN_NAME', 'local_kaltura');
@@ -38,6 +44,12 @@ define('KALTURA_PLAYER_MYMEDIA_UPLOADER',               8464961); // KCW
 define('KALTURA_PLAYER_MYMEDIA_SCREEN_RECORDER',        9780761); // KSR
 define('KALTURA_PLAYER_KSU',                            1002613); // KSU
 
+define('KALTURA_FILTER_MEDIA_WIDTH', 400);
+define('KALTURA_FILTER_MEDIA_HEIGHT', 300);
+define('KALTURA_ASSIGN_MEDIA_WIDTH', 400);
+define('KALTURA_ASSIGN_MEDIA_HEIGHT', 365);
+define('KALTURA_ASSIGN_POPUP_MEDIA_WIDTH', 500);
+define('KALTURA_ASSIGN_POPUP_MEDIA_HEIGHT', 460);
 
 define('KALTURA_PLAYER_PLAYERAUDIO',              11170258); // UofR Audio player
 
@@ -52,8 +64,22 @@ define('KALTURA_POPUP_HEIGHT_ADJUSTMENT', 50);
 
 define('KALTURA_SESSION_LENGTH', 10800); // 3 hours
 
-require_once(dirname(__FILE__) . '/API/KalturaClient.php');
-require_once(dirname(__FILE__) . '/kaltura_entries.class.php');
+define('KALTURA_IPADDRESS_ANY', 'ANY');
+define('KALTURA_IPADDRESS_INT', 'INTERNAL');
+
+define('KALTURA_INTERNAL_ACCESS_CONFIG_NAME', 'access_control_internal_id');
+define('KALTURA_INTERNAL_ACCESS_CONTROL_NAME', 'Internal Access');
+define('KALTURA_INTERNAL_ACCESS_CONTROL_DESC', 'Access conrtorl for internal only');
+define('KALTURA_INTERNAL_ACCESS_CONTROL_SYSTEM_NAME', 'moodleprofile');
+define('KALTURA_DEFAULT_ACCESS_CONTROL_NAME', 'Default');
+define('KALTURA_DEFAULT_ACCESS_CONTROL_DESC', 'Default access control profile');
+define('KALTURA_DEFAULT_ACCESS_CONTROL_SYSTEM_NAME', 'Default');
+define('KALTURA_DEFAULT_ACCESS_CONFIG_NAME', 'acecss_control_default_id');
+
+define('KALTURA_IMAGE_DESKTOP_WIDTH', 640);
+define('KALTURA_IMAGE_DESKTOP_HEIGHT', 480);
+define('KALTURA_IMAGE_MOBILE_WIDTH', 320);
+define('KALTURA_IMAGE_MOBILE_HEIGHT', 240);
 
 /**
  * Initialize the kaltura account and obtain the secrets and partner ID
@@ -83,6 +109,9 @@ function local_kaltura_initialize_account($login, $password, $uri = '') {
         if (!empty($uri)) {
             $config_obj->serviceUrl = $uri;
         }
+
+        $config_obj->serviceUrl = local_kaltura_get_host();
+        $config_obj->cdnUrl = local_kaltura_get_host();
 
         $client_obj = new KalturaClient($config_obj);
 
@@ -391,16 +420,16 @@ function local_kaltura_get_configuration_obj() {
     }
 
     $config_obj = new KalturaConfiguration($partner_id);
-    $config_obj->serviceUrl = $uri;
+    $config_obj->serviceUrl = local_kaltura_get_host();
+    $config_obj->cdnUrl = local_kaltura_get_host();
     $config_obj->clientTag = local_kaltura_create_client_tag();
-
 
     if (!empty($CFG->proxyhost)) {
         $config_obj->proxyHost = $CFG->proxyhost;
         $config_obj->proxyPort = $CFG->proxyport;
         $config_obj->proxyType = $CFG->proxytype;
-        $config_obj->proxyUser = ($CFG->proxyuser)? $CFG->proxyuser : null;
-        $config_obj->proxyPassword = ($CFG->proxypassword && $CFG->proxyuser)? $CFG->proxypassword: null;
+        $config_obj->proxyUser = ($CFG->proxyuser) ? $CFG->proxyuser : null;
+        $config_obj->proxyPassword = ($CFG->proxypassword && $CFG->proxyuser) ? $CFG->proxypassword : null;
     }
     return $config_obj;
 }
@@ -421,16 +450,16 @@ function local_kaltura_get_report_configuration_obj() {
     }
 
     $config_obj = new KalturaConfiguration($partner_id);
-    $config_obj->serviceUrl = $uri;
+    $config_obj->serviceUrl = local_kaltura_get_host();
+    $config_obj->cdnUrl = local_kaltura_get_host();
     $config_obj->clientTag = local_kaltura_create_client_tag();
-
 
     if (!empty($CFG->proxyhost)) {
         $config_obj->proxyHost = $CFG->proxyhost;
         $config_obj->proxyPort = $CFG->proxyport;
         $config_obj->proxyType = $CFG->proxytype;
-        $config_obj->proxyUser = ($CFG->proxyuser)? $CFG->proxyuser : null;
-        $config_obj->proxyPassword = ($CFG->proxypassword && $CFG->proxyuser)? $CFG->proxypassword: null;
+        $config_obj->proxyUser = ($CFG->proxyuser) ? $CFG->proxyuser : null;
+        $config_obj->proxyPassword = ($CFG->proxypassword && $CFG->proxyuser) ? $CFG->proxypassword : null;
     }
     return $config_obj;
 }
@@ -459,7 +488,6 @@ function local_kaltura_testconnection_markup() {
  */
 
 function local_kaltura_get_custom_players() {
-
 
     try {
         $custom_players = array();
@@ -573,28 +601,22 @@ function local_kaltura_get_partner_id() {
 }
 
 /**
- * Returns the javascript needed to initialize the KCW
+ * Return the admin secret
  *
- * @param string - type of KCW to generate
- * @param bool - true if this is an admin using the kcw else false
- *
- * @return string - Javascript used by the KCW
+ * @return string - admin secret
  */
-function local_kaltura_get_kcw($type = 'res_uploader', $admin = false) {
-
-    $client_obj = local_kaltura_login(true);
-
-    if (empty($client_obj)) {
-        return '';
-    }
-
-    $kal_user   = local_kaltura_init_kaltura_user($admin);
-    $vars       = local_kaltura_get_flashvars($client_obj, $kal_user);
-    $uiconf     = local_kaltura_get_player_uiconf($type);
-    $url        = local_kaltura_get_kcw_url($client_obj, $uiconf);
-
-    return local_kaltura_get_kcw_code('', $url, $vars);
+function local_kaltura_get_admin_secret() {
+    return get_config(KALTURA_PLUGIN_NAME, 'adminsecret');
 }
+
+function local_kaltura_get_secret() {
+    return get_config(KALTURA_PLUGIN_NAME, 'secret');
+}
+
+function local_kaltura_get_publisher_name() {
+    return get_config(KALTURA_PLUGIN_NAME, 'login');
+}
+
 
 /**
  * Initialize the KalturaUser object
@@ -618,490 +640,85 @@ function local_kaltura_init_kaltura_user($admin = false) {
 }
 
 /**
- * Return the URL used by the SWFObject
+ * Create html image markup string.
  *
- * @param obj - a KalturaConfiguration object
- * @param int - uniconf Id of the widget to use
- *
- * @return string URL used by the SWFObject
+ * @param object - KalturaMediaEntry object.
+ * @param string - media title used to alt property.
+ * @param string - moodle theme, is desktop or mobile.
+ * @param int - maximum width of thumbnail.
+ * @param int - maximum height of thumbnail.
+ * @return string - image markup.
  */
-function local_kaltura_get_kcw_url($client_obj, $uiconf_id) {
-
-    return $client_obj->getConfig()->serviceUrl . '/kcw/ui_conf_id/' . $uiconf_id;
-}
-
-/**
- * Return the URL used by the SWFObject
- *
- * @param obj - a KalturaConfiguration object
- * @param int - uniconf Id of the widget to use
- *
- * @return string URL used by the SWFObject
- */
-function local_kaltura_get_kdp_presentation_url($client_obj, $uiconf_id) {
-
-    return $client_obj->getConfig()->serviceUrl . '/kwidget/wid/_'.
-           $client_obj->getConfig()->partnerId . '/uiconf_id/' . $uiconf_id;
-}
-
-/**
- * Retrieve the flashvars needed for the Kaltura SWF Uploader widget
- *
- * @param bool - login as an admin
- *
- * @return obj - flash vars as an object with properties
- */
-function local_kaltura_get_uploader_flashvars($admin = false) {
-
-    $client_obj = local_kaltura_login(true);
-
-    if (empty($client_obj)) {
-        return '';
-    }
-
-    $uiconf     = local_kaltura_get_player_uiconf('simple_uploader');
-    $partner_id = local_kaltura_get_partner_id();
-    $var_string = '';
-
-    $vars = array();
-    $vars['ks']          = $client_obj->getKs();
-    $vars['partnerId']  = $partner_id;
-    $vars['subPId'] = $partner_id * 100; // http://www.kaltura.org/kaltura-terminology#kaltura-sub-partner-id
-    $vars['entryId'] = '-1';
-    $vars['maxUploads'] = '10';
-    $vars['maxFileSize'] = '128';
-    $vars['maxTotalSize'] = '200';
-    $vars['uiConfId'] = $uiconf;
-    $vars['jsDelegate'] = 'delegate';
-
-    foreach($vars as $key => $data) {
-        $var_string .= $key . '=' . urlencode($data) . '&';
-    }
-
-    $var_string = rtrim($var_string, '&');
-
-    return $var_string;
-
-}
-
-/**
- * Create flashvars to pass to SWFObject
- *
- * @param object - a KalturaConfiguration object
- * @param string - entry id of the video presentation
- * @param boolean - true to allow editing of the keypoints otherwise false
- *
- * @return string - querystring of flashvars
- */
-function local_kaltura_get_swfdoc_flashvars($client_obj, $entry_id = '', $admin_mode = false) {
-
-    global $USER;
-
-    $var_string = '';
-
-    $vars = array();
-    $vars['showCloseButton'] = 'true';
-    $vars['close'] = 'onContributionWizardClose';
-    $vars['host']  = str_replace('http://', '', local_kaltura_get_host());
-    $vars['partnerid']  = local_kaltura_get_partner_id();
-    $vars['subpid']     = local_kaltura_get_partner_id() * 100; // http://www.kaltura.org/kaltura-terminology#kaltura-sub-partner-id
-    $vars['uid']        = $USER->username;
-    $vars['debugMode'] = '1';
-    $vars['kshowId'] = '-1';
-    $vars['pd_sync_entry'] = $entry_id;
-
-    // If using admin mode adding these flashvars will display the edit buttons for adding sync points
-    if ($admin_mode) {
-        $vars['adminMode']  = 'true';
-        $vars['ks']         = $client_obj->getKs();
-    }
-
-    foreach($vars as $key => $data) {
-        $var_string .= $key . '=' . $data . '&';
-    }
-
-    $var_string = rtrim($var_string, '&');
-
-    return $var_string;
-
-}
-
-/**
- * Create flashvars to pass to SWFObject
- *
- * @param object - a KalturaConfiguration object
- * @param object - a KalturaUser object
- * @param array - array of additional parameters key param name, value param
- * value
- *
- * @return string - querystring of flashvars
- */
-function local_kaltura_get_flashvars($client_obj, $user_obj, $params = array()) {
-
-    $var_string = '';
-
-    $vars = array();
-    $vars['partnerId']          = $client_obj->getConfig()->partnerId;
-    $vars['kshow_id']           = -2;
-    $vars['userId']             = $user_obj->screenName;
-    $vars['sessionId']          = $client_obj->getKs();
-    $vars['isAnonymous']        = 0;
-    $vars['afterAddentry']      = 'onContributionWizardAfterAddEntry';
-    $vars['close']              = 'onContributionWizardClose';
-    //$vars['showCloseButton']    = 1;
-    //$vars['partnerData'] = '';
-
-    $vars = array_merge($vars, $params);
-
-    foreach($vars as $key => $data) {
-        $var_string .= $key . '=' . urlencode($data) . '&';
-    }
-
-    $var_string = rtrim($var_string, '&');
-
-    return $var_string;
-}
-
-function local_kaltura_get_kcw_code($class = '', $swf_url, $flash_vars) {
-    global $_SERVER;
+function local_kaltura_create_image_markup($entryobj, $title, $theme,
+                                           $maxwidth = KALTURA_IMAGE_DESKTOP_WIDTH,
+                                           $maxheight = KALTURA_IMAGE_DESKTOP_HEIGHT) {
 
     $output = '';
-    $kcw_markup = '';
 
-    $requirement = get_string('flashminimum', 'local_kaltura');
+    $originalsource = $entryobj->dataUrl;
 
-    if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') === FALSE) {
+    $httppattern = '/^http:\/\/[A-Za-z0-9\-\.]{1,61}\//';
+    $httpspattern = '/^https:\/\/[A-Za-z0-9\-\.]{1,61}\//';
 
-        $attr = array('type' => 'application/x-shockwave-flash',
-                      'src' => $swf_url,
-                      'width' => '782',
-                      'height' => '449',
-                      'stype' => 'undefined',
-                      'id' => 'kcw_div',
-                      'name' => 'name',
-                      'bgcolor' => '#ffffff',
-                      'quality' => 'high',
-                      'allowscriptaccess' => 'always',
-                      'allowfullscreen' => 'TRUE',
-                      'allownetworking' => 'all',
-                      'flashvars' => $flash_vars,
-                      );
+    $replace = local_kaltura_get_host() . '/';
 
-        $kcw_markup = html_writer::empty_tag('embed', $attr);
-
-    } else {
-        $attr = array('id' => 'kcw_div',
-                      'classid' => 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000',
-                      'width' => '782',
-                      'height' => '449'
-                      );
-        $kcw_markup .= html_writer::start_tag('object', $attr);
-
-        $attr = array('NAME' => '_cx',
-                       'VALUE' => '20690'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => '_cy',
-                       'VALUE' => '11879'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'FlashVars',
-                       'VALUE' => $flash_vars,
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Movie',
-                       'VALUE' => $swf_url
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Src',
-                       'VALUE' => $swf_url
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'WMode',
-                       'VALUE' => 'Window'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Play',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Loop',
-                       'VALUE' => '-1'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Quality',
-                       'VALUE' => 'High'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'SAligh',
-                       'VALUE' => 'LT'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Menu',
-                       'VALUE' => '-1'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Base',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'AllowScriptAccess',
-                       'VALUE' => 'always'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Scale',
-                       'VALUE' => 'NoScale'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'DeviceFont',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'EmbedMovie',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'BGColor',
-                       'VALUE' => 'FFFFFF'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'SWRemote',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'MovieData',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'SeamlessTabbing',
-                       'VALUE' => '1'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Profile',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'ProfileAddress',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'ProfilePort',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'AllowNetworking',
-                       'VALUE' => 'all'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'AllowFullScreen',
-                       'VALUE' => 'true'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $kcw_markup .= html_writer::end_tag('object');
-
+    $modifiedsource = preg_replace($httpspattern, $replace, $originalsource, 1, $count);
+    if ($count != 1) {
+            $modifiedsource = preg_replace($httppattern, $replace, $originalsource, 1, $count);
+        if ($count != 1) {
+            $modifiedsource = $originalsource;
+        }
     }
 
-    return $kcw_markup;
-
-}
-
-function local_kaltura_get_kdp_presentation_code($class = '', $swf_url, $flash_vars) {
-    global $_SERVER;
-
-    $output = '';
-    $kcw_markup = '';
-
-    $requirement = get_string('flashminimum', 'local_kaltura');
-
-    if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') === FALSE) {
-
-        $attr = array('type' => 'application/x-shockwave-flash',
-                      'src' => $swf_url,
-                      'width' => '780',
-                      'height' => '400',
-                      'stype' => 'undefined',
-                      'id' => 'video_presentation_player',
-                      'name' => 'name',
-                      'bgcolor' => '#ffffff',
-                      'quality' => 'high',
-                      'allowscriptaccess' => 'always',
-                      'allowfullscreen' => 'TRUE',
-                      'allownetworking' => 'all',
-                      'flashvars' => $flash_vars,
-                      );
-
-        $kcw_markup = html_writer::empty_tag('embed', $attr);
-
-    } else {
-        $attr = array('id' => 'video_presentation_player',
-                      'classid' => 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000',
-                      'width' => '780',
-                      'height' => '400'
-                      );
-        $kcw_markup .= html_writer::start_tag('object', $attr);
-
-        $attr = array('NAME' => '_cx',
-                       'VALUE' => '20637'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => '_cy',
-                       'VALUE' => '10583'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'FlashVars',
-                       'VALUE' => $flash_vars,
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Movie',
-                       'VALUE' => $swf_url
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Src',
-                       'VALUE' => $swf_url
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'WMode',
-                       'VALUE' => 'Window'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Play',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Loop',
-                       'VALUE' => '-1'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Quality',
-                       'VALUE' => 'High'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'SAligh',
-                       'VALUE' => 'LT'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Menu',
-                       'VALUE' => '-1'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Base',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'AllowScriptAccess',
-                       'VALUE' => 'always'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Scale',
-                       'VALUE' => 'NoScale'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'DeviceFont',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'EmbedMovie',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'BGColor',
-                       'VALUE' => 'FFFFFF'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'SWRemote',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'MovieData',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'SeamlessTabbing',
-                       'VALUE' => '1'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'Profile',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'ProfileAddress',
-                       'VALUE' => ''
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'ProfilePort',
-                       'VALUE' => '0'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'AllowNetworking',
-                       'VALUE' => 'all'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $attr = array('NAME' => 'AllowFullScreen',
-                       'VALUE' => 'true'
-                       );
-        $kcw_markup .= html_writer::empty_tag('PARAM', $attr);
-
-        $kcw_markup .= html_writer::end_tag('object');
-
+    if (0 == strcmp($theme, 'mymobile')) {
+        $maxwidth = KALTURA_IMAGE_MOBILE_WIDTH;
+        $maxheight = KALTURA_IAMGE_MOBILE_HEIGHT;
     }
 
-    return $kcw_markup;
+    if ($entryobj->width > $maxwidth or $entryobj->height > $maxheight) {
+        $originalwidth = $entryobj->width;
+        $originalheight = $entryobj->height;
 
+        $ratiowidth = $entryobj->width / $maxwidth;
+        $ratioheight = $entryobj->height / $maxheight;
+        if ($ratiowidth >= $ratioheight) {
+            $entryobj->width = $entryobj->width / $ratiowidth;
+            $entryobj->height = $entryobj->height / $ratiowidth;
+        } else {
+            $entryobj->width = $entryobj->width / $ratioheight;
+            $entryobj->height = $entryobj->height / $ratioheight;
+        }
+
+        list($beforestr, $afterstr) = preg_split('/\/def_height\//', $modifiedsource);
+        $afterstr = strstr($afterstr, '/');
+        $modifiedsource = $beforestr . '/def_height/' . $entryobj->height . $afterstr;
+        list($beforestr, $afterstr) = preg_split('/\/def_width\//', $modifiedsource);
+        $afterstr = strstr($afterstr, '/');
+        $modifiedsource = $beforestr . '/def_width/' . $entryobj->width . $afterstr;
+
+        $linksource = $modifiedsource;
+
+        list($beforestr, $afterstr) = preg_split('/\/def_height\//', $linksource);
+        $afterstr = strstr($afterstr, '/');
+        $linksource = $beforestr . '/def_height/' . $originalheight . $afterstr;
+        list($beforestr, $afterstr) = preg_split('/\/def_width\//', $linksource);
+        $afterstr = strstr($afterstr, '/');
+        $linksource = $beforestr . '/def_width/' . $originalwidth . $afterstr;
+
+        $output .= '<a href="' . $linksource . '" target="_new">';
+        $output .= '<img src="' . $modifiedsource . '" alt="' . $title . '" title = "' . $title . '" border="0"/>';
+        $output .= '</a>';
+    } else {
+        $output .= '<img src="' . $modifiedsource . '" alt="' . $title . '" title = "' . $title . '" border="0"/>';
+    }
+
+    return $output;
 }
 
 /**
  * This functions returns the HTML markup for the Kaltura dynamic player.
  *
- * @param obj - Kaltura video object
+ * @param obj - Kaltura media object
  * @param int - player ui_conf_id (optional).  If no value is specified the
  * default player will be used.
  * @param int - Moodle course id (optional).  This parameter is required in
@@ -1123,42 +740,62 @@ function local_kaltura_get_kdp_code($entry_obj, $uiconf_id = 0, $courseid = 0, $
         $uid .= '_' . mt_rand();
     }
 
-    $host       = local_kaltura_get_host();
-    $flash_vars = local_kaltura_get_kdp_flashvars($courseid, $session);
-
-    $flash_vars .= '&amp;streamerType=rtmp';
-
-    if (empty($uiconf_id)) {
-        $uiconf = local_kaltura_get_player_uiconf('player');
-    } else {
-        $uiconf = $uiconf_id;
+    $host = local_kaltura_get_host();
+    $flashvars = local_kaltura_get_kdp_flashvars($entryobj->creatorId, $session);
+    if (KalturaMediaType::IMAGE == $entryobj->mediaType) {
+        $varstr = '&amp;IframeCustomPluginCss1=' .  new moodle_url('/local/kaltura/css/hiddenPlayButton.css');
+        $flashvars .= $varstr;
     }
 
-    $output =
-        "<object id=\"kaltura_player_{$uid}\" name=\"kaltura_player_{$uid}\"
-        type=\"application/x-shockwave-flash\" allowFullScreen=\"true\" allowNetworking=\"all\"
-        allowScriptAccess=\"always\" height=\"".(($entry_obj->mediaType == 5)?"30":"{$entry_obj->height}")."\" width=\"{$entry_obj->width}\"
-        xmlns:dc=\"http://purl.org/dc/terms/\" xmlns:media=\"http://search.yahoo.com/searchmonkey/media/\"
-        rel=\"media:{$entry_obj->mediaType}\" resource=\"{$host}/index.php/kwidget/wid/_{$entry_obj->partnerId}/uiconf_id/{$uiconf}/entry_id/{$entry_obj->id}\"
-        data=\"{$host}/index.php/kwidget/wid/_{$entry_obj->partnerId}/uiconf_id/{$uiconf}/entry_id/{$entry_obj->id}\">
+    if (empty($uiconfid)) {
+        $uiconf = local_kaltura_get_player_uiconf('player');
+    } else {
+        $uiconf = $uiconfid;
+    }
 
-        <param name=\"allowFullScreen\" value=\"true\" />
-        <param name=\"allowNetworking\" value=\"all\" />
-        <param name=\"allowScriptAccess\" value=\"always\" />
-        <param name=\"bgcolor\" value=\"#000000\" />
-        <param name=\"flashvars\" value=\"{$flash_vars}\" />
-        <param name=\"wmode\" value=\"opaque\" />
+    $originalurl = $entryobj->thumbnailUrl;
 
-        <param name=\"movie\" value=\"{$host}/index.php/kwidget/wid/_{$entry_obj->partnerId}/uiconf_id/{$uiconf}/entry_id/{$entry_obj->id}\" />
+    $httppattern = '/^http:\/\/[A-Za-z0-9\-\.]{1,61}\//';
+    $httpspattern = '/^https:\/\/[A-Za-z0-9\-\.]{1,61}\//';
 
-        <a rel=\"media:thumbnail\" href=\"{$entry_obj->thumbnailUrl}/width/120/height/90/bgcolor/000000/type/2\"></a>
-        <span property=\"dc:description\" content=\"{$entry_obj->description}\"></span>
-        <span property=\"media:title\" content=\"{$entry_obj->name}\"></span>
-        <span property=\"media:width\" content=\"{$entry_obj->width}\"></span>
-        <span property=\"media:height\" content=\"".(($entry_obj->mediaType == 5)?"30":"{$entry_obj->height}")."\"></span>
-        <span property=\"media:type\" content=\"application/x-shockwave-flash\"></span>
-        <span property=\"media:duration\" content=\"{$entry_obj->duration}\"></span>
-        </object>";
+    $replace = local_kaltura_get_host() . '/';
+
+    $modifiedurl = preg_replace($httpspattern, $replace, $originalurl, 1, $count);
+    if ($count != 1) {
+        $modifiedurl = preg_replace($httppattern, $replace, $originalurl, 1, $count);
+        if ($count != 1) {
+            $modifiedurl = $originalurl;
+        }
+    }
+
+    $output = '';
+
+    $output .= "<object id=\"kaltura_player_{$uid}\" name=\"kaltura_player_{$uid}\" ";
+    $output .= "type=\"application/x-shockwave-flash\" allowFullScreen=\"true\" allowNetworking=\"all\" ";
+    $output .= "allowScriptAccess=\"always\" height=\"{$entryobj->height}\" width=\"{$entryobj->width}\" ";
+    $output .= "xmlns:dc=\"http://purl.org/dc/terms/\" xmlns:media=\"http://search.yahoo.com/searchmonkey/media/\" ";
+    $output .= "rel=\"media:{$entryobj->mediaType}\" ";
+    $output .= "resource=\"{$host}/index.php/kwidget/wid/_{$entryobj->partnerId}/uiconf_id/{$uiconf}/entry_id/{$entryobj->id}\" ";
+    $output .= "data=\"{$host}/index.php/kwidget/wid/_{$entryobj->partnerId}/uiconf_id/{$uiconf}";
+    $output .= "/entry_id/{$entryobj->id}\"> " . PHP_EOL;
+    $output .= "<param name=\"allowFullScreen\" value=\"true\" />" . PHP_EOL;
+    $output .= "<param name=\"allowNetworking\" value=\"all\" />" . PHP_EOL;
+    $output .= "<param name=\"allowScriptAccess\" value=\"always\" />" . PHP_EOL;
+    $output .= "<param name=\"bgcolor\" value=\"#000000\" /> " . PHP_EOL;
+    $output .= "<param name=\"flashvars\" value=\"{$flashvars}\" /> " . PHP_EOL;
+    $output .= "<param name=\"wmode\" value=\"opaque\" /> " . PHP_EOL;
+
+    $output .= "<param name=\"movie\" value=\"{$host}/index.php/kwidget/wid/_{$entryobj->partnerId}";
+    $output .= "/uiconf_id/{$uiconf}/entry_id/{$entryobj->id}\" />" . PHP_EOL;
+
+    $output .= "<a rel=\"media:thumbnail\" href=\"{$modifiedurl}/width/120/height/90/bgcolor/000000/type/2\"></a>". PHP_EOL;
+    $output .= "<span property=\"dc:description\" content=\"{$entryobj->description}\"></span>" . PHP_EOL;
+    $output .= "<span property=\"media:title\" content=\"{$entryobj->name}\"></span>" . PHP_EOL;
+    $output .= "<span property=\"media:width\" content=\"{$entryobj->width}\"></span>" . PHP_EOL;
+    $output .= "<span property=\"media:height\" content=\"{$entryobj->height}\"></span>" . PHP_EOL;
+    $output .= "<span property=\"media:type\" content=\"application/x-shockwave-flash\"></span>" . PHP_EOL;
+    $output .= "<span property=\"media:duration\" content=\"{$entryobj->duration}\"></span>". PHP_EOL;
+    $output .= "</object>" . PHP_EOL;
 
     return $output;
 }
@@ -1249,6 +886,28 @@ function local_kaltura_kaltura_repository_enabled() {
     }
 
     return $enabled;
+}
+
+function local_kaltura_get_root_category() {
+    global $CFG;
+
+    $rootid = '';
+    $rootpath = '';
+
+    if (!function_exists('local_kaltura_create_user_category')) {
+        return null;
+    }
+
+    $rootid   = get_config(KALTURA_PLUGIN_NAME, 'rootcategory_id');
+    $rootpath = get_config(KALTURA_PLUGIN_NAME, 'rootcategory');
+	
+	//die('$rootid:'.print_r($rootid,1).' $rootpath:'.print_r($rootpath,1));
+	
+    if (empty($rootid) || empty($rootpath)) {
+        return null;
+    }
+
+    return array('id' => $rootid, 'name' => $rootpath);
 }
 
 /**
@@ -1590,6 +1249,56 @@ function local_kaltura_get_enable_html5() {
 }
 
 /**
+ * This function validates media objects.  Checks to see if the media is of a
+ * media type "mix".  If so, then an API call is made to get all media entries
+ * that make up the mix. If the mix contains one entry then only the one entry
+ * is returned.  If the mix contains more than one entry then boolean true is
+ * returned.  This function will one day become deprecated; but it for now it is
+ * needed because of KALDEV-28
+ *
+ * @param object - entry object
+ *
+ * @return boolean - true of the entry type is valid, false if invliad AND the
+ * id parameter of the entry_object is overwritten and must be retrieve from the
+ * kaltura server again
+ *
+ */
+function local_kaltura_media_type_valid($entryobj) {
+    try {
+        $clientobj = local_kaltura_login(true, '');
+
+        if (empty($clientobj)) {
+            throw new Exception('Invalid client object');
+        }
+
+        // If we encounter a entry of type "mix", we must find the regular "video" type and display that for playback.
+        if (KalturaEntryType::MIX == $entryobj->type and
+            0 >= $entryobj->duration) {
+
+            // This call returns an array of "video" type entries that exist in the "mix" entry.
+            $mediaentries = $clientobj->mixing->getReadyMediaEntries($entryobj->id);
+
+            if (!empty($mediaentries)) {
+
+                if (count($mediaentries) == 1) {
+                    $entryobj->id = $mediaentries[0]->id;
+                    return false;
+                } else {
+                    return true;
+                }
+
+            }
+        }
+    } catch (Exception $ex) {
+        // Connection failed for some reason.  Maybe proxy settings?
+        $errormessage = 'convert to valid entry type(' . $ex->getMessage() . ')';
+        print_error($errormessage, 'local_kaltura');
+        return false;
+    }
+
+}
+
+/**
  * This function saves standard video metadata
  *
  * @param obj - Kaltura connection object
@@ -1752,7 +1461,7 @@ function local_kaltura_create_client_tag() {
  * caching filtered text and the XHR loading of course section by the MyMobile
  * theme.
  *
- * @param obj - Kaltura video object
+ * @param obj - Kaltura media object
  * @param int - player ui_conf_id (optional).  If no value is specified the
  * default player will be used.
  * @param int - Moodle course id (optional).  This parameter is required in
@@ -1762,10 +1471,10 @@ function local_kaltura_create_client_tag() {
  * and is used as the id of the object tag
  *
  */
-function local_kaltura_get_kwidget_code($entry_obj, $uiconf_id = 0, $courseid = 0, $session = '', $uid = 0) {
+function local_kaltura_get_kwidget_code($entryobj, $uiconfid = 0, $courseid = 0, $session = '', $uid = 0) {
 
-    if (!local_kaltura_is_valid_entry_object($entry_obj)) {
-        return 'Unable to play video ('. $entry_obj->id . ') please contact your site administrator.';
+    if (!local_kaltura_is_valid_entry_object($entryobj)) {
+        return 'Unable to play media ('. $entryobj->id . ') please contact your site administrator.';
     }
 
     if (0 == $uid) {
@@ -1773,17 +1482,20 @@ function local_kaltura_get_kwidget_code($entry_obj, $uiconf_id = 0, $courseid = 
         $uid .= '_' . mt_rand();
     }
 
-    $host               = local_kaltura_get_host();
-    $flash_vars         = local_kaltura_get_kdp_flashvars($courseid, $session);
-    $flash_vars         = explode('&amp;', $flash_vars);
-    $kwidget_flashvar   = '';
+    $host             = local_kaltura_get_host();
+    $flashvars        = local_kaltura_get_kdp_flashvars($entryobj->creatorId, $session);
+    $flashvars        = explode('&amp;', $flashvars);
+    $kwidgetflashvar  = '';
 
-    // Re-format the flashvars into javascript object properties
-    foreach ($flash_vars as $var) {
-        $pro_val = explode('=', $var);
-        $kwidget_flashvar .= ",'". $pro_val[0] ."' : '". $pro_val[1] . "'";
+    // Re-format the flashvars into javascript object properties.
+    foreach ($flashvars as $var) {
+        $proval = explode('=', $var);
+        $kwidgetflashvar .= ",'". $proval[0] ."' : '". $proval[1] . "'";
     }
 
+    if (KalturaMediaType::IMAGE == $entreyobj->mediaType) {
+        $kwidgetflashvar .= ", 'IframeCustomPluginCss1' : '". new moodle_url('/local/kaltura/css/hiddenPlayButton.css') . "'";
+    }
 
     if (empty($uiconf_id)) {
         $uiconf = local_kaltura_get_player_uiconf('player');
@@ -1791,43 +1503,41 @@ function local_kaltura_get_kwidget_code($entry_obj, $uiconf_id = 0, $courseid = 
         $uiconf = $uiconf_id;
     }
 
-    $markup = "<div id=\"kaltura_player_{$uid}\" style=\"width:{$entry_obj->width}px;height:{$entry_obj->height}px;\">
+    $markup = '';
+    $markup .= "<div id=\"kaltura_player_{$uid}\" style=\"width:{$entryobj->width}px;height:{$entryobj->height}px;\">" . PHP_EOL;
+    $markup .= "    <span property=\"dc:description\" content=\"{$entryobj->description}\"></span>" . PHP_EOL;
+    $markup .= "    <span property=\"media:title\" content=\"{$entryobj->name}\"></span>" . PHP_EOL;
+    $markup .= "    <span property=\"media:width\" content=\"{$entryobj->width}\"></span>" . PHP_EOL;
+    $markup .= "    <span property=\"media:height\" content=\"{$entryobj->height}\"></span>". PHP_EOL;
+    $markup .= "</div>" . PHP_EOL;
+    $markup .= "<script language=javascript>". PHP_EOL;
+    $markup .= "    if (document.readyState === \"complete\") {" . PHP_EOL;
+    $markup .= "        local_kaltura_kwidget_{$entryobj->id}();" . PHP_EOL;
+    $markup .= "    } else {" . PHP_EOL;
+    $markup .= "        window.addEventListener(\"onload\", ";
+    $markup .= "function() { local_kaltura_kwidget_{$entryobj->id}(); }, false);" . PHP_EOL;
+    $markup .= "        document.addEventListener(\"DOMContentLoaded\", ";
+    $markup .= "function () { local_kaltura_kwidget_{$entryobj->id}(); }, false);" . PHP_EOL;
+    $markup .= "    }" . PHP_EOL;
+    $markup .= PHP_EOL;
+    $markup .= "    function local_kaltura_kwidget_{$entryobj->id}() {" . PHP_EOL;
+    $markup .= "        console.log('calling kwidget.embed for - kaltura_player_{$uid}');" . PHP_EOL;
+    $markup .= "        kWidget.embed({" . PHP_EOL;
+    $markup .= "            'targetId': 'kaltura_player_{$uid}'," . PHP_EOL;
+    $markup .= "            'wid': '_{$entryobj->partnerId}'," . PHP_EOL;
+    $markup .= "            'uiconf_id' : '{$uiconfid}'," . PHP_EOL;
+    $markup .= "            'entry_id'  : '{$entryobj->id}'," . PHP_EOL;
+    $markup .= "            'width'     : '{$entryobj->width}'," . PHP_EOL;
+    $markup .= "            'height'    : '{$entryobj->height}'," . PHP_EOL;
+    $markup .= "            'flashvars' :{" . PHP_EOL;
+    $markup .= "                'externalInterfaceDisabled' : false," . PHP_EOL;
+    $markup .= "                'autoPlay' : false{$kwidgetflashvar}" . PHP_EOL;
+    $markup .= "            }" . PHP_EOL;
+    $markup .= "        });" . PHP_EOL;
+    $markup .= "    }". PHP_EOL;
+    $markup .= "</script>";
 
-        <span property=\"dc:description\" content=\"{$entry_obj->description}\"></span>
-        <span property=\"media:title\" content=\"{$entry_obj->name}\"></span>
-        <span property=\"media:width\" content=\"{$entry_obj->width}\"></span>
-        <span property=\"media:height\" content=\"{$entry_obj->height}\"></span>
-
-        </div>
-        <script language=javascript>
-
-            if (document.readyState === \"complete\") {
-                local_kaltura_kwidget_{$entry_obj->id}();
-            } else {
-                window.addEventListener(\"onload\", function() { local_kaltura_kwidget_{$entry_obj->id}(); }, false);
-                document.addEventListener(\"DOMContentLoaded\", function () { local_kaltura_kwidget_{$entry_obj->id}(); }, false);
-            }
-
-
-            function local_kaltura_kwidget_{$entry_obj->id}() {
-                console.log('calling kwidget.embed for - kaltura_player_{$uid}');
-
-                kWidget.embed({
-                    'targetId': 'kaltura_player_{$uid}',
-                    'wid': '_{$entry_obj->partnerId}',
-                    'uiconf_id' : '{$uiconf_id}',
-                    'entry_id'  : '{$entry_obj->id}',
-                    'width'     : '{$entry_obj->width}',
-                    'height'    : '{$entry_obj->height}',
-                    'flashvars' :{
-                        'externalInterfaceDisabled' : false,
-                        'autoPlay' : false{$kwidget_flashvar}
-                    }
-                  });
-            }
-         </script>";
-
-         return $markup;
+    return $markup;
 }
 
 /**
@@ -2008,4 +1718,769 @@ function kaltura_course_report_view_permission() {
     }
 
     return false;
+}
+
+/*
+ * This function retrieve client ip address.
+ *
+ * @param bool - if true, check proxy forwarder variable.
+ *
+ * @return string - client ip address.
+ */
+
+function local_kaltura_get_client_ipaddress($checkproxy = true) {
+
+    if ($checkproxy && local_kaltura_get_server_variable('HTTP_CLIENT_IP') != null) {
+        $ip = local_kaltura_get_server_variable('HTTP_CLIENT_IP');
+    } else if ($checkproxy && local_kaltura_get_server_variable('HTTP_X_FORWARDED_FOR') != null) {
+        $ip = getServer('HTTP_X_FORWARDED_FOR');
+    } else { // Not through a proxy.
+        $ip = local_kaltura_get_server_variable('REMOTE_ADDR');
+    }
+    return $ip;
+}
+
+
+
+/**
+ * This function retrieve server variables.
+ *
+ * @param string - server variable name.
+ * @param string  - return this value if there does not exist the variable.
+ *
+ * @return string - value of the variable.
+ */
+function local_kaltura_get_server_variable($key, $default = null) {
+    return (isset($_SERVER[$key])) ? $_SERVER[$key] : $default;
+}
+
+
+/**
+ * This function checks whether the IP address of the client is internal.
+ *
+ * @param string - IP address.
+ *
+ * @param bool - true if the IP adrress is internal, otherwise false.
+ */
+function local_kaltura_check_internal($ipaddress) {
+    try {
+        $addresslist = get_config(KALTURA_PLUGIN_NAME, 'internal_ipaddress');
+
+        $subnetarray = array();
+        if (strpos($addresslist, ' ') === false) {
+            $subnetarray[] = $addresslist;
+        } else {
+            $subnetarray = explode(" ", $addresslist);
+        }
+
+        foreach ($subnetarray as $subnet) {
+            if ($subnet == "0.0.0.0" or $subnet == "0.0.0.0/0") {
+                return true;
+            }
+
+            if (strpos($subnet, '/') === false) {
+                if ($ipaddress == $subnet) {
+                    return true;
+                }
+            }
+
+            $elements = explode("/", $subnet);
+
+            if (count($elements) == 2) {
+                $networkaddress = $elements[0];
+                $networkprefix = (int)$elements[1];
+                $segments = explode(".", $networkaddress);
+                if (count($segments) == 4 and
+                    (int)$segments[0] >= 0 and (int)$segments[0] <= 255 and
+                    (int)$segments[1] >= 0 and (int)$segments[1] <= 255 and
+                    (int)$segments[2] >= 0 and (int)$segments[2] <= 255 and
+                    (int)$segments[3] >= 0 and (int)$segments[3] <= 255 and
+                    $networkprefix >= 1 && $networkprefix <= 32) {
+
+                    if (check_ipaddress_in_range($ipaddress, $subnet)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    } catch (Exception $ex) {
+        return false;
+    }
+
+    return false;
+}
+
+
+/**
+ * This function checks whether the IP address of the client is within a predetermined range.
+ *
+ * @param string - IP address.
+ * @param string - range of IP address.
+ *
+ * @param bool - true if the IP adrress is within the predetermined range, otherwise false.
+ */
+function check_ipaddress_in_range($ip, $range) {
+    try {
+        if (!($ip = ip2long($ip))) {
+            return false;
+        }
+
+        if (strpos($range, '/') !== false) { // Case in subnet.
+            list($net, $mask) = explode('/', $range);
+
+            if (!($net = ip2long($net))) {
+                return false;
+            }
+
+            if (is_numeric($mask)) {
+                $mask = long2ip(bindec(str_repeat('1', $mask) . str_repeat('0', 32 - $mask)));
+            }
+
+            if (!($mask = ip2long($mask))) {
+                return false;
+            }
+
+            return (($ip & $mask) === ($net & $mask)) ? true : false;
+        } else if (strpos($range, '-') !== false) {  // Case in range.
+            $range = explode('-', $range);
+            if (!($range[0] = ip2long($range[0]))) {
+                return false;
+            }
+            if (!($range[1] = ip2long($range[1]))) {
+                return false;
+            }
+            return ($range[0] <= $ip && $ip <= $range[1]) ? true : false;
+
+        } else if ($range = ip2long($range)) {
+            return ($range === $ip) ? true : false;
+        }
+    } catch (Exception $ex) {
+        return false;
+    }
+
+    return false;
+}
+
+
+/**
+ * This function retrieves defaul access control of Kaltura server.
+ *
+ * @parama object - connection object for Kaltura server.
+ *
+ * @return object - object of defaul access control.
+ */
+function local_kaltura_get_default_access_control($connection) {
+    try {
+
+        $result = $connection->accessControl->listAction();
+
+        if (is_null($result)) {
+            return null;
+        }
+
+        $controllist = $result->objects;
+
+        if (is_null($controllist) or count($controllist) == 0) {
+            return null;
+        }
+
+        foreach ($controllist as $control) {
+            if ($control->name == KALTURA_DEFAULT_ACCESS_CONTROL_NAME and
+                $control->systemName == KALTURA_DEFAULT_ACCESS_CONTROL_SYSTEM_NAME) {
+                return $control;
+            }
+        }
+    } catch (Exception $ex) {
+        $errormessage = 'Error in local_kaltura_get_internal_profile(' . $ex->getMessage() . ')';
+        print_error($errormessage, 'local_kaltura');
+        return null;
+    }
+
+    return null;
+}
+
+
+/**
+ * This function retrieves internal access control of Kaltura server.
+ *
+ * @parama object - connection object for Kaltura server.
+ *
+ * @return object - object of internal access control.
+ */
+function local_kaltura_get_internal_access_control($connection) {
+    try {
+
+        $result = $connection->accessControl->listAction();
+
+        if (is_null($result)) {
+            return null;
+        }
+
+        $controllist = $result->objects;
+
+        if (is_null($controllist) or count($controllist) == 0) {
+			/*
+			$controllist = array();
+			$controllist[0] = new stdClass();
+			$controllist[0]->name = KALTURA_INTERNAL_ACCESS_CONTROL_NAME;
+			$controllist[0]->systemName = KALTURA_INTERNAL_ACCESS_CONTROL_SYSTEM_NAME;
+			*/
+			//die('no controllist result');
+            return null;
+        }
+
+        foreach ($controllist as $control) {
+            if ($control->name == KALTURA_INTERNAL_ACCESS_CONTROL_NAME and
+                $control->systemName == KALTURA_INTERNAL_ACCESS_CONTROL_SYSTEM_NAME) {
+                return $control;
+            }
+        }
+    } catch (Exception $ex) {
+        $errormessage = 'Error in local_kaltura_get_internal_control(' . $ex->getMessage() . ')';
+        print_error($errormessage, 'local_kaltura');
+        return null;
+    }
+
+    return null;
+}
+
+/**
+ * This function creates default access control of Kaltura server.
+ *
+ * @parama object - connection object for Kaltura server.
+ *
+ * @return object - object of internal access control.
+ */
+function local_kaltura_create_default_access_control($connection) {
+    $control = new KalturaAccessControl();
+
+    try {
+        $control->name = KALTURA_DEFAULT_ACCESS_CONTROL_NAME;
+        $control->systemName = KALTURA_DEFAULT_ACCESS_CONTROL_SYSTEM_NAME;
+        $control->description = KALTURA_DEFAULT_ACCESS_CONTROL_DESC;
+        $control->isDefault = KalturaNullableBoolean::TRUE_VALUE;
+        $control->restrictions = array();
+        $control = $connection->accessControl->add($control);
+    } catch (Exception $ex) {
+        $errormessage = 'Error in local_kaltura_create_internal_profile(' . $ex->getMessage() . ')';
+        print_error($errormessage, 'local_kaltura');
+        return null;
+    }
+
+    return $control;
+}
+
+
+/**
+ * This function creates internal access control of Kaltura server.
+ *
+ * @parama object - connection object for Kaltura server.
+ *
+ * @return object - object of internal access control.
+ */
+function local_kaltura_create_internal_access_control($connection) {
+    $control = new KalturaAccessControl();
+
+    try {
+        $control->name = KALTURA_INTERNAL_ACCESS_CONTROL_NAME;
+        $control->systemName = KALTURA_INTERNAL_ACCESS_CONTROL_SYSTEM_NAME;
+        $control->description = KALTURA_INTERNAL_ACCESS_CONTROL_DESC;
+        $control->isDefault = KalturaNullableBoolean::NULL_VALUE;
+        $restriction = new KalturaIpAddressRestriction();
+        $restriction->ipAddressRestrictionType = KalturaIpAddressRestrictionType::ALLOW_LIST;
+
+        $addresses = get_config(KALTURA_PLUGIN_NAME, 'internal_ipaddress');
+
+        if ($addresses != null and $addresses != '') {
+            $addressarray = explode(" ", $addresses);
+            if (count($addressarray) >= 2) {
+                $addresses = implode(",", $addressarray);
+            }
+        }
+
+        $restriction->ipAddressList = $addresses;
+        $control->restrictions = array($restriction);
+        $control = $connection->accessControl->add($control);
+    } catch (Exception $ex) {
+        $errormessage = 'Error in local_kaltura_create_internal_profile(' . $ex->getMessage() . ')';
+        print_error($errormessage, 'local_kaltura');
+        return null;
+    }
+
+    return $control;
+}
+
+
+/**
+ * This function updates internal access control of Kaltura server.
+ *
+ * @parama object - connection object for Kaltura server.
+ *
+ * @return bool - true if update is scceeded, otherwise false.
+ */
+function local_kaltura_update_internal_access_control($connection, $id) {
+    $control = new KalturaAccessControl();
+
+    try {
+        $control->id = $id;
+        $control->name = KALTURA_INTERNAL_ACCESS_CONTROL_NAME;
+        $control->systemName = KALTURA_INTERNAL_ACCESS_CONTROL_SYSTEM_NAME;
+        $control->description = KALTURA_INTERNAL_ACCESS_CONTROL_DESC;
+        $control->isDefault = KalturaNullableBoolean::NULL_VALUE;
+        $restriction = new KalturaIpAddressRestriction();
+        $restriction->ipAddressRestrictionType = KalturaIpAddressRestrictionType::ALLOW_LIST;
+
+        $addresses = get_config(KALTURA_PLUGIN_NAME, 'internal_ipaddress');
+
+        if ($addresses != null and $addresses != '') {
+            $addressarray = explode(" ", $addresses);
+            if (count($addressarray) >= 2) {
+                $addresses = implode(",", $addressarray);
+            }
+        }
+
+        $restriction->ipAddressList = $addresses;
+        $control->restrictions = array($restriction);
+        $connection->accessControl->update($id, $control);
+    } catch (Exception $ex) {
+        $errormessage = 'Error in local_kaltura_update_internal_profile(' . $ex->getMessage() . ')';
+        print_error($errormessage, 'local_kaltura');
+        return null;
+    }
+    return $control;
+}
+
+/**
+ * This function checks if the user can use My Media..
+ *
+ * @return - true if user can use My Media, otherwise false.
+ */
+function local_kaltura_get_mymedia_permission() {
+    global $USER;
+
+    $check = get_config(KALTURA_PLUGIN_NAME, 'mymedia_limited_access');
+    $keyword = get_config(KALTURA_PLUGIN_NAME, 'mymedia_access_keyword');
+
+    if ($check == '0' || $keyword == null || $keyword == '') {
+        return true;
+    }
+
+    $rule = get_config(KALTURA_PLUGIN_NAME, 'mymedia_access_rule');
+
+    if ($rule == 'contain_firstname' && strpos($USER->firstname, $keyword) !== false) {
+        return true;
+    } else if ($rule == 'not_contain_firstname' && strpos($USER->firstname, $keyword) === false) {
+        return true;
+    } else if ($rule == 'contain_lastname' && strpos($USER->lastname, $keyword) !== false) {
+        return true;
+    } else if ($rule == 'not_contain_lastname' && strpos($USER->lastname, $keyword) === false) {
+        return true;
+    } else if ($rule == 'contain_email' && strpos($USER->email, $keyword) !== false) {
+        return true;
+    } else if ($rule == 'not_contain_email' && strpos($USER->email, $keyword) === false) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Create the root category structure in the KMC
+ *
+ * @param - Kaltura connection object
+ * @return mixed - an array with the root category path and the root category id
+ *  or false if something wrong happened
+ */
+function local_kaltura_create_root_category($connection) {
+
+    $first = true;
+    $parentid = '';
+    $categories = array();
+    $rootcategory = get_config(KALTURA_PLUGIN_NAME, 'rootcategory');
+    $rootcategoryid = get_config(KALTURA_PLUGIN_NAME, 'rootcategory_id');
+    $duplicate = false;
+
+    // Split categories into an array.
+    if (!empty($rootcategory)) {
+        $categories = explode('>', $rootcategory);
+    }
+
+    $categorytocreated = '';
+
+    // Check if categories already exist in the KMC.
+    foreach ($categories as $categoryname) {
+
+        if (empty($categorytocreated)) {
+            $categorytocreated = $categoryname;
+        } else {
+            $categorytocreated = $categorytocreated . '>' . $categoryname;
+        }
+
+        // Check if the category already exists.  If any exists then we cannot create the category.
+        if (local_kaltura_category_path_exists($connection, $categorytocreated)) {
+            $duplicate = true;
+            break;
+        }
+    }
+
+    // If thre is a duplicate, the user must specify a different root category format.
+    if ($duplicate) {
+        return false;
+    }
+
+    $result = null;
+
+    // Create categories.
+    foreach ($categories as $categoryname) {
+
+        if ($first) {
+            $result = local_kaltura_create_category($connection, $categoryname);
+        } else {
+            $result = local_kaltura_create_category($connection, $categoryname, $parentid);
+        }
+
+        if (!empty($result)) {
+
+            if ($first) {
+                $rootcategory = $result->name;
+            } else {
+                $rootcategory .= '>' . $result->name;
+            }
+
+            $first = false;
+            $parentid = $result->id;
+        }
+    }
+
+    // Save configuration.
+    set_config('rootcategory', $rootcategory, KALTURA_PLUGIN_NAME);
+    set_config('rootcategory_id', $result->id, KALTURA_PLUGIN_NAME);
+
+    return array($rootcategory, $result->id);
+}
+
+
+/**
+ * Create a category in the KMC.  If a perent id is passed then the category
+ * will be created as a sub category of the parent id
+ *
+ * @param obj - Kaltura connection object
+ * @param string - category name
+ * @param int - (optional) parent id
+ * @return mixed - KalturaCategory if category was created, otherwise false
+ */
+function local_kaltura_create_category($connection, $name, $parentid = 0) {
+
+    if (empty($name)) {
+        return false;
+    }
+
+    $category = new KalturaCategory();
+    $category->name = $name;
+
+    if (!empty($parentid)) {
+        $category->parentId = $parentid;
+    }
+
+    $result = $connection->category->add($category);
+
+    if ($result instanceof KalturaCategory) {
+        return $result;
+    }
+
+    return false;
+}
+
+
+/**
+ * Checks to see if a category with the same name exists.  If parent_id is
+ * passed it checks to see a category with the same name and parent id exists
+ * @param obj - Kaltura connection object
+ * @param string - category name
+ * @param int - (optional) parent id
+ * @return bool - true if category exists, otherwise false
+ */
+function local_kaltura_category_exists($connection, $name, $parentid = 0) {
+    // TODO: is this function still needed?
+}
+
+
+/**
+ * Checks if a specific category has a matching fullName value
+ * @param obj - Kaltura connection object
+ * @param int - category id
+ * @param string - category fullName path
+ * @return bool - true if category with fullName path exists. Else false
+ */
+function local_kaltura_category_id_path_exists($connection, $categoryid, $path) {
+    if (empty($path) || empty($categoryid)) {
+        return false;
+    }
+
+    $filter = new KalturaCategoryFilter();
+    $filter->fullNameEqual = $path;
+    $filter->idEqual = $categoryid;
+    $result = $connection->category->listAction($filter);
+
+    if ($result instanceof KalturaCategoryListResponse &&
+        1 == $result->totalCount) {
+
+        if ($result->objects[0] instanceof KalturaCategory) {
+            return $result->objects[0];
+        }
+    }
+
+    return false;
+
+}
+
+
+/**
+ * Checks if a category path exists, if path exists then it returns the
+ * a KalturaCategory object.  Otherwise false.  The API does not allow searching
+ * for categories (using the 'category' service) by name
+ *
+ * @param kaltura_connection $connection An instance of the kaltura_connection class
+ * @param string $path The Kaltura root path
+ * @return bool|KalturaCategory - A KalturaCategory if path exists, otherwise false
+ */
+function local_kaltura_category_path_exists($connection, $path) {
+    global $SESSION;
+
+    if (empty($path)) {
+        return false;
+    }
+
+    // Retrieve access data from the session global.
+    if (isset($SESSION->kalrepo)) {
+
+        if (isset($SESSION->kalrepo["$path"]) && !empty($SESSION->kalrepo["$path"])) {
+            // Gonen - 2nd change - unserialize the found object before returning.
+            $obj = unserialize($SESSION->kalrepo["$path"]);
+            if ($obj !== false) {
+                return $obj;
+            }
+        }
+    } else {
+        $SESSION->kalrepo = array(array());
+    }
+
+    $filter = new KalturaCategoryFilter();
+    $filter->fullNameEqual = $path;
+    $result = $connection->category->listAction($filter);
+
+    if ($result instanceof KalturaCategoryListResponse &&
+        1 <= $result->totalCount) {
+
+        if ($result->objects[0] instanceof KalturaCategory) {
+            // Gonen - 1st change - save serialized object to session.
+            $SESSION->kalrepo["$path"] = serialize($result->objects[0]);
+            return $result->objects[0];
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * This function creates a Kaltura category, if one doesn't exist, whose name is
+ * the Moodle username; and returns the category
+ *
+ * @param obj - Kaltura connection object
+ * @param int - Moodle username
+ *
+ * @return KalturaCategory object, or false if it failed to create one
+ */
+function local_kaltura_create_user_category($connection, $username) {
+
+    // Get the root category path.
+    $rootpath = get_config(KALTURA_PLUGIN_NAME, 'rootcategory');
+
+    // Check if the root category path is an empty string.
+    if (empty($rootpath)) {
+        return false;
+    }
+    $path = $rootpath . '>' . $username;
+
+    // Check if the category exists.
+    $usercategory = local_kaltura_category_path_exists($connection, $path);
+
+    if (!$usercategory) {
+
+        $rootid = get_config(KALTURA_PLUGIN_NAME, 'rootcategory_id');
+
+        // Create category.
+        $usercategory = local_kaltura_create_category($connection, $username, $rootid);
+
+        if (!$usercategory) {
+            return false;
+        }
+    }
+
+    return $usercategory;
+}
+
+/**
+ * Refactored code from @see search_own_medias(), except it also returns medias
+ * that are still being converted.
+ *
+ * @param obj $connection Kaltura connection object
+ * @param string $search Search string (optional)
+ * @param int $page_index Pager index
+ * @param int $search Number of medias to display on a single page (optional override)
+ * @param string $sort Optional sort (most recent or alphabetical)
+ *
+ * @return array List of medias
+ */
+function local_kaltura_search_mymedia_medias($connection, $search = '', $pageindex = 0, $mediasperpage = 0, $sort = null) {
+
+    global $USER;
+
+    $results = array();
+
+    // Create filter.
+    $filter = local_kaltura_create_mymedia_filter($search, $sort);
+
+    // Filter medias with the user's username as the user id.
+    $filter->userIdEqual = $USER->username;
+
+    // Create pager object.
+    $pager = local_kaltura_create_pager($pageindex, $mediasperpage);
+
+    // Get results.
+    $results = $connection->media->listAction($filter, $pager);
+
+    return $results;
+
+}
+
+/**
+ * This function returns a KalturaMediaEntryFilter object with specific
+ * properties based on the arguments passed.  A freeText search is used when
+ * name and tags are not empty.  A tagsMultiLikeOr is used when tags is not
+ * empty.  A nameMultiLikeOr is used when name is not empty
+ *
+ * @param string - media name search criteria
+ * @param string - media tags serach criteria
+ * @param string (optional) - generic search criteria override.  Forces the
+ * function to use tagsNameMultiLikeOr search filter
+ *
+ * @return KalturaMediaEntryFilter - filter object
+ */
+function local_kaltura_create_media_filter($name, $tags, $multioverride = '') {
+
+    $filter = new KalturaMediaEntryFilter();
+
+    if (!empty($multioverride)) {
+        $searchname = explode(' ', $multioverride);
+
+        // Removing duplicate search terms.
+        $search = array_flip(array_flip($searchname));
+
+        $filter->tagsNameMultiLikeOr = implode(',', $search);
+
+    } else if (!empty($name) && !empty($tags)) {
+        // If name and tag is not empty use tagsNameMultiLikeOr search.
+        $searchtags = explode(' ', $tags);
+        $searchname = explode(' ', $name);
+
+        // Removing duplicate search terms.
+        $search = array_flip(array_flip(array_merge($searchtags, $searchname)));
+
+        $filter->tagsNameMultiLikeOr = implode(',', $search);
+
+    } else if (!empty($tags)) {
+
+        $searchtags = explode(' ', $tags);
+        $searchtags = implode(',', $searchtags);
+        $filter->tagsMultiLikeOr = $searchtags;
+    } else if (!empty($name)) {
+
+        $searchname = explode(' ', $name);
+        $searchname = implode(',', $searchname);
+        $filter->nameMultiLikeOr = $searchname;
+    }
+
+    $filter->orderBy = 'name';
+
+    return $filter;
+}
+
+/**
+ * Refactored code from @see create_media_filter(), except it only uses
+ * tagsNameMultiLikeOr and uses KalturaEntryStatus::READY, KalturaEntryStatus::
+ * PRECONVERT, KalturaEntryStatus::IMPORT to retrieve medias that are still
+ * being converted.
+ *
+ * @param string $search Media search string (separated by spaces)
+ * @param string $sort Optional sort (most recent or alphabetical)
+ *
+ * @return KalturaMediaEntryFilter - filter object
+ */
+function local_kaltura_create_mymedia_filter($search, $sort = null) {
+
+    $filter = new KalturaMediaEntryFilter();
+
+    $searchname = explode(' ', $search);
+
+    // Removing duplicate search terms.
+    $searchname = array_flip(array_flip($searchname));
+
+    $filter->freeText = implode(',', $searchname);
+	//$filter->tagsNameMultiLikeOr = implode(',', $search);
+	
+    $filter->statusIn = KalturaEntryStatus::READY .','.
+                        KalturaEntryStatus::PRECONVERT .','.
+                        KalturaEntryStatus::IMPORT;
+
+    if ($sort == 'recent') {
+        $filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_DESC;
+    } else if ($sort == 'old') {
+        $filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
+    } else if ($sort == 'name_asc') {
+         $filter->orderBy = KalturaBaseEntryOrderBy::NAME_ASC;
+    } else if ($sort == 'name_desc') {
+         $filter->orderBy = KalturaBaseEntryOrderBy::NAME_DESC;
+    } else if ($sort == 'duration_asc') {
+         $filter->orderBy = KalturaMediaEntryOrderBy::DURATION_ASC;
+    } else if ($sort == 'duration_desc') {
+         $filter->orderBy = KalturaMediaEntryOrderBy::DURATION_DESC;
+    } else {
+        $filter->orderBy = KalturaBaseEntryOrderBy::CREATED_AT_DESC;
+    }
+
+    return $filter;
+}
+
+
+/**
+ * This function creates and returns a KalturaFilterPager object.  If a page
+ * index greater than 0 is passed, the pager object will be created with a
+ * pageIndex equal to the parameter.  The size of the page is determined by the
+ * itemsperpage plug-in configuration setting.
+ *
+ * @param int - pager index value
+ * @param int - number of items to display on a page (optinal override)
+ *
+ * @return KalturaFilterPager obj
+ */
+function local_kaltura_create_pager($pageindex = 0, $itemsperpage = 0) {
+
+    $page = new KalturaFilterPager();
+
+    if (empty($itemsperpage)) {
+        $page->pageSize = get_config(KALTURA_PLUGIN_NAME, 'mymedia_items_per_page');
+    } else {
+        $page->pageSize = $itemsperpage;
+    }
+
+    if (0 <= (int) $pageindex) {
+        $page->pageIndex = '+' . (int) $pageindex;
+    } else {
+        $page->pageIndex = 0;
+    }
+
+    return $page;
+
 }

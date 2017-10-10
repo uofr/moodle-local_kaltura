@@ -1,1 +1,1 @@
-mw.setConfig('EmbedPlayer.EnableIframeApi', false);
+mw.setConfig('EmbedPlayer.EnableIframeApi', true);
