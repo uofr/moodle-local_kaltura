@@ -729,10 +729,10 @@ function local_kaltura_create_image_markup($entryobj, $title, $theme,
  *
  * @return string - HTML markup
  */
-function local_kaltura_get_kdp_code($entry_obj, $uiconf_id = 0, $courseid = 0, $session = '', $uid = 0) {
+function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $session = '', $uid = 0) {
 
-    if (!local_kaltura_is_valid_entry_object($entry_obj)) {
-        return 'Unable to play video ('. $entry_obj->id . ') please contact your site administrator.';
+    if (!local_kaltura_is_valid_entry_object($entryobj)) {
+        return 'Unable to play video ('. $entryobj->id . ') please contact your site administrator.';
     }
 
     if (0 == $uid) {
