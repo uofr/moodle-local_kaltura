@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura reports page
+ * Kaltura Media Properties page
  *
  * @package    local
  * @subpackage kaltura
@@ -26,32 +26,36 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '/local/kaltura/locallib.php');
 
-if (!defined('MOODLE_INTERNAL')) {
-    // It must be included from a Moodle page.
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
+
+global $SESSION, $USER, $COURSE, $OUTPUT;
+
+$context = context_course::instance($COURSE->id);
+$PAGE->set_context($context);
+
+$header  = format_string($SITE->shortname).": " . get_string('media_prop_header', 'local_kaltura');
+
+$PAGE->set_url('/local/kaltura/media_properties.php');
+
+$PAGE->set_pagetype('player-properties');
+$PAGE->set_pagelayout('embedded');
+$PAGE->set_title($header);
+$PAGE->set_heading("");
+$PAGE->add_body_class('player-properties');
+$PAGE->requires->css('/local/kaltura/css/simple_selector.css', true);
+$PAGE->requires->js_call_amd('local_kaltura/properties', 'init',
+                             array(
+                                 $CFG->wwwroot . "/local/kaltura/media_properties.php",
+                                 get_string('invalid_name', 'local_kaltura'),
+                                 get_string('empty_size', 'local_kaltura'),
+                                 get_string('invalid_custom_size', 'local_kaltura'),
+                                 get_string('invalid_size', 'local_kaltura')
+                             )
+                            );
 
 require_login();
 
-global $SESSION, $USER, $COURSE;
-
-$PAGE->set_context(context_system::instance());
-
-$header  = format_string($SITE->shortname).": Media Properties";
-
-$PAGE->set_url('/local/kaltura/media_properties.php');
-$PAGE->set_course($COURSE);
-
-$PAGE->set_pagetype('mymedia-index');
-$PAGE->set_pagelayout('standard');
-$PAGE->set_title($header);
-$PAGE->set_heading($header);
-$PAGE->add_body_class('mymedia-index');
-$PAGE->requires->js('/local/kaltura/js/encoding.js', true);
-$PAGE->requires->js('/local/kaltura/js/jquery-3.0.0.js', true);
-$PAGE->requires->js('/local/kaltura/js/simple_selector.js', true);
-$PAGE->requires->css('/local/kaltura/css/simple_selector.css', true);
-
+echo $OUTPUT->header();
 
 // Connect to Kaltura server.
 $kaltura = new kaltura_connection();
@@ -69,23 +73,6 @@ $context = context_user::instance($USER->id);
 
 $renderer = $PAGE->get_renderer('local_kaltura');
 
-echo '<!DOCTYPE html>';
-echo '<html lang="ja">';
-echo '<head>';
-echo '<meta charset="UTF-8">';
-
-echo '<link rel="stylesheet" type="text/css" href="'.$CFG->wwwroot.'/theme/styles.php/urcourses_clean/1504494625/all" />';
-echo '<link rel="stylesheet" type="text/css" href="'.$CFG->wwwroot.'/theme/urcourses_clean/style/font-awesome.min.css" />';
-
-echo '<link rel="stylesheet" type="text/css" href="css/simple_selector.css">';
-echo '<title>Simple Selector</title>';
-echo '<script src="js/simple_selector.js"></script>';
-echo '<script src="js/jquery-1.2.6.js"></script>';
-echo '<script src="js/jquery-3.0.0.js"></script>';
-echo '<script src="js/encoding.js"></script>';
-echo '</head>';
-echo '<body text="black" bgcolor="white" link="blue" alink="red" vlink="purple" onload="loadPropertiesParameter()">';
-
 try {
 
     echo $renderer->create_properties_markup();
@@ -97,6 +84,5 @@ try {
     echo $ex->getMessage();
 }
 
-echo '</body>';
-echo '</html>';
+echo $OUTPUT->footer();
 

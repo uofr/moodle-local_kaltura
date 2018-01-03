@@ -1,5 +1,6 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura video assignment grade preferences form
+ * Kaltura Media Local Libraries version file
  *
  * @package    local_kaltura
  * @subpackage kaltura
@@ -22,14 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('MOODLE_INTERNAL')) {
-    // It must be included from a Moodle page.
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2017081600;
+$plugin->version = 2018010200;
 $plugin->component = 'local_kaltura';
-$plugin->release = 'YU Video Package 1.0.0';
-$plugin->requires = 2016052300;
+$plugin->release = 'Kaltura Media Local Libraries 1.1.1';
+$plugin->requires = 2015051100;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->system_version = 2.1; // Used to send information to Kaltura.

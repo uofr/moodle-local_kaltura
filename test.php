@@ -1,5 +1,6 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -25,9 +26,9 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
-global $CFG, $USER, $PAGE;
+defined('MOODLE_INTERNAL') || die();
 
-require_login();
+global $CFG, $USER, $PAGE;
 
 $context = get_context_instance(CONTEXT_SYSTEM);
 
@@ -35,6 +36,8 @@ $url = new moodle_url('/local/kaltura/test.php');
 
 $PAGE->set_url($url);
 $PAGE->set_context($context);
+
+require_login();
 
 echo $OUTPUT->header();
 

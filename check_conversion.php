@@ -1,5 +1,6 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura check media conversion status AND returns the embedded media markup
+ * YU Kaltura check media conversion status AND returns the embedded media markup
  *
  *
  * @package    local
@@ -35,14 +36,15 @@ $title      = optional_param('media_title', '', PARAM_TEXT);
 $widget     = optional_param('widget', 'kdp', PARAM_TEXT);
 $courseid   = required_param('courseid', PARAM_INT);
 
+defined('MOODLE_INTERNAL') || die();
+
 require_login();
 
 $thumbnail    = '';
 $data         = new stdClass();
 $entry_obj    = null;
 
-// If request is for a kaltura dynamic player get the entry object disregarding
-// the entry object status
+// If request is for a kaltura dynamic player get the entry object, disregarding the entry object status.
 if (0 == strcmp($widget, 'kdp')) {
 
     $entry_obj = local_kaltura_get_ready_entry_object($entry_id, false);
@@ -84,7 +86,6 @@ if (0 == strcmp($widget, 'kdp')) {
                 $data->script = 'kAddedScript = false; kCheckAddScript();';
             }
         }
-        
 
     } else {
         switch ((string) $entry_obj->status) {
@@ -116,12 +117,6 @@ if (0 == strcmp($widget, 'kdp')) {
 }
 
 $data = json_encode($data);
-
-//$myFile = "/tmp/A.txt";
-//$fh = fopen($myFile, 'w');
-//$stringData = 'testing';
-//fwrite($fh, $data);
-//fclose($fh);
 
 echo $data;
 

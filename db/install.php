@@ -1,6 +1,6 @@
 <?php
-
-
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -26,22 +26,24 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once(dirname(dirname(__FILE__)) . '/locallib.php');
 
-// It must be included from a Moodle page
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
-
+/**
+ * This function install XML DB to Moodle.
+ *
+ * @return boolean - true if error does not occur.
+ *
+ */
 function xmldb_local_kaltura_install() {
 
-    // Copy plug configuration data
+    // Copy plug configuration data.
     migrate_configuration_data();
 
-    // Create new Kaltura media resource/presentations from old resource types
+    // Create new Kaltura media resource/presentations from old resource types.
     migrate_resource_data();
 
     // Create new Kaltura media assignment from old assignment type and update all,
-    // user data pertaining to that assignment
+    // user data pertaining to that assignment.
     migrate_assignment_data();
 
     return true;
@@ -56,6 +58,7 @@ function xmldb_local_kaltura_install() {
  * record using the data from the old media assignment submission record and
  * remove the old assignment submission data.  Lastly the old assignment record
  * is remove.
+ *
  */
 function migrate_assignment_data() {
     global $DB;
@@ -448,9 +451,8 @@ function create_new_kalvidassign($old_assignment) {
 /**
  * Adds a new instance of the kaltura video assignment submission
  *
- * @param int - Id of the kaltura video assignment the submission is for
- * @param object - old video assignment submission object
- *
+ * @param int $kalvidassignid - Id of the kaltura media assignment the submission is for
+ * @param object $oldassignsub - old media assignment submission object
  * @return int - id of the newly inserted record or false
  */
 function create_new_kalvidassign_submission($kalvidassign_id, $old_assign_sub) {
@@ -478,7 +480,7 @@ function create_new_kalvidassign_submission($kalvidassign_id, $old_assign_sub) {
  * Construct a kaltura video resource object using parameters from a Moodle 1.9
  * kaltura video resource
  *
- * @param object - kaltura video resource object (ver: Moodle 1.9)
+ * @param object $oldresource - kaltura media resource object (ver: Moodle 1.9)
  * @return object - kaltura video resource object (var: Moodle 2.1)
  */
 function create_new_kalvidres($old_resource) {
@@ -531,7 +533,7 @@ function create_new_kalvidpres($old_resource) {
 /**
  * Check if the Kaltura video assignment table schema exists
  *
- * @para object - db manager
+ * @param object $dbman - Database manager
  * @return bool - true if exists, else false
  */
 function kalvidassign_exists($dbman) {
@@ -554,7 +556,7 @@ function kalvidassign_exists($dbman) {
 /**
  * Check if the Kaltura video resource table schema exists
  *
- * @para object - db manager
+ * @param object $dbman - Database manager
  * @return bool - true if exists, else false
  */
 function kalvidres_exists($dbman) {

@@ -1,5 +1,6 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura static entries class
+ * YU Kaltura static entries class
  *
  * @package    local_kaltura
  * @subpackage kaltura
@@ -27,11 +28,17 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(dirname(dirname(__FILE__))) . '/local/kaltura/locallib.php');
 
-if (!defined('MOODLE_INTERNAL')) {
-    // It must be included from a Moodle page.
-    die('Direct access to this script is forbidden.');
-}
+defined('MOODLE_INTERNAL') || die();
 
+require_login();
+
+/**
+ * Kaltura static entries class.
+ *
+ * @package local_yukaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <gh-cc@mlex.cc.yamaguchi-u.ac.jp>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class KalturaStaticEntries {
 
     private static $_entries = array();
@@ -60,10 +67,9 @@ class KalturaStaticEntries {
 
     /**
      * Add an entry object directory to the array
-     * 
-     * @param object - an entry object
-     * 
-     * @return - nothing
+     *
+     * @param object $entryobj - an entry object
+     * @return nothing
      */
     public static function addEntryObject($entry_obj) {
         if (!array_key_exists($entry_obj->id, self::$_entries)) {
@@ -71,17 +77,14 @@ class KalturaStaticEntries {
             self::$_entries[$key] = $entry_obj;
         }
     }
-    
+
     /**
      * Retrieve an entry object.  First verify if the object has already been
      * cached.  If not, retreive the object via API calls.  Else just return the
      * object
-     * 
-     * @param string - entry id to retrieve
-     * @param object - a KalturaBaseEntryService object
-     * @param bool - true to make an API call if the entry object doesn't exist.
-     * False do not make an API call
-     * 
+     * @param string $entryid - entry id to retrieve
+     * @param object $baseentryservice - a KalturaBaseEntryService object
+     * @param bool $fetch - true to make an API call if the entry object doesn't exist.
      * @return mixed - entry object or false if it was not found
      */
     public static function getEntry($entryId, $base_entry_service, $fetch = true) {
@@ -100,12 +103,10 @@ class KalturaStaticEntries {
 
     /**
      * Makes an API call to retrieve an entry object and store the object in the
-     * static entries list
-     * 
-     * @param string - entry id
-     * @param object - a KalturaBaseEntryService object
-     * 
-     * @return - nothing
+     * static entries list.
+     * @param string $entryid - id of kaltura media entry.
+     * @param object $baseentryservice - a KalturaBaseEntryService object.
+     * @return - nothing.
      */
     private static function getEntryFromApi($entryId, $base_entry_service) {
 
@@ -119,11 +120,9 @@ class KalturaStaticEntries {
 
     /**
      * Return a list of entry objects
-     * 
-     * @param string - an entry id
-     * @param object - a KalturaBaseEntryService object
-     * 
-     * @return array - array of entry objects with the entry id as the key
+     * @param array $entryids an entry id
+     * @param object $baseentryservice a KalturaBaseEntryService object
+     * @return array array of entry objects with the entry id as the key
      */
     public static function listEntries($entryIds = array(), $base_entry_service) {
 
@@ -156,27 +155,30 @@ class KalturaStaticEntries {
     /**
      * Retrieve a list of entry objects; and store the objects in the static
      * array.
-     * 
-     * @param array - array of entry ids to retreive
-     * @param object - a KalturaBaseEntryService object
-     * 
+     *
+     * @param array $entryids array of entry ids to retreive
+     * @param object $baseentryservice a KalturaBaseEntryService object
      * @return nothing
      */
     private static function listEntriesFromApi($entryIds = array(), $base_entry_service) {
 
-        // perform baseEntry->listAction() call:
+        // Perform baseEntry->listAction() call.
         $filter = new KalturaBaseEntryFilter();
         $filter->idIn = implode(',', $entryIds);
         $result = $base_entry_service->listAction($filter);
 
-        // put entry objects in array:
-        foreach($result->objects as $entry) {
+        // Put entry objects in array.
+        foreach ($result->objects as $entry) {
             self::$_entries[$entry->id] = $entry;
         }
     }
-    
+
+
     /**
-     * Remove an entry from cache
+     * Remove an entry from cache.
+     *
+     * @param string $entryid - id of Kaltura Media entry
+     * @return nothing
      */
     public static function removeEntry($entry_id) {
         global $SESSION;

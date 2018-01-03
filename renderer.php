@@ -1,5 +1,6 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -22,38 +23,26 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+defined('MOODLE_INTERNAL') || die();
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/lib/tablelib.php');
 
-if (!defined('MOODLE_INTERNAL')) {
-    // It must be included from a Moodle page.
-    die('Direct access to this script is forbidden.');
-}
-
+/**
+ * Renderer class of local_yukaltura
+ * @package local_yukaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University <gh-cc@mlex.cc.yamaguchi-u.ac.jp>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_kaltura_renderer extends plugin_renderer_base {
-
-    /**
-     * Generate the HTML for the iframe
-     *
-     * @return string The HTML iframe
-     */
-    public function render_recent_courses() {
-        $html = '<div class="resourcecontent resourcegeneral">
-                    <iframe id="resourceobject" src="courses.php?action=recent_courses" width="700" height="700"></iframe>
-                </div>';
-
-        return $html;
-    }
 
     /**
      * This function outputs a table layout for display media
      *
-     * @param array - array of Kaltura media entry objects
+     * @param array $medialist - array of Kaltura media entry objects
      *
-     * @return HTML markup
+     * @return string - HTML markup for media table
      */
-    public function create_media_table($medialist = array(), $connection) {
-        global $OUTPUT;
+    public function create_media_table($medialist = array()) {
 
         $output      = '';
         $maxcolumns = 3;
@@ -73,9 +62,9 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         foreach ($medialist as $key => $media) {
             if (KalturaEntryStatus::READY == $media->status) {
-                $data[] = $this->create_media_entry_markup($media, true, $connection);
+                $data[] = $this->create_media_entry_markup($media, true);
             } else {
-                $data[] = $this->create_media_entry_markup($media, false, $connection);
+                $data[] = $this->create_media_entry_markup($media, false);
             }
 
             // When the max number of columns is reached, add the data to the table object.
@@ -116,17 +105,16 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
     /**
      * This function creates HTML markup used to sort the media listing.
-     *
-     * @return HTML Markup for sorting pulldown.
+     * @return string - HTML markup for sorting pulldown.
      */
     public function create_sort_option() {
-        global $CFG, $SESSION;
+        global $SESSION;
 
         $recent = null;
         $old = null;
         $nameasc = null;
         $namedesc = null;
-        $sorturl = $CFG->wwwroot.'/local/kaltura/simple_selector.php?sort=';
+        $sorturl = new moodle_url('/local/kaltura/simple_selector.php?sort=');
 
         if (isset($SESSION->selectorsort) && !empty($SESSION->selectorsort)) {
             $sort = $SESSION->selectorsort;
@@ -163,7 +151,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $sort .= html_writer::end_tag('td');
         $sort .= html_writer::start_tag('td');
         $sort .= '&nbsp;';
-        $sort .= html_writer::start_tag('select', array('id' => 'selectorSort', 'onchange' => 'changeSort()'));
+        $sort .= html_writer::start_tag('select', array('id' => 'selectorSort'));
 
         $attr = array('value' => $sorturl . 'recent');
 
@@ -210,27 +198,22 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup used to display table upper options.
      *
-     * @return HTML Markup for sorting pulldown.
+     * @param string $page - HTML text (paging markup).
+     * @return string - HTML text added sorting pulldown.
      */
     public function create_options_table_upper($page) {
         global $USER;
 
         $output = '';
 
-        $upload = '';
         $simplesearch = '';
 
         $context = context_user::instance($USER->id);
-		
 
-        if (has_capability('local/mymedia:upload', $context, $USER)) {
-            $upload = $this->create_upload_markup();
-        }
-		
         if (has_capability('local/kaltura:search_selector', $context, $USER)) {
             $simplesearch = $this->create_search_markup();
         }
-		$output .= $upload;
+
         $output .= $simplesearch;
 
         if (!empty($page)) {
@@ -246,10 +229,10 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup used to display table lower options.
      *
-     * @return HTML Markup for sorting pulldown.
+     * @param string $page - HTML text (paging markup).
+     * @return string - HTML markup for sorting pulldown.
      */
     public function create_options_table_lower($page) {
-        global $USER;
 
         $output = '';
 
@@ -275,9 +258,9 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup used to display the media name
      *
-     * @param string - name of media
+     * @param string $name - name of media entry.
      *
-     * @return HTML markup
+     * @return string - HTML markup for media name part.
      */
     public function create_media_name_markup($name) {
 
@@ -295,10 +278,11 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup used to display the media thumbnail
      *
-     * @param string - thumbnail URL
-     * @param string - alternate text
+     * @param string $url - thumbnail URL
+     * @param string $alt - alternate text
+     * @param string $entryid - id of Kaltura Media entry.
      *
-     * @param HTML markup
+     * @return string - HTML markup
      */
     public function create_media_thumbnail_markup($url, $alt, $entryid) {
 
@@ -307,17 +291,13 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $attr   = array('class' => 'selector media thumbnail');
         $output .= html_writer::start_tag('div', $attr);
 
-        $thumbnail = $url . '/width/150/height/100/type/3';
-
         $attr    = array('src' => $url . '/width/120/height/80/type/3',
                          'class' => 'media_thumbnail',
                          'id' => $entryid,
                          'alt' => $alt,
                          'height' => '80',
                          'width'  => '120',
-                         'title' => $alt,
-                         'onclick' => 'clickThumbnailImage(\'' . $entryid  . '\',\'' . $alt . '\',\'' . $thumbnail . '\')',
-                         'ondblclick' => 'clickThumbnailImage(\'' . $entryid  . '\',\'' . $alt . '\',\'' . $thumbnail . '\');selectorSubmitClick();');
+                         'title' => $alt);
 
         $output .= html_writer::empty_tag('img', $attr);
 
@@ -329,9 +309,9 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup used to display the media created daytime.
      *
-     * @param string - name of media
+     * @param string $date - name of media
      *
-     * @return HTML markup
+     * @return string - HTML markup
      */
     public function create_media_created_markup($date) {
 
@@ -349,19 +329,18 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup for a media entry
      *
-     * @param obj - Kaltura media object
+     * @param obj $entry - Kaltura media object
+     * @param bool $entryready - true if entry is ready,
      *
-     * @return HTML Markup for media entry.
+     * @return string - HTML Markup for media entry.
      */
-    public function create_media_entry_markup($entry, $entryready = true, $connection) {
-
-        global $USER;
+    public function create_media_entry_markup($entry, $entryready = true) {
 
         $output = '';
 
         $attr = array('class' => 'selector media entry',
                       'align' => 'center',
-                      'id' => 'entry_'.$entry->id);
+                      'id' => $entry->id);
 
         $output .= html_writer::start_tag('div', $attr);
 
@@ -400,7 +379,6 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // Add entry to cache.
-        $entries = new KalturaStaticEntries();
         KalturaStaticEntries::add_entry_object($entry);
         return $output;
 
@@ -409,7 +387,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup for a search tool box.
      *
-     * @return HTML Markup for search tool box.
+     * @return string - HTML markup for search tool box.
      */
     public function create_search_markup() {
         global $SESSION;
@@ -513,7 +491,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup for loading screen.
      *
-     * @return HTML Markup for loading screen.
+     * @return string - HTML markup for loading screen.
      */
     public function create_loading_screen_markup() {
 
@@ -537,7 +515,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup for selected media name, submit button, and cancel button.
      *
-     * @return HTML Markup for selected media name, submit button, and cancel button.
+     * @return string - HTML markup for selected media name, submit button, and cancel button.
      */
     public function create_selector_submit_form() {
 		
@@ -569,7 +547,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
 
         $attr = array('type' => 'button', 'id' => 'cancel_btn', 'name' => 'cancel_btn',
-                      'value' => 'Cancel, Close', 'onclick' => 'fadeOutSelectorWindow();');
+                      'value' => 'Cancel, Close');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('div');
@@ -582,7 +560,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup used to display media properties.
      *
-     * @return HTML Markup for media properties.
+     * @return string - HTML markup for media properties.
      */
     public function create_properties_markup() {
         $output = '';
@@ -590,7 +568,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         // Panel markup to set media properties.
 
         $attr = array('class' => 'hd');
-        $output .= html_writer::tag('div', '<center>' . get_string('media_prop_header', 'kalmediares') . '</center>', $attr);
+        $output .= html_writer::tag('div', '<center>' . get_string('media_prop_header', 'local_kaltura') . '</center>', $attr);
         $output .= html_writer::start_tag('br', array());
 
         $attr = array('class' => 'bd');
@@ -610,16 +588,14 @@ class local_kaltura_renderer extends plugin_renderer_base {
      * Create player properties panel markup.  Default values are loaded from
      * the javascript (see function "handle_cancel" in kaltura.js
      *
-     * @param - none
-     *
-     * @return string - html markup
+     * @return string - HTML markup of media preferences.
      */
     public function get_media_preferences_markup() {
         $output = '';
 
         // Display name input box.
         $attr = array('for' => 'media_prop_name');
-        $output .= html_writer::tag('label', get_string('media_prop_name', 'kalmediares'), $attr);
+        $output .= html_writer::tag('label', get_string('media_prop_name', 'local_kaltura'), $attr);
         $output .= '&nbsp;';
 
         $attr = array('type' => 'text',
@@ -634,7 +610,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         // Display section element for player design.
         $attr = array('for' => 'media_prop_player');
-        $output .= html_writer::tag('label', get_string('media_prop_player', 'kalmediares'), $attr);
+        $output .= html_writer::tag('label', get_string('media_prop_player', 'local_kaltura'), $attr);
         $output .= '&nbsp;';
 
         list($options, $defaultoption) = $this->get_media_resource_players();
@@ -647,15 +623,15 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         // Display player size drop down button.
         $attr = array('for' => 'media_prop_size');
-        $output .= html_writer::tag('label', get_string('media_prop_size', 'kalmediares'), $attr);
+        $output .= html_writer::tag('label', get_string('media_prop_size', 'local_kaltura'), $attr);
         $output .= '&nbsp;';
 
-        $options = array(0 => get_string('media_prop_size_large', 'kalmediares'),
-                         1 => get_string('media_prop_size_small', 'kalmediares'),
-                         2 => get_string('media_prop_size_custom', 'kalmediares')
+        $options = array(0 => get_string('media_prop_size_large', 'local_kaltura'),
+                         1 => get_string('media_prop_size_small', 'local_kaltura'),
+                         2 => get_string('media_prop_size_custom', 'local_kaltura')
                          );
 
-        $attr = array('id' => 'media_prop_size', 'onchange' => 'handlePlayerSizeSelect();');
+        $attr = array('id' => 'media_prop_size');
         $selected = !empty($defaults) ? $defaults['media_prop_size'] : array();
 
         $output .= html_writer::select($options, 'media_prop_size', $selected, array(), $attr);
@@ -668,8 +644,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
                       'name' => 'media_prop_width',
                       'value' => '',
                       'maxlength' => '4',
-                      'size' => '4',
-                      'onchange' => 'handlePlayerDimensionChange();'
+                      'size' => '4'
                       );
         $output .= html_writer::empty_tag('input', $attr);
 
@@ -680,8 +655,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
                       'name' => 'media_prop_height',
                       'value' => '',
                       'maxlength' => '4',
-                      'size' => '4',
-                      'onchange' => 'handlePlayerDimensionChange();'
+                      'size' => '4'
                       );
         $output .= html_writer::empty_tag('input', $attr);
 
@@ -693,8 +667,6 @@ class local_kaltura_renderer extends plugin_renderer_base {
      *
      * If the override configuration option is checked, then this function will
      * only return a single array entry with the overridden player
-     *
-     * @param none
      *
      * @return array - First element will be an array whose keys are player ids
      * and values are player name.  Second element will be the default selected
@@ -721,7 +693,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         // If the default player id does not exist in the list of choice.
         // Then the user must be using a custom player id, add it to the list.
         if (!array_key_exists($defaultplayerid, $choices)) {
-            $choices = $choices + array($defaultplayerid => get_string('custom_player', 'kalmediares'));
+            $choices = $choices + array($defaultplayerid => get_string('custom_player', 'local_kaltura'));
         }
 
         // Check if player selection is globally overridden.
@@ -737,7 +709,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * This function creates HTML markup used to display properties submit block.
      *
-     * @return HTML Markup for propertied submit block.
+     * @return string - HTML markup for propertied submit block.
      */
     public function create_properties_submit_markup() {
         $output = '';
@@ -750,7 +722,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('td', array());
 
         $attr = array('type' => 'button', 'class'=>'btn btn-default', 'id' => 'submit_btn', 'name' => 'submit_btn',
-                      'value' => 'OK', 'onclick' => 'propertiesSubmitClick();');
+                      'value' => 'OK');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');
@@ -758,7 +730,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('td', array());
 
         $attr = array('type' => 'button', 'class'=>'btn btn-default', 'id' => 'cancel_btn', 'name' => 'cancel_btn',
-                      'value' => 'Cancel, Close', 'onclick' => 'fadeOutPropertiesWindow();');
+                      'value' => 'Cancel, Close');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');
@@ -772,11 +744,9 @@ class local_kaltura_renderer extends plugin_renderer_base {
     }
 
     /**
-     * his function creates HTML markup used to display no permission message.
+     * This function creates HTML markup used to display no permission message.
      *
-     * @param - none
-     *
-     * @return string - html markup for no permission message.
+     * @return string - HTML markup for no permission message.
      */
     public function create_permission_message() {
         $output = '';
@@ -791,8 +761,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $attr = array('type' => 'button',
                       'name' => 'faedeout',
                       'id' => 'fadeout',
-                      'value' => 'Close',
-                      'onclick' => 'fadeOutSelectorWindow()'
+                      'value' => 'Close'
                      );
 
         $output .= html_writer::empty_tag('input', $attr);
@@ -823,4 +792,3 @@ class local_kaltura_renderer extends plugin_renderer_base {
     }
 
 }
-

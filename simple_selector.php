@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura reports page
+ * Embed media selector script
  *
  * @package    local
  * @subpachage kaltura
@@ -26,7 +26,7 @@
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/local/kaltura/locallib.php');
 
-require_login();
+defined('MOODLE_INTERNAL') || die();
 
 global $SESSION, $USER, $COURSE;
 
@@ -46,10 +46,11 @@ $PAGE->set_title($header);
 $PAGE->set_heading($header);
 $PAGE->add_body_class('mymedia-index');
 
+require_login();
+
 $PAGE->requires->css('/local/kaltura/css/simple_selector.css', true);
-$PAGE->requires->js('/local/kaltura/js/simple_selector.js', true);
-$PAGE->requires->js('/local/kaltura/js/jquery-1.2.6.js', true);
-$PAGE->requires->js('/local/kaltura/js/jquery-3.0.0.js', true);
+$PAGE->requires->js_call_amd('local_kaltura/simpleselector', 'init',
+                             array($CFG->wwwroot . "/local/kaltura/simple_selector.php", null));
 
 // Connect to Kaltura server.
 $kaltura = new kaltura_connection();
@@ -93,7 +94,7 @@ if (local_kaltura_get_mymedia_permission()) {
     try {
 
         if (!$connection) {
-            throw new Exception("Unable to connect");
+            throw new Exception(get_string('conn_failed', 'local_kaltura'));
         }
 
         $perpage = 9;
@@ -116,8 +117,6 @@ if (local_kaltura_get_mymedia_permission()) {
         if ($medialist instanceof KalturaMediaListResponse &&  0 < $medialist->totalCount ) {
             $medialist = $medialist->objects;
 
-        	echo $renderer->create_selector_submit_form();
-
             $page = $OUTPUT->paging_bar($total,
                                         $page,
                                         $perpage,
@@ -126,7 +125,7 @@ if (local_kaltura_get_mymedia_permission()) {
 
             echo $renderer->create_options_table_upper($page);
 
-            echo $renderer->create_media_table($medialist, $connection);
+            echo $renderer->create_media_table($medialist);
 
             echo $renderer->create_options_table_lower($page);
         } else {
@@ -136,6 +135,8 @@ if (local_kaltura_get_mymedia_permission()) {
             echo $renderer->create_options_table_lower($page);
 
         }
+
+        echo $renderer->create_selector_submit_form();
 
     } catch (Exception $ex) {
         $errormessage = 'View - error main page(' .  $ex->getMessage() . ')';
