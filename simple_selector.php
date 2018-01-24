@@ -121,8 +121,7 @@ if (local_kaltura_get_mymedia_permission()) {
                                         $page,
                                         $perpage,
                                         new moodle_url('/local/kaltura/simple_selector.php', array('sort' => $sort)));
-
-
+		
             echo $renderer->create_options_table_upper($page);
 
             echo $renderer->create_media_table($medialist);

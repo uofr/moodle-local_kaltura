@@ -164,6 +164,25 @@ define('KALTURA_IMAGE_MOBILE_WIDTH', 320);
  */
 define('KALTURA_IMAGE_MOBILE_HEIGHT', 240);
 
+
+
+/**
+ * KALTURA_PLAYER_PLAYERAUDIO - UiConf id of audio player.
+ */
+define('KALTURA_PLAYER_PLAYERAUDIO', 11170258); // UofR Audio player
+
+
+/**
+ * KALTURA_FILTER_VIDEO_WIDTH - default width for video player.
+ */
+define('KALTURA_FILTER_VIDEO_WIDTH', 400);
+
+/**
+ * KALTURA_FILTER_VIDEO_HEIGHT - default height for video player.
+ */
+
+define('KALTURA_FILTER_VIDEO_HEIGHT', 300);
+
 /**
  * Initialize the kaltura account and obtain the secrets and partner ID
  *
@@ -698,13 +717,15 @@ function local_kaltura_create_image_markup($entryobj, $title, $theme,
  * @param obj $entryobj - KalturaMedia object
  * @param int $uiconfid - player ui_conf_id (optional).  If no value is specified the
  * default player will be used.
+ * @param int - Moodle course id (optional).  This parameter is required in
+ * order to generate Kaltura analytics data.
  * @param string $session - A kaltura session string
  * @param int $uid - a unique identifier, this value is appented to 'kaltura_player_'
  * and is used as the id of the object tag
  *
  * @return string - HTML markup
  */
-function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $session = '', $uid = 0) {
+function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $session = '', $uid = 0) {
 
     if (!local_kaltura_is_valid_entry_object($entryobj)) {
         return 'Unable to play video ('. $entryobj->id . ') please contact your site administrator.';
@@ -716,7 +737,7 @@ function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $session = '', $u
     }
 
     $host = local_kaltura_get_host();
-    $flashvars = local_kaltura_get_kdp_flashvars($entryobj->creatorId, $session);
+    $flashvars = local_kaltura_get_kdp_flashvars($courseid, $session);
     if (KalturaMediaType::IMAGE == $entryobj->mediaType) {
         $varstr = '&amp;IframeCustomPluginCss1=' .  new moodle_url('/local/kaltura/css/hiddenPlayButton.css');
         $flashvars .= $varstr;
@@ -953,9 +974,11 @@ function local_kaltura_get_ready_entry_object($entry_id, $ready_only = true) {
 
     } catch (Exception $ex) {
         // Connection failed for some reason.  Maybe proxy settings?
-        $errormessage = 'check conversion(' . $ex->getMessage() . ')';
+        /*
+		$errormessage = 'check conversion(' . $ex->getMessage() . ')';
         print_error($errormessage, 'local_kaltura');
-        return false;
+        */
+		return false;
     }
 }
 

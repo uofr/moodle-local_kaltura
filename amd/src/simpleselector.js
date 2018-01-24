@@ -39,6 +39,8 @@ define(['jquery'], function($) {
             var modalX = 0;
             var modalY = 0;
             var timer = false;
+			
+			var kmr_selected = '';
 
             /**
              * This function reflects change of sort option.
@@ -70,12 +72,52 @@ define(['jquery'], function($) {
                 $("#select_name").html(selectName);
                 // Get thumbnail of selected media.
                 $("#select_thumbnail").val(selectThumbnail);
-
+				
+				$('#'+selectId).addClass('kmrthmbselected');
+				console.log('selsrc:'+$('#'+selectId).attr('src'));
+				$('#kmr_selected_thumb').prop('src', selectThumbnail);
+				
+				if (kmr_selected != '') $('#'+kmr_selected).toggleClass('kmrthmbselected')
+				kmr_selected = selectId;
+				
                 // Enable OK button.
                 $("#submit_btn").prop("disabled", false);
                 $("#submit_btn").css({opacity: "1.0"});
             }
+			
+			function clickThumbnailRow(div) {
+                var selectId = $( div ).attr('id');
+				var selectName = $('#th_'+selectId).attr('alt');
+                var selectThumbnail = $('#th_'+selectId).attr('src');
+				
+				console.log('this.prop:'+selectId);
+				
+				console.log('selsrc:'+$('#'+selectId).attr('id'));
 
+                selectThumbnail = selectThumbnail.replace(/width\/\d+/g, "width/150");
+                selectThumbnail = selectThumbnail.replace(/height\/\d+/g, "height/100");
+				
+                // Get entry id of selected media.
+                $("#select_id").val(selectId);
+                // Get name of selected media.
+                $("#select_name").html(selectName);
+                // Get thumbnail of selected media.
+                $("#select_thumbnail").val(selectThumbnail);
+				
+				$('#'+selectId).addClass('kmrthmbselected');
+				console.log('selsrc:'+$('#'+selectId).attr('id'));
+				$('#kmr_selected_thumb').prop('src', selectThumbnail);
+				
+				if (kmr_selected != '') $('#'+kmr_selected).toggleClass('kmrthmbselected')
+				kmr_selected = selectId;
+				
+                // Enable OK button.
+                $("#submit_btn").prop("disabled", false);
+                $("#submit_btn").css({opacity: "1.0"});
+				
+				//console.log('selsrc:'+$('#'+selectId).attr('id'));
+			}
+			
             /**
              * This function centerize modal window.
              * @access private
@@ -174,7 +216,7 @@ define(['jquery'], function($) {
 
                     var idName = $("#id_name", parent.document);
 
-                    if (idName !== null) {
+                    if (idName !== null && idName.val() == '') {
                         idName.val($("#select_name").html());
                     }
 
@@ -190,7 +232,7 @@ define(['jquery'], function($) {
 
                     var editor = $("#id_introeditoreditable", parent.document);
 
-                    if (editor !== null) {
+                    if (editor !== null && $.trim(editor.text()) == '') {
                         editor.html(desc);
                     }
 
@@ -223,6 +265,65 @@ define(['jquery'], function($) {
             function replaceAddMediaLabel(str) {
                 $("#id_add_media", parent.document).val(str);
             }
+			
+			
+			$('#ss-sortgrid').on("click", function() {
+				console.log( $( this ).prop('id') );
+		
+				$('#ss-sortlist').removeClass('active');
+		
+				$(this).addClass('active');
+		
+				YUI().use('cookie', function(Y) {
+				    Y.Cookie.set("ss-sort-style", "grid", { expires: new Date("January 12, 2025") });
+				});
+				/*
+				$('.mymedia.mm-media.entry').each(function() {
+					$( this ).addClass( "span4" );
+				});
+				*/
+				$('.mymedia.mm-media.entry .btn').each(function() {
+					$( this ).addClass( "btn-small" );
+				});
+				$('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
+					$( this ).removeClass( "span4" ).addClass( "span12" );
+				});
+				$('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
+					$( this ).removeClass( "span8" ).addClass( "span12" );
+				});		
+		
+		
+			});
+	
+
+			$('#ss-sortlist').on("click", function() {
+				console.log( $( this ).prop('id') );
+		
+				YUI().use('cookie', function(Y) {
+				    Y.Cookie.set("ss-sort-style", "list", { expires: new Date("January 12, 2025") });
+				});
+		
+				$('#ss-sortgrid').removeClass('active');
+		
+				$(this).addClass('active');
+				/*
+				$('.mymedia.mm-media.entry').each(function() {
+					if ($( this ).hasClass( "span4" )) $( this ).removeClass( "span4" );
+				});
+				*/
+				$('.mymedia.mm-media.entry .btn').each(function() {
+					$( this ).removeClass( "btn-small" );
+				});
+				$('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
+					if ($( this ).hasClass( "span12" )) $( this ).removeClass( "span12" ).addClass( "span4" );
+				});
+				$('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
+					if ($( this ).hasClass( "span12" )) $( this ).removeClass( "span12" ).addClass( "span8" );
+				});		
+		
+		
+			});
+			
 
             $("#id_add_media").on("click", function() {
                 fadeInSelectorWindow(selectorUrl);
@@ -245,8 +346,12 @@ define(['jquery'], function($) {
             });
 
             if ($(location).attr("pathname").indexOf("simple_selector.php") != -1) {
-                $(".media_thumbnail").on("click", function(e) {
-                    clickThumbnailImage(e);
+                //$(".media_thumbnail").on("click", function(e) {
+                //    clickThumbnailImage(e);
+                //});
+				
+                $(".selector").on("click", function() {
+                    clickThumbnailRow($(this));
                 });
             } else {
                 $("#media_thumbnail").on("change", function() {

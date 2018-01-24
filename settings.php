@@ -231,13 +231,12 @@ if ($hassiteconfig) {
 
     // Kaltura regular player selection.
     if ($enableapicalls) {
-        $players = local_yukaltura_get_custom_players();
+        $players = local_kaltura_get_custom_players();
     }
 
     // Kaltura Media Assignment section.
-    $settings->add(new admin_setting_heading('kaltura_kalmediaassign_heading',
-                   get_string('kaltura_kalmediaassign_title', 'local_kaltura'), ''));
-                   get_string('kaltura_kalmediaassign_title', 'local_kaltura'), ''));
+    $settings->add(new admin_setting_heading('kaltura_kalvidassign_heading',
+                   get_string('kaltura_kalvidassign_title', 'local_kaltura'), ''));
 
     $choices = array(KALTURA_PLAYER_PLAYERREGULARDARK  => get_string('player_regular_dark', 'local_kaltura'),
                      KALTURA_PLAYER_PLAYERREGULARLIGHT => get_string('player_regular_light', 'local_kaltura'),
@@ -263,40 +262,40 @@ if ($hassiteconfig) {
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
-    $adminsetting = new admin_setting_configtext('kalmediaassign_player_width',
-                                                 get_string('kalmediaassign_player_width',
+    $adminsetting = new admin_setting_configtext('kalvidassign_player_width',
+                                                 get_string('kalvidassign_player_width',
                                                  'local_kaltura'),
-                                                 get_string('kalmediaassign_player_width_desc',
+                                                 get_string('kalvidassign_player_width_desc',
                                                  'local_kaltura'), '400', PARAM_INT);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
-    $adminsetting = new admin_setting_configtext('kalmediaassign_player_height',
-                                                 get_string('kalmediaassign_player_height', 'local_kaltura'),
-                                                 get_string('kalmediaassign_player_height_desc', 'local_kaltura'),
+    $adminsetting = new admin_setting_configtext('kalvidassign_player_height',
+                                                 get_string('kalvidassign_player_height', 'local_kaltura'),
+                                                 get_string('kalvidassign_player_height_desc', 'local_kaltura'),
                                                  '365', PARAM_INT);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
-    $adminsetting = new admin_setting_configtext('kalmediaassign_popup_player_width',
-                                                 get_string('kalmediaassign_popup_player_width',
+    $adminsetting = new admin_setting_configtext('kalvidassign_popup_player_width',
+                                                 get_string('kalvidassign_popup_player_width',
                                                  'local_kaltura'),
-                                                 get_string('kalmediaassign_popup_player_width_desc',
+                                                 get_string('kalvidassign_popup_player_width_desc',
                                                  'local_kaltura'), '500', PARAM_INT);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
-    $adminsetting = new admin_setting_configtext('kalmediaassign_popup_player_height',
-                                                 get_string('kalmediaassign_popup_player_height',
+    $adminsetting = new admin_setting_configtext('kalvidassign_popup_player_height',
+                                                 get_string('kalvidassign_popup_player_height',
                                                  'local_kaltura'),
-                                                 get_string('kalmediaassign_popup_player_height_desc', 'local_kaltura'),
+                                                 get_string('kalvidassign_popup_player_height_desc', 'local_kaltura'),
                                                  '460', PARAM_INT);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
     // Kaltura Media Resource section.
-    $settings->add(new admin_setting_heading('kaltura_kalmediares_heading',
-                                             get_string('kaltura_kalmediares_title', 'local_kaltura'), ''));
+    $settings->add(new admin_setting_heading('kaltura_kalvidres_heading',
+                                             get_string('kaltura_kalvidres_title', 'local_kaltura'), ''));
 
     $adminsetting = new admin_setting_configselect('player_resource',
                                                    get_string('kaltura_player_resource', 'local_kaltura'),
@@ -400,7 +399,7 @@ if ($hassiteconfig) {
     $connection = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
 
     if (!empty($connection) && !empty($session)) {
-        $control = local_yukaltura_get_internal_access_control($connection);
+        $control = local_kaltura_get_internal_access_control($connection);
         if (!is_null($control)) {
             $restriction = $control->restrictions[0];
             $addresses = $restriction->ipAddressList;

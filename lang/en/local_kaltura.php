@@ -68,8 +68,8 @@ $string['media_bad'] = 'Please do not use this media';
 $string['kaltura_general'] = 'General Settings';
 $string['kaltura_kalmediapres_title'] = 'Kaltura Media Presentation Settings';
 $string['kaltura_kcw_title'] = 'Kaltura Content Wizard (KCW) Settings';
-$string['kaltura_kalmediares_title'] = 'Kaltura Media Resource Settings';
-$string['kaltura_kalmediaassign_title'] = 'Kaltura Media Assignment Settings';
+$string['kaltura_kalvidres_title'] = 'Kaltura Media Resource Settings';
+$string['kaltura_kalvidassign_title'] = 'Kaltura Media Assignment Settings';
 $string['filter_player_width'] = 'Embedded player width';
 $string['filter_player_width_desc'] = 'Width of the embedded player';
 $string['filter_player_height'] = 'Embedded player height';
@@ -135,13 +135,13 @@ $string['kalvidassign_player_width'] = 'Player width';
 $string['kalvidassign_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or viewing video submissions.';
 $string['simple_uploader'] = 'Simple Uploader (1002613)';
 
-$string['kalmediaassign_player_width'] = 'Player width';
-$string['kalmediaassign_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or viewing media submissions.';
+$string['kalvidassign_player_width'] = 'Player width';
+$string['kalvidassign_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or viewing media submissions.';
 
-$string['kalmediaassign_popup_player_height'] = 'Popup player height';
-$string['kalmediaassign_popup_player_height_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or popup viewing media submissions.';
-$string['kalmediaassign_popup_player_width'] = 'Popup player width';
-$string['kalmediaassign_popup_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or popup viewing media submissions.';
+$string['kalvidassign_popup_player_height'] = 'Popup player height';
+$string['kalvidassign_popup_player_height_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or popup viewing media submissions.';
+$string['kalvidassign_popup_player_width'] = 'Popup player width';
+$string['kalvidassign_popup_player_width_desc'] = 'Adjust this setting if your Kaltura player is being cut off when submitting and/or popup viewing media submissions.';
 
 $string['enable_reports'] = 'Enable reports';
 $string['enable_reports_desc'] = 'Kaltura reports are only compatible with Kaltura version Falcon or above';
