@@ -722,10 +722,11 @@ function local_kaltura_create_image_markup($entryobj, $title, $theme,
  * @param string $session - A kaltura session string
  * @param int $uid - a unique identifier, this value is appented to 'kaltura_player_'
  * and is used as the id of the object tag
+ * @param bool $autoplay - whether we should autoplay this entry if possible
  *
  * @return string - HTML markup
  */
-function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $session = '', $uid = 0) {
+function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $session = '', $uid = 0, $autoplay = 0) {
 
     if (!local_kaltura_is_valid_entry_object($entryobj)) {
         return 'Unable to play video ('. $entryobj->id . ') please contact your site administrator.';
@@ -742,6 +743,10 @@ function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $s
         $varstr = '&amp;IframeCustomPluginCss1=' .  new moodle_url('/local/kaltura/css/hiddenPlayButton.css');
         $flashvars .= $varstr;
     }
+		
+		if ($autoplay == 1) {
+			$flashvars .= '&amp;autoPlay=1';
+		}
 
     if (empty($uiconfid)) {
         $uiconf = local_kaltura_get_player_uiconf('player');
@@ -1241,10 +1246,11 @@ function local_kaltura_create_client_tag() {
  * @param string $session - A kaltura session string
  * @param int $uid - a unique identifier, this value is appented to 'kaltura_player_'
  * and is used as the id of the object tag
+ * @param bool $autoplay - whether we should autoplay this entry if possible
  * @return string - HTML tags of kwidget player.
  *
  */
-function local_kaltura_get_kwidget_code($entryobj, $uiconfid = 0, $courseid = 0, $session = '', $uid = 0) {
+function local_kaltura_get_kwidget_code($entryobj, $uiconfid = 0, $courseid = 0, $session = '', $uid = 0, $autoplay = 0) {
 
     if (!local_kaltura_is_valid_entry_object($entryobj)) {
         return 'Unable to play media ('. $entryobj->id . ') please contact your site administrator.';
@@ -1274,7 +1280,9 @@ function local_kaltura_get_kwidget_code($entryobj, $uiconfid = 0, $courseid = 0,
     } else {
         $uiconf = $uiconf_id;
     }
-
+		
+		$doAutoPlay = ($autoplay==1) ? 'true' : 'false';
+		
     $markup = '';
     $markup .= "<div id=\"kaltura_player_{$uid}\" style=\"width:{$entryobj->width}px;height:{$entryobj->height}px;\">" . PHP_EOL;
     $markup .= "    <span property=\"dc:description\" content=\"{$entryobj->description}\"></span>" . PHP_EOL;
@@ -1303,7 +1311,7 @@ function local_kaltura_get_kwidget_code($entryobj, $uiconfid = 0, $courseid = 0,
     $markup .= "            'height'    : '{$entryobj->height}'," . PHP_EOL;
     $markup .= "            'flashvars' :{" . PHP_EOL;
     $markup .= "                'externalInterfaceDisabled' : false," . PHP_EOL;
-    $markup .= "                'autoPlay' : false{$kwidgetflashvar}" . PHP_EOL;
+    $markup .= "                'autoPlay' : {$doAutoPlay}{$kwidgetflashvar}" . PHP_EOL;
     $markup .= "            }" . PHP_EOL;
     $markup .= "        });" . PHP_EOL;
     $markup .= "    }". PHP_EOL;
