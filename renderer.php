@@ -218,16 +218,41 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output = '';
 
+        $upload = '';
         $simplesearch = '';
 
         $context = context_user::instance($USER->id);
 
+        if (has_capability('local/mymedia:upload', $context, $USER)) {
+            $upload = $this->create_upload_markup();
+        }
+		
         if (has_capability('local/kaltura:search_selector', $context, $USER)) {
             $simplesearch = $this->create_search_markup();
         }
+				
+        $attr = array('class' => 'row-fluid');
 
+        $output .= html_writer::start_tag('div', $attr);
+
+        $attr = array('class' => 'span2');
+        $output .= html_writer::start_tag('div', $attr);
+				
+				$output .= $upload;
+				
+        $output .= html_writer::end_tag('div');
+				
+        $attr = array('class' => 'span10');
+        $output .= html_writer::start_tag('div', $attr);
+				
+				$output .= '<span id="close_btn"><i class="fa fa-close"></i> Close</span>';
+				
         $output .= $simplesearch;
 
+        $output .= html_writer::end_tag('div');
+
+        $output .= html_writer::end_tag('div');
+				
         if (!empty($page)) {
 			
 			
@@ -256,7 +281,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 			
 				$ss_grid_active = (isset($_COOKIE["ss-sort-style"])&&$_COOKIE["ss-sort-style"]=='grid') ? ' active':'';
 			
-				$output .= 'View:<a href="#" id="ss-sortlist" class="btn'.(empty($ss_grid_active)?' active':'').'" title="View as list"><i class="fa fa-th-list" aria-hidden="true"></i></a><a href="#" id="ss-sortgrid" class="btn'.$ss_grid_active.'" title="View as grid"><i class="fa fa-th" aria-hidden="true"></i></a>';
+				$output .= 'View: <a href="#" id="ss-sortlist" class="btn'.(empty($ss_grid_active)?' active':'').'" title="View as list"><i class="fa fa-th-list" aria-hidden="true"></i></a><a href="#" id="ss-sortgrid" class="btn'.$ss_grid_active.'" title="View as grid"><i class="fa fa-th" aria-hidden="true"></i></a>';
 			
 		        $output .= html_writer::end_tag('div');
 			
@@ -475,14 +500,9 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('form', $attr);
 
-        $attr = array('align' => 'right', 'border' => '0', 'cellpadding' => '0');
+       
 
-        $output .= html_writer::start_tag('table', $attr);
-
-        $output .= html_writer::start_tag('tr');
-        $output .= html_writer::start_tag('td');
-
-        $attr = array('cellpadding' => '0', 'border' => 0);
+        $attr = array('align'=>'right','cellpadding' => '0', 'border' => 0);
 
         $output .= html_writer::start_tag('table', $attr);
 
@@ -514,8 +534,6 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');
-        $output .= html_writer::end_tag('tr');
-        $output .= html_writer::end_tag('table');
 
         $attr = array('type' => 'hidden',
                       'id' => 'sesskey_id',
@@ -546,11 +564,9 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::empty_tag('input', $attr);
 
-        $output .= html_writer::end_tag('td');
         $output .= html_writer::end_tag('tr');
-
         $output .= html_writer::end_tag('table');
-
+				
         $output .= html_writer::end_tag('form');
 
         $output .= html_writer::end_tag('span');
@@ -591,19 +607,19 @@ class local_kaltura_renderer extends plugin_renderer_base {
 		
         $output = '<div class="kmr-selectbar row-fluid"><div class="kmr-selected row-fluid">';
 
-                $output .= '<p>Selected Media:</p>';
+				$output .= '<div class="span2">';
+        $output .= '<p>Selected Media:</p>';
 				
-				$output .= '<div class="span4">';
 				$output .= '<p><img src="pix/vidThumb.png" id="kmr_selected_thumb" class="kmr-selected-thumbnail" height="80" width="120" /></p>';
 				$output .= '</div>';
 				
-				$output .= '<div class="span8">';  
+				$output .= '<div class="span10">';  
                         
                 $attr = array('id' => 'select_name', 'name' => 'select_name');
                 $output .= html_writer::start_tag('h6', $attr);
                 $output .= 'Please make a selection';
                 $output .= html_writer::end_tag('h6');
-
+								
                 $output .= '</div>';
                 $output .= '</div>';
 
@@ -622,7 +638,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
 
         $attr = array('type' => 'button', 'id' => 'cancel_btn', 'name' => 'cancel_btn',
-                      'value' => 'Cancel, Close');
+                      'value' => 'Cancel');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('div');
@@ -805,7 +821,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('td', array());
 
         $attr = array('type' => 'button', 'class'=>'btn btn-default', 'id' => 'cancel_btn', 'name' => 'cancel_btn',
-                      'value' => 'Cancel, Close');
+                      'value' => 'Cancel');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');

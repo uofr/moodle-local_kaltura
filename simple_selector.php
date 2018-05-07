@@ -48,6 +48,7 @@ $PAGE->add_body_class('mymedia-index');
 
 require_login();
 
+$PAGE->requires->css( new moodle_url($CFG->wwwroot . '/theme/urcourses_clean/style/font-awesome.min.css') );
 $PAGE->requires->css('/local/kaltura/css/simple_selector.css', true);
 $PAGE->requires->js_call_amd('local_kaltura/simpleselector', 'init',
                              array($CFG->wwwroot . "/local/kaltura/simple_selector.php", null));

@@ -340,6 +340,11 @@ define(['jquery'], function($) {
             $("#cancel_btn").on("click", function() {
                 fadeOutSelectorWindow();
             });
+						
+
+            $("#close_btn").on("click", function() {
+                fadeOutSelectorWindow();
+            });
 
             $("#fadeout").on("click", function() {
                 fadeOutSelectorWindow();
@@ -358,6 +363,13 @@ define(['jquery'], function($) {
                     replaceAddMediaLabel(replaceLabel);
                 });
             }
+						
+						
+						/*
+						if (kmr_selected == '') {
+							$(".kmr-selectbar").hide();
+						} 
+						*/
 
         }
     };
