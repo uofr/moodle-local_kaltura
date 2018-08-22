@@ -1021,7 +1021,8 @@ function local_kaltura_has_mobile_flavor_enabled() {
 
     } catch (Exception $ex) {
         $errormessage = 'mobile flavor on(' . $ex->getMessage() . ')';
-        print_error($errormessage, 'local_kaltura');
+				debugging($errormessage, DEBUG_DEVELOPER);
+        //print_error($errormessage, 'local_kaltura');
         return false;
     }
 }
@@ -1049,7 +1050,8 @@ function local_kaltura_test_connection($client_obj) {
 
     } catch (Exception $ex) {
         $errormessage = 'test connection(' . $ex->getMessage() . ')';
-        print_error($errormessage, 'local_kaltura');
+				debugging($errormessage, DEBUG_DEVELOPER);
+        //print_error($errormessage, 'local_kaltura');
         return false;
     }
 }

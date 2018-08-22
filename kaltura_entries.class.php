@@ -30,7 +30,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/local/kaltura/locallib.php'
 
 defined('MOODLE_INTERNAL') || die();
 
-require_login();
+//require_login();
 
 /**
  * Kaltura static entries class.
