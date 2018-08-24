@@ -28,7 +28,7 @@ require_once(dirname(__FILE__) . '/locallib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
-require_login();
+//require_login();
 
 $param = optional_param('section', '', PARAM_TEXT);
 
