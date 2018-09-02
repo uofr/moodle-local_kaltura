@@ -334,7 +334,7 @@ if ($hassiteconfig) {
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
-    $choices = array('contain_lastname' => get_string('mymedia_contain_lastname', 'local_kaltura'),
+    $access_choices = array('contain_lastname' => get_string('mymedia_contain_lastname', 'local_kaltura'),
                      'not_contain_lastname' => get_string('mymedia_not_contain_lastname', 'local_kaltura'),
                      'contain_firstname' => get_string('mymedia_contain_firstname', 'local_kaltura'),
                      'not_contain_firstname' => get_string('mymedia_not_contain_firstname', 'local_kaltura'),
@@ -344,7 +344,7 @@ if ($hassiteconfig) {
     $adminsetting = new admin_setting_configselect('mymedia_access_rule',
                                                    get_string('mymedia_access_rule', 'local_kaltura'),
                                                    get_string('mymedia_access_rule_desc', 'local_kaltura'),
-                                                   'contain_lastname', $choices);
+                                                   'contain_lastname', $access_choices);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
