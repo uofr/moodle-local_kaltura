@@ -21,4 +21,4 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-mw.setConfig('EmbedPlayer.EnableIframeApi', true);
+if (typeof mw != "undefined") mw.setConfig('EmbedPlayer.EnableIframeApi', true);
