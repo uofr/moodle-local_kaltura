@@ -188,6 +188,7 @@ $string['problem_viewing'] = 'There is a problem displaying the page.  Please tr
 $string['permission_disable'] = 'You don\'t have permission to use kaltura media.';
 
 // Screen recorder.
+$string['enable_screen_recorder'] = 'Enable Screen Recording';
 $string['screenrecorder'] = 'Screen Recording';
 $string['loadingwait'] = 'Loading. This may take a few minutes.';
 
