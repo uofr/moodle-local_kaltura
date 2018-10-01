@@ -51,7 +51,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $table->id = 'selector_media';
         $table->size = array('25%', '25%', '25%');
-        $table->colclasses = array('media column 1', 'media column 2', 'media column 3');
+        $table->colclasses = array('column 1', 'column 2', 'column 3');
 
         $table->align = array('center', 'center', 'center');
         $table->data = array();
@@ -147,22 +147,10 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $sort = '';
 
-        $attr = array('cellpadding' => '0', 'border' => 0);
-
-        $sort .= html_writer::start_tag('table', $attr);
-
-        $sort .= html_writer::start_tag('tr');
-
-        $attr = array('valign' => 'middle');
-
-        $sort .= html_writer::start_tag('td', $attr);
-
+        
         $sort .= get_string('sortby', 'local_kaltura').':';
         $sort .= '&nbsp;';
 
-        $sort .= html_writer::end_tag('td');
-        $sort .= html_writer::start_tag('td');
-        $sort .= '&nbsp;';
         $sort .= html_writer::start_tag('select', array('id' => 'selectorSort'));
 
         $attr = array('value' => $sorturl . 'recent');
@@ -199,10 +187,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $sort .= html_writer::end_tag('select');
 
-        $sort .= html_writer::end_tag('td');
-        $sort .= html_writer::end_tag('tr');
-        $sort .= html_writer::end_tag('table');
-
+       
         return $sort;
     }
 
@@ -219,12 +204,17 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output = '';
 
         $upload = '';
+				$webcamupload = '';
         $simplesearch = '';
 
         $context = context_user::instance($USER->id);
 
         if (has_capability('local/mymedia:upload', $context, $USER)) {
             $upload = $this->create_upload_markup();
+						
+						if (local_kaltura_get_webcam_permission()) {
+	            $webcamupload .= $this->create_webcam_markup();
+	        	}
         }
 		
         if (has_capability('local/kaltura:search_selector', $context, $USER)) {
@@ -235,14 +225,14 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', $attr);
 
-        $attr = array('class' => 'span2');
+        $attr = array('class' => 'span4');
         $output .= html_writer::start_tag('div', $attr);
 				
-				$output .= $upload;
+				$output .= $upload.$webcamupload;
 				
         $output .= html_writer::end_tag('div');
 				
-        $attr = array('class' => 'span10');
+        $attr = array('class' => 'span8');
         $output .= html_writer::start_tag('div', $attr);
 				
 				$output .= '<span id="close_btn"><i class="fa fa-close"></i> Close</span>';
@@ -259,14 +249,14 @@ class local_kaltura_renderer extends plugin_renderer_base {
 		        $attr = array('class' => 'mm-sortbar row-fluid');
 		        $output .= html_writer::start_tag('div', $attr);
 			
-		        $attr = array('class' => 'span7');
+		        $attr = array('class' => 'span6');
 		        $output .= html_writer::start_tag('div', $attr);
 						
 				$output .= $page;
 			
 				$output .= html_writer::end_tag('div');
 			
-		        $attr = array('class' => 'mm-sorter pull-right');
+		        $attr = array('class' => 'span6 mm-sorter pull-right');
 		        $output .= html_writer::start_tag('div', $attr);
 
 		        $attr = array('class' => 'mm-sort-and-view');
@@ -330,7 +320,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
     public function create_media_name_markup($name) {
 
         $output = '';
-        $attr = array('class' => 'selector media name',
+        $attr = array('class' => 'selector kmedia name',
                         'title' => $name);
 
         $output .= html_writer::start_tag('div', $attr);
@@ -353,7 +343,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output = '';
 
-        $attr   = array('class' => 'media thumbnail');
+        $attr   = array('class' => 'kmedia kthumbnail');
         $output .= html_writer::start_tag('div', $attr);
 
         $attr    = array('src' => $url . '/width/120/height/80/type/3',
@@ -381,7 +371,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
     public function create_media_created_markup($date) {
 
         $output = '';
-        $attr = array('class' => 'selector media created',
+        $attr = array('class' => 'selector kmedia created',
                       'title' => userdate($date));
 
         $output .= html_writer::start_tag('div', $attr);
@@ -409,7 +399,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 			//$mm_entry_span = '';
 			//}
 		
-        $attr   = array('class' => 'mymedia mm-media selector media entry span4'.$mm_entry_span,
+        $attr   = array('class' => 'mymedia mm-media selector kmedia entry span4'.$mm_entry_span,
                         'id' => $entry->id);
 
         $output .= html_writer::start_tag('div', $attr);
@@ -460,15 +450,20 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('h6', $entry->name);
 		$output .= html_writer::end_tag('div');
 		
-		$output .= '<i class="fa fa-hashtag" aria-hidden="true"></i> Entry ID: ' . $entry->id . '<br><i class="fa fa-clock-o" aria-hidden="true" title="Uploaded"></i> '.userdate($entry->createdAt);
+		$dateformat = '%b %e, %Y %I:%M %p';
 		
+		$output .= '<span title="Entry ID"><i class="fa fa-hashtag" aria-hidden="true"></i> ' . $entry->id . '</span><br />
+			<span title="Uploaded"><i class="fa fa-clock-o" aria-hidden="true" title="Uploaded"></i> '.userdate($entry->createdAt, $dateformat).'</span>';
+				
+				/*
         $attr = array('id' => 'description_'. $entry->id);
         $output .= html_writer::start_tag('div', $attr);
         if ($entry->description != null && $entry->description != '') {
             $output .= $entry->description;
         }
         $output .= html_writer::end_tag('div');
-		
+				*/
+				
         $output .= html_writer::end_tag('div');
 		
         $output .= html_writer::end_tag('div');
@@ -490,7 +485,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output = '';
 
         $attr = array('id' => 'simple_search_container',
-                      'class' => 'selector simple search container');
+                      'class' => 'selector simple search');
 
         $output .= html_writer::start_tag('span', $attr);
 
@@ -870,16 +865,47 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= '</script>';
 
         $attr = array('id' => 'uploader_open',
-                      'class' => 'mymedia simple upload button',
+                      'class' => 'mymedia simple upload btn',
                       'value' => get_string('simple_upload', 'local_mymedia'),
                       'type' => 'button',
                       'title' => get_string('simple_upload', 'local_mymedia'),
                       'onClick' => 'openSimpleUploader()');
 
-        $output .= html_writer::empty_tag('input', $attr);
+							        $output .= html_writer::start_tag('a', $attr);
+		
+									$output .= '<i class="fa fa-cloud-upload"></i> '.get_string('simple_upload', 'local_mymedia');
+
+							        $output .= html_writer::end_tag('a');
 
         return $output;
 
+    }
+		
+    /**
+     * This function outputs the media upload.
+     *
+     * @return string - HTML markup of webcam upload.
+     */
+    public function create_webcam_markup() {
+        $output = '';
+        $output .= '<script>';
+        $output .= 'function openWebcamUploader() { location.href="./../mymedia/webcam_uploader.php?embedded=1"; }';
+        $output .= '</script>';
+
+        $attr = array('id' => 'webcam_open',
+                      'class' => 'mymedia simple webcam upload btn',
+                      'title' => get_string('webcam_upload', 'local_mymedia'),
+                      'onClick' => 'openWebcamUploader()');
+				
+				$output .= html_writer::start_tag('a', $attr);
+				
+				$output .= '<i class="fa fa-video-camera"></i> '.get_string('webcam_upload', 'local_mymedia');
+				
+        $output .= html_writer::end_tag('a');
+				
+        //$output .= html_writer::empty_tag('input', $attr);
+
+        return $output;
     }
 
 }

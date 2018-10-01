@@ -8,13 +8,7 @@
 
 img.media_thumbnail {
     display: block;
-    -moz-box-shadow: 2px 2px 3px 3px #ccc;
-    -webkit-box-shadow: 2px 2px 3px 3px #ccc;
-    box-shadow: 2px 2px 3px 3px #ccc;
     background-color: #eee;
-    padding: 3px;
-    margin: 3px;
-    transition: all 0.5s ease;
 }
 /*
 img:hover.media_thumbnail {
@@ -180,4 +174,24 @@ img.media_thumbnail {
 
 .mm-sorter {
     margin-top: 26px;
+}
+
+.mm-sorter div {
+	margin-left: 1em;
+}
+
+#webcam_open {
+    margin-left: 1em;
+}
+
+.kmedia.kthumbnail {
+    margin-bottom: 0.75em;
+}
+
+.mm-entry-grp {
+	font-size: 0.85em;
+}
+
+.mm-entry-grp h6 {
+	margin: 0;
 }
