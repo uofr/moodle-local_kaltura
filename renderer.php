@@ -861,7 +861,13 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output = '';
         $output .= '<script>';
-        $output .= 'function openSimpleUploader() { location.href="./../mymedia/simple_uploader.php?embedded=1"; }';
+        $output .= 'function openSimpleUploader() { ';
+					
+		    $output .= '	var urlParams = new URLSearchParams(window.location.search);';
+	      $output .= '	var seltype = (urlParams.get(\'seltype\')) ? \'&seltype=\'+urlParams.get(\'seltype\') : \'\';';
+				
+				$output .= 	'	location.href="./../mymedia/simple_uploader.php?embedded=1"+seltype;';
+				$output .= 	'}';
         $output .= '</script>';
 
         $attr = array('id' => 'uploader_open',
@@ -889,7 +895,14 @@ class local_kaltura_renderer extends plugin_renderer_base {
     public function create_webcam_markup() {
         $output = '';
         $output .= '<script>';
-        $output .= 'function openWebcamUploader() { location.href="./../mymedia/webcam_uploader.php?embedded=1"; }';
+        $output .= 'function openWebcamUploader() {  ';
+					
+		    $output .= '	var urlParams = new URLSearchParams(window.location.search);';
+	      $output .= '	var seltype = (urlParams.get(\'seltype\')) ? \'&seltype=\'+urlParams.get(\'seltype\') : \'\';';
+				
+				
+				$output .= 	'	location.href="./../mymedia/webcam_uploader.php?embedded=1"+seltype;';
+				$output .= 	'}';
         $output .= '</script>';
 
         $attr = array('id' => 'webcam_open',
