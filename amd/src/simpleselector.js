@@ -223,7 +223,7 @@ define(['jquery'], function($) {
                     var desc = "";
 
                     var selectDesc = $("#description_" + selectId);
-                    if (selectDesc !== null) {
+                    if (selectDesc !== null && $.trim(selectDesc.html()) != '') {
                         desc = selectDesc.html();
                         desc = desc.replace(/\n/g, "<br />");
                     }
