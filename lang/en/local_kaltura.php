@@ -181,6 +181,7 @@ $string['invalid_size'] = 'Player size(width,height) is a wrong dimension.';
 
 // Simple selector.
 $string['selected_media'] = 'Selected Media';
+$string['modal_header'] = 'Please Make a Selection';
 
 // Troubles.
 $string['no_media'] = 'No media found';

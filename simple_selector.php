@@ -49,9 +49,8 @@ $PAGE->add_body_class('mymedia-index');
 require_login();
 
 $PAGE->requires->css( new moodle_url($CFG->wwwroot . '/theme/urcourses_clean/style/font-awesome.min.css') );
-$PAGE->requires->css('/local/kaltura/css/simple_selector.css', true);
-$PAGE->requires->js_call_amd('local_kaltura/simpleselector', 'init',
-                             array($CFG->wwwroot . "/local/kaltura/simple_selector.php", null));
+$PAGE->requires->css( new moodle_url($CFG->wwwroot . '/local/kaltura/css/simple_selector.css'));
+$PAGE->requires->js_call_amd('local_kaltura/simpleselector', 'init', null);
 
 // Connect to Kaltura server.
 $kaltura = new kaltura_connection();
@@ -136,7 +135,7 @@ if (local_kaltura_get_mymedia_permission()) {
 
         }
 
-        echo $renderer->create_selector_submit_form();
+        // echo $renderer->create_selector_submit_form();
 
     } catch (Exception $ex) {
         $errormessage = 'View - error main page(' .  $ex->getMessage() . ')';
