@@ -32,7 +32,6 @@
     var sort = '#selectorSort';
 
     // modal selectors (located in parent.document)
-    var modal = "#video_selector_modal";
     var selectedVidThumb = '#selected_video_thumbnail';
     var selectedVidName = '#selected_video_name';
     var selectedVidId = '#selected_video_id';

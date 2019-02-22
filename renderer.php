@@ -855,7 +855,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('iframe', '', ['id' => 'video_selector_iframe', 'src' => $url, 'style' => 'width: 100%; height: 500px; border: 0px solid transparent']);
         $output .= html_writer::end_tag('div');
 
-        $output .= html_writer::start_tag('div', ['class' => 'modal-footer bg-secondary']);
+        $output .= html_writer::start_tag('div', ['class' => 'modal-footer']);
 
         $output .= html_writer::start_tag('div', ['class' => 'container']);
         $output .= html_writer::tag('h6', 'Select a Video', ['id' => 'selected_video_name']);
@@ -864,7 +864,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         $output .= html_writer::empty_tag('input', ['type' => 'button', 'id' => 'submit_btn', 'name' => 'submit_btn', 'value' => 'OK', 'disabled' => 'true', 'class' => 'btn btn-primary', 'data-dismiss' => 'modal']);
-        $output .= html_writer::empty_tag('input', ['type' => 'button', 'id' => 'cancel_btn', 'name' => 'cancel_btn', 'value' => 'Cancel', 'class' => 'btn bg-white', 'data-dismiss' => 'modal']);
+        $output .= html_writer::empty_tag('input', ['type' => 'button', 'id' => 'cancel_btn', 'name' => 'cancel_btn', 'value' => 'Cancel', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal']);
 
         $output .= html_writer::end_tag('div');
 
