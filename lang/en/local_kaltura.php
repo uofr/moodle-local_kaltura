@@ -165,7 +165,7 @@ $string['category_reset_complete'] = '<b>Root category has been reset</b>';
 
 // Properties panel.
 $string['media_properties'] = 'Media Properties';
-$string['media_prop_header'] = 'Media Properties';
+$string['media_prop_header'] = 'Edit Media Properties';
 $string['media_prop_name'] = 'Name:';
 $string['media_prop_player'] = 'Player design:';
 $string['media_prop_dimensions'] = 'Player dimensions:';
@@ -182,6 +182,7 @@ $string['invalid_size'] = 'Player size(width,height) is a wrong dimension.';
 // Simple selector.
 $string['selected_media'] = 'Selected Media';
 $string['modal_header'] = 'Please Make a Selection';
+$string['upload_record'] = 'Upload New';
 
 // Troubles.
 $string['no_media'] = 'No media found';
@@ -205,6 +206,7 @@ $string['search_text_tooltip'] = 'Enter media name or tags';
 
 // Sorting.
 $string['sortby'] = 'Sort by';
+$string['sort'] = 'Sort';
 $string['mostrecent'] = 'Most recent';
 $string['oldest'] = 'Oldest';
 $string['medianameasc'] = 'Media name (ascending)';

@@ -26,10 +26,12 @@
     // selectors
     var gridButton = "#ss-sortgrid";
     var listButton = '#ss-sortlist';
+    var sort = '#selectorSort';
+    var uploadButton = "#uploader_open";
+    var webcamUploadButton = "#webcam_open";
     var mediaEntry = '.mymedia.mm-media.entry';
     var mediaEntryThumbnail = '.mymedia.mm-media.entry .mm-thumb-grp';
     var mediaEntryMetadata = '.mymedia.mm-media.entry .mm-entry-grp';
-    var sort = '#selectorSort';
 
     // modal selectors (located in parent.document)
     var selectedVidThumb = '#selected_video_thumbnail';
@@ -39,17 +41,20 @@
     var cancelButton = "#cancel_btn";
     var xButton = "#modal_dismiss";
 
-    // hidden elements in parent.document that get updated when you select a video and press OK
+    // elements in parent.document
     var entryId = "#entry_id";
     var entryName = "#id_name";
     var entryThumbnail = "#media_thumbnail";
     var idMediaProperties = "#id_media_properties"; 
+    var submitMedia = "#submit_media";
 
     function init() {
         // event listeners
         $(gridButton).click(layoutGrid);
         $(listButton).click(layoutList);
         $(sort).change(sortMedia);
+        $(uploadButton).click(openUploader);
+        $(webcamUploadButton).click(openWebcamUploader);
         $(mediaEntry).click(selectMedia);
         $(submitButton, parent.document).click(submit);
         $(cancelButton, parent.document).click(cancel);
@@ -86,6 +91,18 @@
         window.location.href = $(this).val();
     }
 
+    function openUploader() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var seltype = (urlParams.get('seltype')) ? '&seltype=' + urlParams.get('seltype') : '';
+        location.href = "./../mymedia/simple_uploader.php?embedded=1" + seltype;
+    }
+
+    function openWebcamUploader() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var seltype = (urlParams.get('seltype')) ? '&seltype=' + urlParams.get('seltype') : '';
+        location.href = "./../mymedia/webcam_uploader.php?embedded=1" + seltype;
+    }
+
     function selectMedia() {
         var selectedId = $(this).attr('id');
         var selectedName = $('#th_' + selectedId).attr('alt');
@@ -106,20 +123,30 @@
         var selectedName = $(selectedVidName, parent.document).text();
         var selectedThumb = $(selectedVidThumb, parent.document).attr('src');
 
-        if (selectedId !== null && selectedId !== '') {
-            $(entryId, parent.document).val(selectedId);
+        if ($(entryId, parent.document) !== null) {
+            if (selectedId !== null && selectedId !== '') {
+                $(entryId, parent.document).val(selectedId);
+            }
         }
 
-        if (selectedName !== null && selectedName !== '') {
-            $(entryName, parent.document).val(selectedName);
+        if ($(entryName, parent.document) !== null) {
+            if (selectedName !== null && selectedName !== '') {
+                $(entryName, parent.document).val(selectedName);
+            }
         }
 
-        if (selectedThumb !== null && selectedThumb !== '') {
-            $(entryThumbnail, parent.document).attr('src', selectedThumb);
+        if ($(entryThumbnail, parent.document !== null)) {
+            if (selectedThumb !== null && selectedThumb !== '') {
+                $(entryThumbnail, parent.document).attr('src', selectedThumb);
+            }
         }
-
+        
         if ($(idMediaProperties, parent.document) !== null) {
             $(idMediaProperties, parent.document).css({visibility: "visible"});
+        }
+
+        if ($(submitMedia, parent.document) !== null) {
+            $(submitMedia, parent.document).prop("disabled", false);
         }
     }
 

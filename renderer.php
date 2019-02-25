@@ -98,63 +98,35 @@ class local_kaltura_renderer extends plugin_renderer_base {
         if (isset($SESSION->selectorsort) && !empty($SESSION->selectorsort)) {
             $sort = $SESSION->selectorsort;
             if ($sort == 'recent') {
-                $recent = "selected";
+                $button_text = get_string('mostrecent', 'local_kaltura');
             } else if ($sort == 'old') {
-                $old = "selected";
+                $button_text = get_string('oldest', 'local_kaltura');
             } else if ($sort == 'name_asc') {
-                $nameasc = "selected";
+               $button_text = get_string('medianameasc', 'local_kaltura');
             } else if ($sort == 'name_desc') {
-                $namedesc = "selected";
+                $button_text = get_string('medianamedesc', 'local_kaltura');
             } else {
-                $recent = "selected";
+                $button_text = get_string('recent', 'local_kaltura');
             }
         } else {
-            $recent = "selected";
+           $button_text = get_string('recent', 'local_kaltura');
         }
 
         $sort = '';
 
-       
+        $sort .= html_writer::start_tag('div', ['class' => 'btn-group mr-2']);
 
-        $sort .= html_writer::start_tag('div', ['class' => 'form-group']);
-
-        $sort .= html_writer::start_tag('select', array('id' => 'selectorSort', 'class' => 'form-control'));
-
-        $attr = array('value' => $sorturl . '=recent');
-
-        if ($recent != null) {
-            $attr['selected'] = 'selected';
-        }
-
-        $sort .= html_writer::tag('option', get_string('mostrecent', 'local_kaltura'), $attr);
-
-        $attr = array('value' => $sorturl . '=old');
-
-        if ($old != null) {
-            $attr['selected'] = 'selected';
-        }
-
-        $sort .= html_writer::tag('option', get_string('oldest', 'local_kaltura'), $attr);
-
-        $attr = array('value' => $sorturl . '=name_asc');
-
-        if ($nameasc != null) {
-            $attr['selected'] = 'selected';
-        }
-
-        $sort .= html_writer::tag('option', get_string('medianameasc', 'local_kaltura'), $attr);
-
-        $attr = array('value' => $sorturl . '=name_desc');
-
-        if ($namedesc != null) {
-            $attr['selected'] = 'selected';
-        }
-
-        $sort .= html_writer::tag('option', get_string('medianamedesc', 'local_kaltura'), $attr);
-
-        $sort .= html_writer::end_tag('select');
+        $sort .= html_writer::tag('button', $button_text, ['class' => 'btn btn-secondary']);
+        $sort .= html_writer::tag('button', '', ['class' => 'dropdown-toggle dropdown-toggle-split btn btn-secondary', 'data-toggle' => 'dropdown']);
+        
+        $sort .= html_writer::start_tag('div', ['class' => 'dropdown-menu dropdown-menu-right']);
+        $sort .= html_writer::tag('a', get_string('mostrecent', 'local_kaltura'), ['class' => 'dropdown-item', 'href' => $sorturl . '=recent']);
+        $sort .= html_writer::tag('a', get_string('oldest', 'local_kaltura'), ['class' => 'dropdown-item', 'href' => $sorturl . '=old']);
+        $sort .= html_writer::tag('a', get_string('medianameasc', 'local_kaltura'), ['class' => 'dropdown-item', 'href' => $sorturl . '=name_asc']);
+        $sort .= html_writer::tag('a', get_string('medianamedesc', 'local_kaltura'), ['class' => 'dropdown-item', 'href' => $sorturl . '=name_desc']);
         $sort .= html_writer::end_tag('div');
 
+        $sort .= html_writer::end_tag('div');
        
         return $sort;
     }
@@ -174,64 +146,50 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', ['class' => 'container-fluid']);
 
-        // upload and record buttons
-        $output .= html_writer::start_tag('div', ['class' => 'row mb-2']);
-        $output .= html_writer::start_tag('div', ['class' => 'col-sm-12']);
+        // upload, record search
         $output .= html_writer::start_tag('div', ['class' => 'row']);
+
+        // upload / webcam upload
         if (has_capability('local/mymedia:upload', $context, $USER)) {
-            $output .= html_writer::start_tag('div', ['class' => 'col-sm-4']);
+            $output .= html_writer::start_tag('div', ['class' => 'col-sm-4 mb-2']);
             $output .= $this->create_upload_markup();
-            if (local_kaltura_get_webcam_permission()) {
-                $output .= $this->create_webcam_markup();
-            }
-            $output .= html_writer::end_tag('div');
-        }
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
-
-        // search results heading
-        if (isset($SESSION->mymedia)&&$SESSION->mymedia != '') {
-            $output .= html_writer::start_tag('div', ['class' => 'row mb-2']);
-            $output .= html_writer::start_tag('div', ['class' => 'col-sm-12']);
-
-            $clearurl = new moodle_url('/local/mymedia/mymedia.php',array('clear_simple_search_btn_name' => 'Clear', 'sesskey' => sesskey()));
-            $output .= '<span class="mr-3">Showing search results for <b>'.$SESSION->mymedia.'</b>.</span>';
-            $output .= '<a class="btn btn-secondary" href="'.$clearurl.'">Clear search filter</a>';
-
-            $output .= html_writer::end_tag('div');
+            $output .= $this->create_webcam_markup();
             $output .= html_writer::end_tag('div');
         }
 
-        // search bar
-        $output .= html_writer::start_tag('div', ['class' => 'row mb-2']);
-        $output .= html_writer::start_tag('div', ['class' => 'col-sm-12']);
+        // search
         if (has_capability('local/mymedia:search', $context, $USER)) {
+            $output .= html_writer::start_tag('div', ['class' => 'col-sm-8 mb-2']);
             $output .= $this->create_search_markup();
+            $output .= html_writer::end_tag('div');
         }
-        $output .= html_writer::end_tag('div');
+
         $output .= html_writer::end_tag('div');
 
-        // sort, layout, and page
+        // sort and layout
         $output .= html_writer::start_tag('div', ['class' => 'row mb-2']);
 
-        $output .= html_writer::start_tag('div', ['class' => 'col-sm-12']);
-        $output .= $this->create_sort_option();
-        $output .= html_writer::end_tag('div');
+         $output .= html_writer::start_tag('div', ['class' => 'col-sm-4']);
+         $output .= html_writer::end_tag('div');
 
-        $output .= html_writer::end_tag('div');
-
-        $output .= html_writer::start_tag('div', ['class' => 'row']);
-        $output .= html_writer::start_tag('div', ['class' => 'col-sm-12']);
         if (isset($_COOKIE["ss-sort-style"]) && $_COOKIE["ss-sort-style"] == 'grid') {
             $gridActive = ' active';
             $listActive = '';
 		} else {
             $gridActive = '';
             $listActive = ' active';
-		}
-        $output .= '<a href="#" id="ss-sortlist" class="btn btn-secondary'.$listActive.'" title="View as list"><i class="fa fa-th-list" aria-hidden="true"></i></a>';
-        $output .= '<a href="#" id="ss-sortgrid" class="btn btn-secondary'.$gridActive.'" title="View as grid"><i class="fa fa-th" aria-hidden="true"></i></a>';
+        }
+        $output .= html_writer::start_tag('div', ['class' => 'col-sm-8']);
+        $output .= $this->create_sort_option();
+        $output .= '<a href="#" id="ss-sortlist" class="btn btn-secondary mr-2'.$listActive.'" title="View as list"><i class="fa fa-th-list" aria-hidden="true"></i></a>';
+        $output .= '<a href="#" id="ss-sortgrid" class="btn btn-secondary mr-2'.$gridActive.'" title="View as grid"><i class="fa fa-th" aria-hidden="true"></i></a>';
+        $output .= html_writer::end_tag('div');
+
+        $output .= html_writer::end_tag('div');
+
+        // page
+        $output .= html_writer::start_tag('div', ['class' => 'row']);
+        $output .= html_writer::start_tag('div', ['class' => 'col-sm-12']);
         if (!empty($page)) {
             $output .= html_writer::start_tag('div', ['class' => 'float-right']);
             $output .= $page;
@@ -414,8 +372,8 @@ class local_kaltura_renderer extends plugin_renderer_base {
 		
 		$dateformat = '%b %e, %Y %I:%M %p';
 		
-		$output .= '<span title="Entry ID"><i class="fa fa-hashtag" aria-hidden="true"></i> ' . $entry->id . '</span><br />
-			<span title="Uploaded"><i class="fa fa-clock-o" aria-hidden="true" title="Uploaded"></i> '.userdate($entry->createdAt, $dateformat).'</span>';
+		$output .= '<small title="Entry ID"><i class="fa fa-hashtag" aria-hidden="true"></i> ' . $entry->id . '</small> <br/>
+			<small title="Uploaded"><i class="fa fa-clock-o" aria-hidden="true" title="Uploaded"></i> '.userdate($entry->createdAt, $dateformat).'</small>';
 				
         $output .= html_writer::end_tag('div');
 		
@@ -441,21 +399,21 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('form', ['action' => new moodle_url('/local/kaltura/simple_selector.php'), 'method' => 'post']);
 
+        $output .= html_writer::start_tag('div', ['class' => 'input-group']);
+
         $attr = array('type' => 'hidden',
                       'id' => 'sesskey_id',
                       'name' => 'sesskey',
                       'value' => sesskey());
         $output .= html_writer::empty_tag('input', $attr);
-
-        $output .= html_writer::start_tag('div', ['class' => 'input-group']);
-
+        
         $defaultvalue = (isset($SESSION->selector) && !empty($SESSION->selector)) ? $SESSION->selector : '';
         $attr = array('type' => 'text',
                       'id' => 'simple_search',
-                      'class' => 'form-control',
+                      'class' => 'form-control expanding-search',
                       'name' => 'simple_search_name',
-                      'size' => '30',
                       'value' => $defaultvalue,
+                      'placeholder' => get_string('search', 'local_kaltura'),
                       'title' => get_string('search_text_tooltip', 'local_kaltura'),
                       'style' => 'display: inline;');
         $output .= html_writer::empty_tag('input', $attr);
@@ -464,19 +422,22 @@ class local_kaltura_renderer extends plugin_renderer_base {
                       'id'   => 'simple_search_btn',
                       'name' => 'simple_search_btn_name',
                       'value' => get_string('search', 'local_kaltura'),
-                      'class' => 'input-group-append btn btn-primary',
+                      'class' => 'btn btn-primary',
                       'title' => get_string('search', 'local_kaltura'));
-        $output .= html_writer::empty_tag('input', $attr);
+        $output .= html_writer::start_tag('button', $attr);
+        $output .= html_writer::tag('i', '', ['class' => 'fa fa-search']);
+        $output .= html_writer::end_tag('button');
         
         $attr   = array('type' => 'submit',
                         'id'   => 'clear_simple_search_btn',
                         'name' => 'clear_simple_search_btn_name',
                         'value' => get_string('search_clear', 'local_kaltura'),
-                        'class' => 'input-group-append btn btn-secondary',
+                        'class' => 'btn btn-secondary',
                         'title' => get_string('search_clear', 'local_kaltura'));
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('div');
+
 
         $output .= html_writer::end_tag('form');
 
@@ -594,6 +555,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output = '';
 
         // Display name input box.
+        $output .= html_writer::start_tag('div', ['class' => 'form-inline']);
         $attr = array('for' => 'media_prop_name');
         $output .= html_writer::tag('label', get_string('media_prop_name', 'local_kaltura'), $attr);
         $output .= '&nbsp;';
@@ -601,27 +563,30 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $attr = array('type' => 'text',
                       'id' => 'media_prop_name',
                       'name' => 'media_prop_name',
+                      'class' => 'form-control',
                       'size' => '40',
                       'value' => '',
                       'maxlength' => '100');
         $output .= html_writer::empty_tag('input', $attr);
         $output .= html_writer::empty_tag('br');
         $output .= html_writer::empty_tag('br');
+        $output .= html_writer::end_tag('div');
 
         // Display section element for player design.
+        $output .= html_writer::start_tag('div', ['class' => 'form-inline']);
         $attr = array('for' => 'media_prop_player');
         $output .= html_writer::tag('label', get_string('media_prop_player', 'local_kaltura'), $attr);
         $output .= '&nbsp;';
 
         list($options, $defaultoption) = $this->get_media_resource_players();
 
-        $attr = array('id' => 'media_prop_player');
-
+        $attr = array('id' => 'media_prop_player', 'class' => 'form-control');
         $output .= html_writer::select($options, 'media_prop_player', $defaultoption, false, $attr);
-        $output .= html_writer::empty_tag('br');
-        $output .= html_writer::empty_tag('br');
+        $output .= html_writer::end_tag('div');
 
         // Display player size drop down button.
+        $output .= html_writer::start_tag('div', ['class' => 'form-inline']);
+        
         $attr = array('for' => 'media_prop_size');
         $output .= html_writer::tag('label', get_string('media_prop_size', 'local_kaltura'), $attr);
         $output .= '&nbsp;';
@@ -642,6 +607,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $attr = array('type' => 'text',
                       'id' => 'media_prop_width',
                       'name' => 'media_prop_width',
+                      'class' => 'form-control',
                       'value' => '',
                       'maxlength' => '4',
                       'size' => '4'
@@ -653,11 +619,14 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $attr = array('type' => 'text',
                       'id' => 'media_prop_height',
                       'name' => 'media_prop_height',
+                      'class' => 'form-control',
                       'value' => '',
                       'maxlength' => '4',
                       'size' => '4'
                       );
         $output .= html_writer::empty_tag('input', $attr);
+
+        $output .= html_writer::end_tag('div');
 
         return $output;
     }
@@ -721,7 +690,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('td', array());
 
-        $attr = array('type' => 'button', 'class'=>'btn btn-default', 'id' => 'submit_btn', 'name' => 'submit_btn',
+        $attr = array('type' => 'button', 'class'=>'btn btn-default mr-2', 'id' => 'prop_submit_btn', 'name' => 'prop_submit_btn',
                       'value' => 'OK');
         $output .= html_writer::empty_tag('input', $attr);
 
@@ -729,7 +698,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('td', array());
 
-        $attr = array('type' => 'button', 'class'=>'btn btn-default', 'id' => 'cancel_btn', 'name' => 'cancel_btn',
+        $attr = array('type' => 'button', 'class'=>'btn btn-default mr-2', 'id' => 'prop_cancel_btn', 'name' => 'prop_cancel_btn',
                       'value' => 'Cancel');
         $output .= html_writer::empty_tag('input', $attr);
 
@@ -774,21 +743,11 @@ class local_kaltura_renderer extends plugin_renderer_base {
     public function create_upload_markup() {
 
         $output = '';
-        $output .= '<script>';
-        $output .= 'function openSimpleUploader() { ';
-					
-		$output .= '	var urlParams = new URLSearchParams(window.location.search);';
-	    $output .= '	var seltype = (urlParams.get(\'seltype\')) ? \'&seltype=\'+urlParams.get(\'seltype\') : \'\';';
-				
-		$output .= 	'	location.href="./../mymedia/simple_uploader.php?embedded=1"+seltype;';
-		$output .= 	'}';
-        $output .= '</script>';
 
         $attr = array('id' => 'uploader_open',
                       'class' => 'mymedia simple upload btn btn-secondary mr-2',
                       'value' => get_string('simple_upload', 'local_mymedia'),
-                      'title' => get_string('simple_upload', 'local_mymedia'),
-                      'onClick' => 'openSimpleUploader()');
+                      'title' => get_string('simple_upload', 'local_mymedia'));
 
 		$output .= html_writer::start_tag('a', $attr);
 		
@@ -807,21 +766,10 @@ class local_kaltura_renderer extends plugin_renderer_base {
      */
     public function create_webcam_markup() {
         $output = '';
-        $output .= '<script>';
-        $output .= 'function openWebcamUploader() {  ';
-					
-		$output .= '	var urlParams = new URLSearchParams(window.location.search);';
-	    $output .= '	var seltype = (urlParams.get(\'seltype\')) ? \'&seltype=\'+urlParams.get(\'seltype\') : \'\';';
-				
-				
-		$output .= 	'	location.href="./../mymedia/webcam_uploader.php?embedded=1"+seltype;';
-		$output .= 	'}';
-        $output .= '</script>';
 
         $attr = array('id' => 'webcam_open',
                       'class' => 'mymedia simple webcam upload btn btn-secondary mr-2',
-                      'title' => get_string('webcam_upload', 'local_mymedia'),
-                      'onClick' => 'openWebcamUploader()');
+                      'title' => get_string('webcam_upload', 'local_mymedia'));
 				
 		$output .= html_writer::start_tag('a', $attr);
 				
@@ -835,8 +783,10 @@ class local_kaltura_renderer extends plugin_renderer_base {
     /**
      * @return string - Markup for video selection modal.
      */
-    public function create_video_selector_modal($url) {
+    public function create_video_selector_modal() {
         global $CFG;
+
+        $url = $CFG->wwwroot . '/local/kaltura/simple_selector.php';
 
         $output = '';
 
@@ -851,7 +801,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('button');
         $output .= html_writer::end_tag('div');
 
-        $output .= html_writer::start_tag('div', ['class' => 'modal-body']);
+        $output .= html_writer::start_tag('div', ['class' => 'modal-body', 'style' => 'padding: 0px;']);
         $output .= html_writer::tag('iframe', '', ['id' => 'video_selector_iframe', 'src' => $url, 'style' => 'width: 100%; height: 500px; border: 0px solid transparent']);
         $output .= html_writer::end_tag('div');
 
@@ -871,6 +821,43 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
+
+        return $output;
+    }
+
+    /**
+     * @return string - Markup for media properties modal
+     * Modal used in mod_kalvidres and mod_kalvidassign
+     */
+    public function create_video_properties_modal() {
+        $output = '';
+
+        $output .= '<div id="video_properties_modal" class="modal">
+
+                        <div class="modal-dialog">
+
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <h4>'. get_string('media_prop_header', 'local_kaltura') .'</h4>
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
+
+                                <div class="modal-body">'.
+                                    $this->get_media_preferences_markup()
+                                .'</div>
+
+                                <div class="modal-footer">'.
+                                    $this->create_properties_submit_markup()
+                                .'</div>
+
+                            </div>
+
+                        </div>
+
+                    </div>';
 
         return $output;
     }

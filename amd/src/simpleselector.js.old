@@ -1,0 +1,237 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Simple Secctor script for kaltura media embed.
+ *
+ * @package    local_yukaltura
+ * @copyright  (C) 2016-2017 Yamaguchi University (gh-cc@mlex.cc.yamaguchi-u.ac.jp)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * @module local_yukaltura/simpleselector
+ */
+
+define(['jquery'], function($) {
+
+    return {
+        /**
+         * Initial function.
+         * @access public
+         * @param {string} selectorUrl - url of simple selector page.
+         * @param {string} replaceLabel - label of media replace button.
+         */
+        init: function(replaceLabel) {
+			
+			var kmr_selected = '';
+
+            /**
+             * This function reflects change of sort option.
+             * @access public
+             */
+            function changeSort() {
+                // Get url.
+                var url = $("#selectorSort").val();
+                // Change url of selector window.
+                window.location.href = url;
+            }
+
+            /**
+             * This is callback function for thumbnail click.
+             * @access private
+             * @param {object} e - event object of target image.
+             */
+            function clickThumbnailImage(e) {
+                var selectId = e.target.id;
+                var selectName = e.target.alt;
+                var selectThumbnail = e.target.src;
+
+                selectThumbnail = selectThumbnail.replace(/width\/\d+/g, "width/150");
+                selectThumbnail = selectThumbnail.replace(/heightF\/\d+/g, "height/100");
+
+                // Get entry id of selected media.
+                $("#select_id").val(selectId);
+                // Get name of selected media.
+                $("#select_name").html(selectName);
+                // Get thumbnail of selected media.
+                $("#select_thumbnail").val(selectThumbnail);
+				
+				$('#'+selectId).addClass('kmrthmbselected');
+				console.log('selsrc:'+$('#'+selectId).attr('src'));
+				$('#kmr_selected_thumb').prop('src', selectThumbnail);
+				
+				if (kmr_selected != '') $('#'+kmr_selected).toggleClass('kmrthmbselected')
+				kmr_selected = selectId;
+				
+                // Enable OK button.
+                $("#submit_btn").prop("disabled", false);
+                $("#submit_btn").css({opacity: "1.0"});
+            }
+			
+			function clickThumbnailRow(div) {
+                var selectId = $( div ).attr('id');
+				var selectName = $('#th_'+selectId).attr('alt');
+                var selectThumbnail = $('#th_'+selectId).attr('src');
+				
+				console.log('this.prop:'+selectId);
+				
+				console.log('selsrc:'+$('#'+selectId).attr('id'));
+
+                selectThumbnail = selectThumbnail.replace(/width\/\d+/g, "width/150");
+                selectThumbnail = selectThumbnail.replace(/height\/\d+/g, "height/100");
+				
+                // Get entry id of selected media.
+                $("#select_id").val(selectId);
+                // Get name of selected media.
+                $("#select_name").html(selectName);
+                // Get thumbnail of selected media.
+                $("#select_thumbnail").val(selectThumbnail);
+				
+				$('#'+selectId).addClass('kmrthmbselected');
+                console.log('selsrc:'+$('#'+selectId).attr('id'));
+				$('#kmr_selected_thumb').prop('src', selectThumbnail);
+				
+				if (kmr_selected != '') $('#'+kmr_selected).toggleClass('kmrthmbselected')
+                    kmr_selected = selectId;
+				
+                // Enable OK button.
+                $("#submit_btn").prop("disabled", false);
+                $("#submit_btn").css({opacity: "1.0"});
+				
+			}
+
+            /**
+             * This function is callback for OK button click.
+             * @access public
+             */
+            function selectorSubmitClick() {
+                // Get entry id of selected media.
+                var selectId = $("#select_id").val();
+                // Get name of selected media.
+                var selectName = $("#select_name").html();
+                // Get thumbnail of selected media.
+                var selectThumbnail = $("#select_thumbnail").val();
+
+                if (selectId !== null && selectId !== "") {
+                    if ($("#entry_id") !== null) {
+                        $("#entry_id", parent.document).val($("#select_id").val());
+                    }
+
+                    var idName = $("#id_name", parent.document);
+
+                    if (idName !== null && idName.val() == '') {
+                        idName.val($("#select_name").html());
+                    }
+
+                    var desc = "";
+
+                    var selectDesc = $("#description_" + selectId);
+                    if (selectDesc !== null && $.trim(selectDesc.html()) != '') {
+                        desc = selectDesc.html();
+                        desc = desc.replace(/\n/g, "<br />");
+                    }
+
+                    desc = "<p>" + desc + "<br /></p>";
+
+                    var editor = $("#id_introeditoreditable", parent.document);
+
+                    if (editor !== null && $.trim(editor.text()) == '') {
+                        editor.html(desc);
+                    }
+
+                    if ($("#media_thumbnail", parent.document) !== null) {
+                        $("#media_thumbnail", parent.document).prop("src", selectThumbnail);
+                        $("#media_thumbnail", parent.document).prop("alt", selectName);
+                        $("#media_thumbnail", parent.document).prop("title", selectName);
+                    }
+
+                    var idMediaProperties = $("#id_media_properties", parent.document);
+                    if (idMediaProperties !== null) {
+                        idMediaProperties.css({visibility: "visible"});
+                    }
+
+                    var submitMedia = $("#submit_media", parent.document);
+                    if (submitMedia !== null) {
+                        submitMedia.prop("disabled", false);
+                    }
+
+                    // Fade-out modal windoiw.
+                    fadeOutSelectorWindow();
+                }
+            }
+
+            /**
+             * This function replaces "Add Media" label when membed media is selected.
+             * @access private
+             * @param {string} str - Label of "Add Media" button.
+             */
+            function replaceAddMediaLabel(str) {
+                $("#id_add_media", parent.document).val(str);
+            }
+			
+			
+			$('#ss-sortgrid').on("click", function() {
+				document.cookie = "ss-sort-style=grid;expires=January 12, 2025";
+
+                $('.mymedia.mm-media.entry').each(function() {
+                    if ($(this).hasClass("col-sm-12")) {
+                        $(this).removeClass("col-sm-12").addClass( "col-sm-4" );
+                    }
+                });
+                $('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
+                    $( this ).removeClass( "col-sm-4" ).addClass( "col-sm-12" );
+                });
+                $('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
+                    $( this ).removeClass( "col-sm-8" ).addClass( "col-sm-12" );
+                });
+			});
+	
+
+			$('#ss-sortlist').on("click", function() {
+				document.cookie = "ss-sort-style=list;expires=January 12, 2025";
+
+                $('.mymedia.mm-media.entry').each(function() {
+                    if ($( this ).hasClass( "col-sm-4" )) $( this ).removeClass( "col-sm-4" ).addClass("col-sm-12");
+                });
+                $('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
+                    if ($( this ).hasClass( "col-sm-12" )) $( this ).removeClass( "col-sm-12" ).addClass( "col-sm-4" );
+                });
+                $('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
+                    if ($( this ).hasClass( "col-sm-12" )) $( this ).removeClass( "col-sm-12" ).addClass( "col-sm-8" );
+                });		
+			});
+
+            $("#selectorSort").on("change", function() {
+                changeSort();
+            });
+
+            $("#submit_btn").on("click", function() {
+                selectorSubmitClick();
+            });
+
+            if ($(location).attr("pathname").indexOf("simple_selector.php") != -1) {				
+                $(".selector").on("click", function() {
+                    clickThumbnailRow($(this));
+                });
+            } else {
+                $("#media_thumbnail").on("change", function() {
+                    replaceAddMediaLabel(replaceLabel);
+                });
+            }
+
+        }
+    };
+});

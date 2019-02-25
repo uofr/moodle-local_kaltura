@@ -6,21 +6,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-@media only screen and (max-width: 600px) {
-    #ss-sortlist, #ss-sortgrid {
-      display: none;
-    }
+body {
+    padding: 1em;
 }
 
 .mymedia.mm-media.entry {
     margin-bottom: 1em;
+    -webkit-transition: background-color 0.4s;
+    transition: background-color 0.4s;
 }
 
 .mymedia.mm-media.entry:hover{
     cursor: pointer;
-    background-color: lightgray;
+    background-color: rgb(230, 227, 227);
 }
 
 .selected {
-    background-color: lightgray;
+    background-color: rgb(230, 227, 227);
+}
+
+@media only screen and (max-width: 600px) {
+    #ss-sortlist, #ss-sortgrid {
+      display: none;
+    }
 }
