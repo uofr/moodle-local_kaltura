@@ -673,7 +673,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('td', array());
 
         $attr = array('type' => 'button', 'class'=>'btn btn-primary mr-2', 'id' => 'prop_submit_btn', 'name' => 'prop_submit_btn',
-                      'value' => 'OK');
+                      'value' => 'OK', 'data-dismiss' => 'modal');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');

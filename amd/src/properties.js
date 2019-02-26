@@ -22,10 +22,125 @@
 define(['jquery'], function($) {
     
     // selectors
+    var videoPropertiesModal = "#video_properties_modal";
+    var playerDropdown = "#media_prop_player";
+    var sizeDropdown = "#media_prop_size";
+    var sizeDropdownOptions = sizeDropdown + " option";
+    var playerWidth = "#width";
+    var playerHeight = "#height";
+    var mediaPropWidth = "#media_prop_width";
+    var mediaPropHeight = "#media_prop_height";
+    var submitButton = "#prop_submit_btn";
 
     function init() {
-        console.log('Properties.js');
+        $(videoPropertiesModal).on('show.bs.modal', loadProperties);
+        $(sizeDropdown).change(changeSize);
+        $(mediaPropHeight).change(dimensionChange);
+        $(mediaPropWidth).change(dimensionChange);
+        $(submitButton).click(submit);
+    }
+
+    function loadProperties() {
+        var uiconfid = $("#uiconf_id", parent.document).val();
+        var selectedPlayerIndex = $(playerDropdown + ' option[value="' + uiconfid + '"]').index();
+        var width = $(playerWidth).val();
+        var height = $(playerHeight).val();
+        var dimension = width + 'x' + height;
+
+        $(playerDropdown).prop("selected", selectedPlayerIndex);
+
+        if (width !== "" && width != "0" && height !== "" && height != "0") {
+
+            for (var i = 0; i < $(sizeDropdownOptions).length; i++) {
+                if ($(sizeDropdownOptions)[i].text.indexOf(dimension) > -1) {
+                    $(sizeDropdown).prop("selectedIndex", i);
+                    $(mediaPropWidth).prop("disabled", true);
+                    $(mediaPropHeight).prop("disabled", true);
+                }
+            }
+
+            if ($(mediaPropWidth).prop("disabled") === false) {
+                $(sizeDropdown).prop("selected", $(sizeDropdownOptions).length - 1);
+                $(mediaPropWidth).val(width);
+                $(mediaPropHeight).val(height);
+            }
+            else {
+                $(mediaPropWidth).val("");
+                $(mediaPropHeight).val("");
+                $(sizeDropdown).prop("selectedIndex", 0);
+            }
+        }
+
+    }
+
+    function changeSize() {
+        var index = $(sizeDropdown).prop("selectedIndex");
         
+        if (index == $(sizeDropdownOptions).length - 1) {
+            $(mediaPropWidth).prop("disabled", false);
+            $(mediaPropHeight).prop("disabled", false);
+            $(submitButton).prop("disabled", true);
+        }
+        else {
+            $(mediaPropWidth).prop("disabled", true);
+            $(mediaPropHeight).prop("disabled", true);
+            $(submitButton).prop("disabled", false);
+        }
+    }
+
+    function dimensionChange() {
+        var flag = false;
+        var widthStr = $(mediaPropWidth).val();
+        var heightStr = $(mediaPropHeight).val();
+        var regex = /^\d{2,4}$/;
+
+        if (regex.test(widthStr) === true && regex.test(heightStr) === true) {
+            var widthInt = parseInt(widthStr);
+            var heightInt = parseInt(heightStr);
+            flag = checkPlayerDimension(widthInt, heightInt);
+        }
+
+        if (flag === true) {
+            $(mediaPropWidth).removeClass("border border-danger");
+            $(mediaPropHeight).removeClass("border border-danger");
+            $(submitButton).prop("disabled", false);
+        } 
+        else {
+            $(mediaPropWidth).addClass("border border-danger");
+            $(mediaPropHeight).addClass("border border-danger");
+            $(submitButton).prop("disabled", true);
+        }
+    }
+
+    function checkPlayerDimension(width, height) {
+        if (width < 200 || height < 200) {
+            return false;
+        } 
+        else if (width > 1280 || height > 1280) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function submit() {
+        var width = "";
+        var height = "";
+
+        if ($(sizeDropdown).prop("selectedIndex") === $(sizeDropdownOptions).length - 1) {
+            width = $(mediaPropWidth).val().trim();
+            height = $(mediaPropHeight).val().trim();
+        }
+        else {
+            var dimension = $(sizeDropdown + " option:selected").text();
+            var dimensionArray = dimension.match(/\d{2,4}/g);
+            width = dimensionArray[0];
+            height = dimensionArray[1];
+        }
+
+        $(playerWidth).val(width);
+        $(playerHeight).val(height);
+        $("#uiconfid").val($(playerDropdown).val());
     }
 
     return {init : init};
