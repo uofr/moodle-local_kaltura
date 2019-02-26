@@ -38,8 +38,6 @@
     var selectedVidName = '#selected_video_name';
     var selectedVidId = '#selected_video_id';
     var submitButton = "#submit_btn";
-    var cancelButton = "#cancel_btn";
-    var xButton = "#modal_dismiss";
 
     // elements in parent.document
     var entryId = "#entry_id";
@@ -57,8 +55,6 @@
         $(webcamUploadButton).click(openWebcamUploader);
         $(mediaEntry).click(selectMedia);
         $(submitButton, parent.document).click(submit);
-        $(cancelButton, parent.document).click(cancel);
-        $(xButton, parent.document).click(cancel);
     }
 
     // displays media as a grid
@@ -148,20 +144,6 @@
         if ($(submitMedia, parent.document) !== null) {
             $(submitMedia, parent.document).prop("disabled", false);
         }
-    }
-
-    function cancel() {
-        $(mediaEntry).removeClass('selected');
-
-        $(entryId, parent.document).val('');
-        $(entryName, parent.document).val('');
-        $(entryThumbnail, parent.document).attr('src', url.relativeUrl('/local/kaltura/pix/vidThumb.png'));
-        $(idMediaProperties, parent.document).css({visibility: "hidden"});
-
-        $(selectedVidId, parent.document).val('');
-        $(selectedVidThumb, parent.document).attr('src', url.relativeUrl('/local/kaltura/pix/vidThumb.png'));
-        $(selectedVidName, parent.document).text('Select a Video');
-        $(submitButton, parent.document).prop("disabled", true);
     }
 
     return {init: init};

@@ -367,7 +367,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 		
         $attr = array('id' => 'name_'. $entry->id);
         $output .= html_writer::start_tag('div', $attr);
-        $output .= html_writer::tag('h6', $entry->name);
+        $output .= html_writer::tag('strong', $entry->name, null);
 		$output .= html_writer::end_tag('div');
 		
 		$dateformat = '%b %e, %Y %I:%M %p';
@@ -554,24 +554,6 @@ class local_kaltura_renderer extends plugin_renderer_base {
     public function get_media_preferences_markup() {
         $output = '';
 
-        // Display name input box.
-        $output .= html_writer::start_tag('div', ['class' => 'form-inline']);
-        $attr = array('for' => 'media_prop_name');
-        $output .= html_writer::tag('label', get_string('media_prop_name', 'local_kaltura'), $attr);
-        $output .= '&nbsp;';
-
-        $attr = array('type' => 'text',
-                      'id' => 'media_prop_name',
-                      'name' => 'media_prop_name',
-                      'class' => 'form-control',
-                      'size' => '40',
-                      'value' => '',
-                      'maxlength' => '100');
-        $output .= html_writer::empty_tag('input', $attr);
-        $output .= html_writer::empty_tag('br');
-        $output .= html_writer::empty_tag('br');
-        $output .= html_writer::end_tag('div');
-
         // Display section element for player design.
         $output .= html_writer::start_tag('div', ['class' => 'form-inline']);
         $attr = array('for' => 'media_prop_player');
@@ -690,17 +672,13 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('td', array());
 
-        $attr = array('type' => 'button', 'class'=>'btn btn-default mr-2', 'id' => 'prop_submit_btn', 'name' => 'prop_submit_btn',
+        $attr = array('type' => 'button', 'class'=>'btn btn-primary mr-2', 'id' => 'prop_submit_btn', 'name' => 'prop_submit_btn',
                       'value' => 'OK');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');
 
         $output .= html_writer::start_tag('td', array());
-
-        $attr = array('type' => 'button', 'class'=>'btn btn-default mr-2', 'id' => 'prop_cancel_btn', 'name' => 'prop_cancel_btn',
-                      'value' => 'Cancel');
-        $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');
 
@@ -814,8 +792,6 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         $output .= html_writer::empty_tag('input', ['type' => 'button', 'id' => 'submit_btn', 'name' => 'submit_btn', 'value' => 'OK', 'disabled' => 'true', 'class' => 'btn btn-primary', 'data-dismiss' => 'modal']);
-        $output .= html_writer::empty_tag('input', ['type' => 'button', 'id' => 'cancel_btn', 'name' => 'cancel_btn', 'value' => 'Cancel', 'class' => 'btn btn-secondary', 'data-dismiss' => 'modal']);
-
         $output .= html_writer::end_tag('div');
 
         $output .= html_writer::end_tag('div');

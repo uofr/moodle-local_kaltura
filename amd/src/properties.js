@@ -24,7 +24,7 @@ define(['jquery'], function($) {
     // selectors
 
     function init() {
-        // event listeners
+        console.log('Properties.js');
         
     }
 
