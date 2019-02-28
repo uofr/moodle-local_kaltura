@@ -133,9 +133,6 @@ define(['jquery'], function($) {
 
         if ($(sizeDropdown).prop("selectedIndex") === $(sizeDropdownOptions).length - 1) {
             if ($(mediaPropWidth).val() === "" || $(mediaPropHeight).val() === "") {
-                console.log("empty");
-                $(mediaPropWidth).addClass("border border-danger");
-                $(mediaPropHeight).addClass("border border-danger");
                 return;
             }
             else {
@@ -143,7 +140,6 @@ define(['jquery'], function($) {
                 height = $(mediaPropHeight).val().trim();
                 var regex = /^\d{2,4}$/;
                 if (regex.test(width) === false || regex.test(height) === false) {
-                    $(mediaPropWidth).addClass("border border-danger");
                     return;
                 }
             }
@@ -151,18 +147,11 @@ define(['jquery'], function($) {
         else {
             var dimension = $(sizeDropdown + " option:selected").text();
             var dimensionArray = dimension.match(/\d{2,4}/g);
-            if (dimensionArray === null || dimensionArray.length != 2) {
-                $(sizeDropdown).addClass("border border-danger");
-                return;
-            }
             width = dimensionArray[0];
             height = dimensionArray[1];
         }
 
         if (checkPlayerDimension(parseInt(width), parseInt(height)) === false) {
-            $(mediaPropWidth).addClass("border border-danger");
-            $(mediaPropHeight).addClass("border border-danger");
-            $(sizeDropdown).addClass("border border-danger");
             return;
         }
 
