@@ -157,7 +157,7 @@ define(['jquery'], function($) {
 
         $(playerWidth).val(width);
         $(playerHeight).val(height);
-        $("#uiconfid").val($(playerDropdown).val());
+        $("#uiconf_id").val($(playerDropdown).val());
         $(videoPropertiesModal).modal("hide");
     }
 
