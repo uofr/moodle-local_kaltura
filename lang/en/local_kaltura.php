@@ -178,6 +178,7 @@ $string['invalid_name'] = 'There is deprecated letter(s) in name.';
 $string['empty_size'] = 'Please input custom player size(width,height).';
 $string['invalid_custom_size'] = 'Custom player size(width,height) is a wrong dimension.';
 $string['invalid_size'] = 'Player size(width,height) is a wrong dimension.';
+$string['custom_size_info'] = 'Width and height must be between 200 and 1280.';
 
 // Simple selector.
 $string['selected_media'] = 'Selected Media';

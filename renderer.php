@@ -367,7 +367,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
 		
         $attr = array('id' => 'name_'. $entry->id);
         $output .= html_writer::start_tag('div', $attr);
-        $output .= html_writer::tag('strong', $entry->name, null);
+        $output .= html_writer::tag('h7', $entry->name, null);
 		$output .= html_writer::end_tag('div');
 		
 		$dateformat = '%b %e, %Y %I:%M %p';
@@ -610,6 +610,8 @@ class local_kaltura_renderer extends plugin_renderer_base {
 
         $output .= html_writer::end_tag('div');
 
+        $output .= html_writer::tag('span', '* ' . get_string('custom_size_info', 'local_kaltura'), ['id' => 'custom_size_info', 'class' => 'form-text', 'style' => 'display: none;']);
+
         return $output;
     }
 
@@ -673,7 +675,7 @@ class local_kaltura_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('td', array());
 
         $attr = array('type' => 'button', 'class'=>'btn btn-primary mr-2', 'id' => 'prop_submit_btn', 'name' => 'prop_submit_btn',
-                      'value' => 'OK', 'data-dismiss' => 'modal');
+                      'value' => 'OK');
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('td');
