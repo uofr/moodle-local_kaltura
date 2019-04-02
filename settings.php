@@ -462,6 +462,13 @@ if ($hassiteconfig) {
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 	
+	// Screen recorder not available with Kaltura CE
+	/*
+    $adminsetting = new admin_setting_configcheckbox('enable_screen_recorder', get_string('enable_screen_recorder', 'local_kaltura'),
+                       get_string('enable_screen_recorder_desc', 'local_kaltura'), '1');
+    $adminsetting->plugin = KALTURA_PLUGIN_NAME;
+    $settings->add($adminsetting);
+	*/
     $adminsetting = new admin_setting_configtext('mymedia_application_name', get_string('application_name', 'local_kaltura'),
                        get_string('application_name_desc', 'local_kaltura'), 'Moodle', PARAM_NOTAGS);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
