@@ -187,9 +187,6 @@ $string['no_media'] = 'No media found';
 $string['problem_viewing'] = 'There is a problem displaying the page.  Please try again or contact your site administrator';
 $string['permission_disable'] = 'You don\'t have permission to use kaltura media.';
 
-// Screen recorder.
-$string['enable_screen_recorder'] = 'Enable Screen Recording';
-$string['screenrecorder'] = 'Screen Recording';
 $string['loadingwait'] = 'Loading. This may take a few minutes.';
 
 // Capabilities
