@@ -85,4 +85,3 @@ try {
 }
 
 echo $OUTPUT->footer();
-

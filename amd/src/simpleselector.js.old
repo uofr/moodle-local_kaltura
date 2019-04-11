@@ -35,7 +35,9 @@ define(['jquery'], function($) {
          * @param {string} replaceLabel - label of media replace button.
          */
         init: function(replaceLabel) {
-            
+			
+			var kmr_selected = '';
+
             /**
              * This function reflects change of sort option.
              * @access public
@@ -44,7 +46,7 @@ define(['jquery'], function($) {
                 // Get url.
                 var url = $("#selectorSort").val();
                 // Change url of selector window.
-                location.href = url;
+                window.location.href = url;
             }
 
             /**
@@ -58,7 +60,7 @@ define(['jquery'], function($) {
                 var selectThumbnail = e.target.src;
 
                 selectThumbnail = selectThumbnail.replace(/width\/\d+/g, "width/150");
-                selectThumbnail = selectThumbnail.replace(/height\/\d+/g, "height/100");
+                selectThumbnail = selectThumbnail.replace(/heightF\/\d+/g, "height/100");
 
                 // Get entry id of selected media.
                 $("#select_id").val(selectId);
@@ -99,16 +101,16 @@ define(['jquery'], function($) {
                 $("#select_thumbnail").val(selectThumbnail);
 				
 				$('#'+selectId).addClass('kmrthmbselected');
-				console.log('selsrc:'+$('#'+selectId).attr('id'));
+                console.log('selsrc:'+$('#'+selectId).attr('id'));
 				$('#kmr_selected_thumb').prop('src', selectThumbnail);
 				
 				if (kmr_selected != '') $('#'+kmr_selected).toggleClass('kmrthmbselected')
-				kmr_selected = selectId;
+                    kmr_selected = selectId;
 				
                 // Enable OK button.
                 $("#submit_btn").prop("disabled", false);
                 $("#submit_btn").css({opacity: "1.0"});
-
+				
 			}
 
             /**
@@ -179,50 +181,37 @@ define(['jquery'], function($) {
             function replaceAddMediaLabel(str) {
                 $("#id_add_media", parent.document).val(str);
             }
-
+			
+			
 			$('#ss-sortgrid').on("click", function() {
-				console.log( $( this ).prop('id') );
-		
-				$('#ss-sortlist').removeClass('active');
-		
-				$(this).addClass('active');
-		
-				YUI().use('cookie', function(Y) {
-				    Y.Cookie.set("ss-sort-style", "grid", { expires: new Date("January 12, 2025") });
-				});
-				$('.mymedia.mm-media.entry .btn').each(function() {
-					$( this ).addClass( "btn-small" );
-				});
-				$('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
-					$( this ).removeClass( "span4" ).addClass( "span12" );
-				});
-				$('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
-					$( this ).removeClass( "span8" ).addClass( "span12" );
-				});		
-		
-		
+				document.cookie = "ss-sort-style=grid;expires=January 12, 2025";
+
+                $('.mymedia.mm-media.entry').each(function() {
+                    if ($(this).hasClass("col-sm-12")) {
+                        $(this).removeClass("col-sm-12").addClass( "col-sm-4" );
+                    }
+                });
+                $('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
+                    $( this ).removeClass( "col-sm-4" ).addClass( "col-sm-12" );
+                });
+                $('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
+                    $( this ).removeClass( "col-sm-8" ).addClass( "col-sm-12" );
+                });
 			});
 	
 
 			$('#ss-sortlist').on("click", function() {
-				console.log( $( this ).prop('id') );
-		
-				YUI().use('cookie', function(Y) {
-				    Y.Cookie.set("ss-sort-style", "list", { expires: new Date("January 12, 2025") });
-				});
-		
-				$('#ss-sortgrid').removeClass('active');
-		
-				$(this).addClass('active');
-				$('.mymedia.mm-media.entry .btn').each(function() {
-					$( this ).removeClass( "btn-small" );
-				});
-				$('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
-					if ($( this ).hasClass( "span12" )) $( this ).removeClass( "span12" ).addClass( "span4" );
-				});
-				$('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
-					if ($( this ).hasClass( "span12" )) $( this ).removeClass( "span12" ).addClass( "span8" );
-				});		
+				document.cookie = "ss-sort-style=list;expires=January 12, 2025";
+
+                $('.mymedia.mm-media.entry').each(function() {
+                    if ($( this ).hasClass( "col-sm-4" )) $( this ).removeClass( "col-sm-4" ).addClass("col-sm-12");
+                });
+                $('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
+                    if ($( this ).hasClass( "col-sm-12" )) $( this ).removeClass( "col-sm-12" ).addClass( "col-sm-4" );
+                });
+                $('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
+                    if ($( this ).hasClass( "col-sm-12" )) $( this ).removeClass( "col-sm-12" ).addClass( "col-sm-8" );
+                });		
 			});
 
             $("#selectorSort").on("change", function() {
@@ -233,19 +222,7 @@ define(['jquery'], function($) {
                 selectorSubmitClick();
             });
 
-            $("#cancel_btn").on("click", function() {
-                fadeOutSelectorWindow();
-            });
-						
-            $("#close_btn").on("click", function() {
-                fadeOutSelectorWindow();
-            });
-
-            $("#fadeout").on("click", function() {
-                fadeOutSelectorWindow();
-            });
-
-            if ($(location).attr("pathname").indexOf("simple_selector.php") != -1) {
+            if ($(location).attr("pathname").indexOf("simple_selector.php") != -1) {				
                 $(".selector").on("click", function() {
                     clickThumbnailRow($(this));
                 });
@@ -254,6 +231,7 @@ define(['jquery'], function($) {
                     replaceAddMediaLabel(replaceLabel);
                 });
             }
+
         }
     };
 });

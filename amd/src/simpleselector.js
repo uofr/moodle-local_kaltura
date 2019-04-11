@@ -14,363 +14,138 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple Secctor script for kaltura media embed.
+ * Script for video selector in mod_kalvidres and mod_kalvidassign.
  *
- * @package    local_yukaltura
- * @copyright  (C) 2016-2017 Yamaguchi University (gh-cc@mlex.cc.yamaguchi-u.ac.jp)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_kaltura
+ * @module      local_kaltura/simpleselector
  */
 
-/**
- * @module local_yukaltura/simpleselector
- */
 
-define(['jquery'], function($) {
+ define(['jquery', 'core/url'], function($, url) {
+    
+    // selectors
+    var gridButton = "#ss-sortgrid";
+    var listButton = '#ss-sortlist';
+    var sort = '#selectorSort';
+    var uploadButton = "#uploader_open";
+    var webcamUploadButton = "#webcam_open";
+    var mediaEntry = '.mymedia.mm-media.entry';
+    var mediaEntryThumbnail = '.mymedia.mm-media.entry .mm-thumb-grp';
+    var mediaEntryMetadata = '.mymedia.mm-media.entry .mm-entry-grp';
 
-    return {
-        /**
-         * Initial function.
-         * @access public
-         * @param {string} selectorUrl - url of simple selector page.
-         * @param {string} replaceLabel - label of media replace button.
-         */
-        init: function(selectorUrl, replaceLabel) {
+    // modal selectors (located in parent.document)
+    var selectedVidThumb = '#selected_video_thumbnail';
+    var selectedVidName = '#selected_video_name';
+    var selectedVidId = '#selected_video_id';
+    var submitButton = "#submit_btn";
 
-            var modalX = 0;
-            var modalY = 0;
-            var timer = false;
-			
-			var kmr_selected = '';
+    // elements in parent.document
+    var entryId = "#entry_id";
+    var entryName = "#id_name";
+    var entryThumbnail = "#media_thumbnail";
+    var idMediaProperties = "#id_media_properties"; 
+    var submitMedia = "#submit_media";
 
-            /**
-             * This function reflects change of sort option.
-             * @access public
-             */
-            function changeSort() {
-                // Get url.
-                var url = $("#selectorSort").val();
-                // Change url of selector window.
-                location.href = url;
-            }
+    function init() {
+        // event listeners
+        $(gridButton).click(layoutGrid);
+        $(listButton).click(layoutList);
+        $(sort).change(sortMedia);
+        $(uploadButton).click(openUploader);
+        $(webcamUploadButton).click(openWebcamUploader);
+        $(mediaEntry).click(selectMedia);
+        $(submitButton, parent.document).click(submit);
+    }
 
-            /**
-             * This is callback function for thumbnail click.
-             * @access private
-             * @param {object} e - event object of target image.
-             */
-            function clickThumbnailImage(e) {
-                var selectId = e.target.id;
-                var selectName = e.target.alt;
-                var selectThumbnail = e.target.src;
+    // displays media as a grid
+    function layoutGrid() {
+        $(gridButton).addClass('active');
+        $(listButton).removeClass('active');
 
-                selectThumbnail = selectThumbnail.replace(/width\/\d+/g, "width/150");
-                selectThumbnail = selectThumbnail.replace(/height\/\d+/g, "height/100");
-
-                // Get entry id of selected media.
-                $("#select_id").val(selectId);
-                // Get name of selected media.
-                $("#select_name").html(selectName);
-                // Get thumbnail of selected media.
-                $("#select_thumbnail").val(selectThumbnail);
-				
-				$('#'+selectId).addClass('kmrthmbselected');
-				console.log('selsrc:'+$('#'+selectId).attr('src'));
-				$('#kmr_selected_thumb').prop('src', selectThumbnail);
-				
-				if (kmr_selected != '') $('#'+kmr_selected).toggleClass('kmrthmbselected')
-				kmr_selected = selectId;
-				
-                // Enable OK button.
-                $("#submit_btn").prop("disabled", false);
-                $("#submit_btn").css({opacity: "1.0"});
-            }
-			
-			function clickThumbnailRow(div) {
-                var selectId = $( div ).attr('id');
-				var selectName = $('#th_'+selectId).attr('alt');
-                var selectThumbnail = $('#th_'+selectId).attr('src');
-				
-				console.log('this.prop:'+selectId);
-				
-				console.log('selsrc:'+$('#'+selectId).attr('id'));
-
-                selectThumbnail = selectThumbnail.replace(/width\/\d+/g, "width/150");
-                selectThumbnail = selectThumbnail.replace(/height\/\d+/g, "height/100");
-				
-                // Get entry id of selected media.
-                $("#select_id").val(selectId);
-                // Get name of selected media.
-                $("#select_name").html(selectName);
-                // Get thumbnail of selected media.
-                $("#select_thumbnail").val(selectThumbnail);
-				
-				$('#'+selectId).addClass('kmrthmbselected');
-				console.log('selsrc:'+$('#'+selectId).attr('id'));
-				$('#kmr_selected_thumb').prop('src', selectThumbnail);
-				
-				if (kmr_selected != '') $('#'+kmr_selected).toggleClass('kmrthmbselected')
-				kmr_selected = selectId;
-				
-                // Enable OK button.
-                $("#submit_btn").prop("disabled", false);
-                $("#submit_btn").css({opacity: "1.0"});
-				
-				//console.log('selsrc:'+$('#'+selectId).attr('id'));
-			}
-			
-            /**
-             * This function centerize modal window.
-             * @access private
-             * @param {object} contentPanel - HTML element of content panel.
-             */
-            function centeringModalSyncer(contentPanel) {
-                if (timer !== false) {
-                    clearTimeout(timer);
-                }
-                timer = setTimeout(function() {
-                    // Get width and height of window.
-                    var w = $(window).width();
-                    var h = $(window).height();
-
-                    // Get width and height of modal content.
-                    var cw = $(contentPanel).outerWidth();
-                    var ch = $(contentPanel).outerHeight();
-
-                    // Execute centering of modal window.
-                    $(contentPanel).css({"left": ((w - cw) / 2) + "px", "top": ((h - ch) / 2) + "px"});
-                }, 200);
-            }
-
-            /**
-             * This function print modal window.
-             * @access private
-             * @param {string} url - URL of simple selector web page.
-             * @return {bool} - if fade-in modal window, return true.
-             */
-            function fadeInSelectorWindow(url) {
-                // Avoidance of duplicatable execute.
-                $(this).blur(); // Unfocus base window.
-                if ($("#modal_window")[0]) {
-                    return false;
-                }
-
-                // Save scroll position of base window.
-                var dElm = document.documentElement;
-                var dBody = document.body;
-                modalX = dElm.scrollLeft || dBody.scrollLeft; // X value of current position.
-                modalY = dElm.scrollTop || dBody.scrollTop;  // Y value of current position.
-                // Print ovaerlay.
-                $("body").append("<div id=\"selector_content\"></div>");
-                $("body").append("<div id=\"modal_window\"></div>");
-                $("#modal_window").fadeIn("slow");
-
-                // Centering content.
-                centeringModalSyncer("#selector_content");
-                // Fade-in content.
-                $("#selector_content").fadeIn("slow");
-                // Set url of content.
-                $("#selector_content").html("<iframe src=\"" + url + "\" width=\"100%\" height=\"100%\">");
-
-                // Cntering content.
-                centeringModalSyncer("#selector_content");
-
-                $(parent.window).resize(function() {
-                    centeringModalSyncer("#selector_content");
-                });
-
-                return true;
-            }
-
-            /**
-             * This function delete modal window.
-             * @access public
-             */
-            function fadeOutSelectorWindow() {
-
-                // Restore scroll position of base window.
-                window.scrollTo(modalX, modalY);
-
-                // Fade-out and delete modal contet and modal window.
-                $("#modal_window", parent.document).fadeOut("slow");
-                $("#modal_window", parent.document).remove();
-                $("#selector_content", parent.document).fadeOut("slow");
-                $("#selector_content", parent.document).remove();
-            }
-
-            /**
-             * This function is callback for OK button click.
-             * @access public
-             */
-            function selectorSubmitClick() {
-                // Get entry id of selected media.
-                var selectId = $("#select_id").val();
-                // Get name of selected media.
-                var selectName = $("#select_name").html();
-                // Get thumbnail of selected media.
-                var selectThumbnail = $("#select_thumbnail").val();
-
-                if (selectId !== null && selectId !== "") {
-                    if ($("#entry_id") !== null) {
-                        $("#entry_id", parent.document).val($("#select_id").val());
-                    }
-
-                    var idName = $("#id_name", parent.document);
-
-                    if (idName !== null && idName.val() == '') {
-                        idName.val($("#select_name").html());
-                    }
-
-                    var desc = "";
-
-                    var selectDesc = $("#description_" + selectId);
-                    if (selectDesc !== null && $.trim(selectDesc.html()) != '') {
-                        desc = selectDesc.html();
-                        desc = desc.replace(/\n/g, "<br />");
-                    }
-
-                    desc = "<p>" + desc + "<br /></p>";
-
-                    var editor = $("#id_introeditoreditable", parent.document);
-
-                    if (editor !== null && $.trim(editor.text()) == '') {
-                        editor.html(desc);
-                    }
-
-                    if ($("#media_thumbnail", parent.document) !== null) {
-                        $("#media_thumbnail", parent.document).prop("src", selectThumbnail);
-                        $("#media_thumbnail", parent.document).prop("alt", selectName);
-                        $("#media_thumbnail", parent.document).prop("title", selectName);
-                    }
-
-                    var idMediaProperties = $("#id_media_properties", parent.document);
-                    if (idMediaProperties !== null) {
-                        idMediaProperties.css({visibility: "visible"});
-                    }
-
-                    var submitMedia = $("#submit_media", parent.document);
-                    if (submitMedia !== null) {
-                        submitMedia.prop("disabled", false);
-                    }
-
-                    // Fade-out modal windoiw.
-                    fadeOutSelectorWindow();
-                }
-            }
-
-            /**
-             * This function replaces "Add Media" label when membed media is selected.
-             * @access private
-             * @param {string} str - Label of "Add Media" button.
-             */
-            function replaceAddMediaLabel(str) {
-                $("#id_add_media", parent.document).val(str);
-            }
-			
-			
-			$('#ss-sortgrid').on("click", function() {
-				console.log( $( this ).prop('id') );
-		
-				$('#ss-sortlist').removeClass('active');
-		
-				$(this).addClass('active');
-		
-				YUI().use('cookie', function(Y) {
-				    Y.Cookie.set("ss-sort-style", "grid", { expires: new Date("January 12, 2025") });
-				});
-				/*
-				$('.mymedia.mm-media.entry').each(function() {
-					$( this ).addClass( "span4" );
-				});
-				*/
-				$('.mymedia.mm-media.entry .btn').each(function() {
-					$( this ).addClass( "btn-small" );
-				});
-				$('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
-					$( this ).removeClass( "span4" ).addClass( "span12" );
-				});
-				$('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
-					$( this ).removeClass( "span8" ).addClass( "span12" );
-				});		
-		
-		
-			});
-	
-
-			$('#ss-sortlist').on("click", function() {
-				console.log( $( this ).prop('id') );
-		
-				YUI().use('cookie', function(Y) {
-				    Y.Cookie.set("ss-sort-style", "list", { expires: new Date("January 12, 2025") });
-				});
-		
-				$('#ss-sortgrid').removeClass('active');
-		
-				$(this).addClass('active');
-				/*
-				$('.mymedia.mm-media.entry').each(function() {
-					if ($( this ).hasClass( "span4" )) $( this ).removeClass( "span4" );
-				});
-				*/
-				$('.mymedia.mm-media.entry .btn').each(function() {
-					$( this ).removeClass( "btn-small" );
-				});
-				$('.mymedia.mm-media.entry .mm-thumb-grp').each(function() {
-					if ($( this ).hasClass( "span12" )) $( this ).removeClass( "span12" ).addClass( "span4" );
-				});
-				$('.mymedia.mm-media.entry .mm-entry-grp').each(function() {
-					if ($( this ).hasClass( "span12" )) $( this ).removeClass( "span12" ).addClass( "span8" );
-				});		
-		
-		
-			});
-			
-
-            $("#id_add_media").on("click", function() {
-                fadeInSelectorWindow(selectorUrl);
-            });
-
-            $("#selectorSort").on("change", function() {
-                changeSort();
-            });
-
-            $("#submit_btn").on("click", function() {
-                selectorSubmitClick();
-            });
-
-            $("#cancel_btn").on("click", function() {
-                fadeOutSelectorWindow();
-            });
-						
-
-            $("#close_btn").on("click", function() {
-                fadeOutSelectorWindow();
-            });
-
-            $("#fadeout").on("click", function() {
-                fadeOutSelectorWindow();
-            });
-
-            if ($(location).attr("pathname").indexOf("simple_selector.php") != -1) {
-                //$(".media_thumbnail").on("click", function(e) {
-                //    clickThumbnailImage(e);
-                //});
-				
-                $(".selector").on("click", function() {
-                    clickThumbnailRow($(this));
-                });
-            } else {
-                $("#media_thumbnail").on("change", function() {
-                    replaceAddMediaLabel(replaceLabel);
-                });
-            }
-						
-						
-						/*
-						if (kmr_selected == '') {
-							$(".kmr-selectbar").hide();
-						} 
-						*/
-
+        document.cookie = "ss-sort-style=grid;expires=January 12, 2025";
+        if ($(mediaEntry).hasClass('col-sm-12')) {
+            $(mediaEntry).removeClass('col-sm-12').addClass('col-sm-4');
         }
-    };
-});
+        $(mediaEntryThumbnail).removeClass('col-sm-4').addClass('col-sm-12');
+        $(mediaEntryMetadata).removeClass('col-sm-8').addClass('col-sm-12');
+    }
+
+    // displays media as a list
+    function layoutList() {
+        $(listButton).addClass('active');
+        $(gridButton).removeClass('active');
+        
+        document.cookie = "ss-sort-style=list;expires=January 12, 2025";
+        if ($(mediaEntry).hasClass('col-sm-4')) {
+            $(mediaEntry).removeClass('col-sm-4').addClass('col-sm-12');
+        }
+        $(mediaEntryThumbnail).removeClass('col-sm-12').addClass('col-sm-4');
+        $(mediaEntryMetadata).removeClass('col-sm-12').addClass('col-sm-8');
+    }
+
+    function sortMedia() {
+        window.location.href = $(this).val();
+    }
+
+    function openUploader() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var seltype = (urlParams.get('seltype')) ? '&seltype=' + urlParams.get('seltype') : '';
+        location.href = "./../mymedia/simple_uploader.php?embedded=1" + seltype;
+    }
+
+    function openWebcamUploader() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var seltype = (urlParams.get('seltype')) ? '&seltype=' + urlParams.get('seltype') : '';
+        location.href = "./../mymedia/webcam_uploader.php?embedded=1" + seltype;
+    }
+
+    function selectMedia() {
+        var selectedId = $(this).attr('id');
+        var selectedName = $('#th_' + selectedId).attr('alt');
+        var selectedThumbnail = $('#th_' + selectedId).attr('src');
+
+        $(mediaEntry).removeClass('selected');
+        $(this).addClass('selected');
+        
+        $(selectedVidId, parent.document).val(selectedId);
+        $(selectedVidThumb, parent.document).attr('src', selectedThumbnail);
+        $(selectedVidName, parent.document).text(selectedName);
+
+        $(submitButton, parent.document).prop("disabled", false);
+    }
+
+    function submit() {
+        var selectedId = $(selectedVidId, parent.document).val();
+        var selectedName = $(selectedVidName, parent.document).text();
+        var selectedThumb = $(selectedVidThumb, parent.document).attr('src');
+
+        if ($(entryId, parent.document) !== null) {
+            if (selectedId !== null && selectedId !== '') {
+                $(entryId, parent.document).val(selectedId);
+            }
+        }
+
+        if ($(entryName, parent.document) !== null) {
+            if (selectedName !== null && selectedName !== '') {
+                $(entryName, parent.document).val(selectedName);
+            }
+        }
+
+        if ($(entryThumbnail, parent.document !== null)) {
+            if (selectedThumb !== null && selectedThumb !== '') {
+                $(entryThumbnail, parent.document).attr('src', selectedThumb);
+            }
+        }
+        
+        if ($(idMediaProperties, parent.document) !== null) {
+            $(idMediaProperties, parent.document).css({visibility: "visible"});
+        }
+
+        if ($(submitMedia, parent.document) !== null) {
+            $(submitMedia, parent.document).prop("disabled", false);
+        }
+    }
+
+    return {init: init};
+
+ });
