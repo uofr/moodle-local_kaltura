@@ -33,7 +33,7 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/lib/tablelib.php');
  * @copyright  (C) 2016-2017 Yamaguchi University <gh-cc@mlex.cc.yamaguchi-u.ac.jp>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_kaltura_renderer extends plugin_renderer_base {
+class local_kaltura_renderer extends \plugin_renderer_base {
 
     /**
      * This function outputs a table layout for display media

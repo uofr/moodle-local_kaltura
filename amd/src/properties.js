@@ -39,6 +39,9 @@ define(['jquery'], function($) {
         $(mediaPropHeight).change(dimensionChange);
         $(mediaPropWidth).change(dimensionChange);
         $(submitButton).click(submit);
+        $(document).on('DOMNodeRemoved','.modal-backdrop',function() {
+            if ($('.modal-backdrop').parent()) setTimeout('$(\'.modal-backdrop\').remove()',100);
+        });
     }
 
     function loadProperties() {

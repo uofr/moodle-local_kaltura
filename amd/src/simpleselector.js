@@ -55,6 +55,9 @@
         $(webcamUploadButton).click(openWebcamUploader);
         $(mediaEntry).click(selectMedia);
         $(submitButton, parent.document).click(submit);
+        $(document).on('DOMNodeRemoved','.modal-backdrop',function() {
+            if ($('.modal-backdrop').parent()) setTimeout('$(\'.modal-backdrop\').remove()',100);
+        });
     }
 
     // displays media as a grid
