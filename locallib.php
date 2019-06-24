@@ -773,7 +773,7 @@ function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $s
 
     $output .= "<object id=\"kaltura_player_{$uid}\" name=\"kaltura_player_{$uid}\" ";
     $output .= "type=\"application/x-shockwave-flash\" allowFullScreen=\"true\" allowNetworking=\"all\" ";
-    $output .= "allowScriptAccess=\"always\" height=\"{$entryobj->height}\" width=\"{$entryobj->width}\" ";
+    $output .= "allowScriptAccess=\"always\"";
     $output .= "xmlns:dc=\"http://purl.org/dc/terms/\" xmlns:media=\"http://search.yahoo.com/searchmonkey/media/\" ";
     $output .= "rel=\"media:{$entryobj->mediaType}\" ";
     $output .= "resource=\"{$host}/index.php/kwidget/wid/_{$entryobj->partnerId}/uiconf_id/{$uiconf}/entry_id/{$entryobj->id}\" ";

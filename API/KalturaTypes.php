@@ -2841,7 +2841,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 {
 	/**
 	 * The media type of the entry
-	 * 
+	 *
 	 *
 	 * @var KalturaMediaType
 	 * @insertonly
@@ -2858,7 +2858,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 	public $conversionQuality = null;
 
 	/**
-	 * The source type of the entry 
+	 * The source type of the entry
 	 *
 	 * @var KalturaSourceType
 	 * @insertonly
@@ -2913,7 +2913,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 
 	/**
 	 * Comma separated flavor params ids that exists for this media entry
-	 * 
+	 *
 	 *
 	 * @var string
 	 * @readonly
@@ -3039,7 +3039,7 @@ class KalturaFlavorAsset extends KalturaAsset
 {
 	/**
 	 * The Flavor Params used to create this Flavor Asset
-	 * 
+	 *
 	 *
 	 * @var int
 	 * @insertonly
@@ -3047,8 +3047,8 @@ class KalturaFlavorAsset extends KalturaAsset
 	public $flavorParamsId = null;
 
 	/**
-	 * The width of the Flavor Asset 
-	 * 
+	 * The width of the Flavor Asset
+	 *
 	 *
 	 * @var int
 	 * @readonly
@@ -3057,7 +3057,7 @@ class KalturaFlavorAsset extends KalturaAsset
 
 	/**
 	 * The height of the Flavor Asset
-	 * 
+	 *
 	 *
 	 * @var int
 	 * @readonly
@@ -3065,8 +3065,8 @@ class KalturaFlavorAsset extends KalturaAsset
 	public $height = null;
 
 	/**
-	 * The overall bitrate (in KBits) of the Flavor Asset 
-	 * 
+	 * The overall bitrate (in KBits) of the Flavor Asset
+	 *
 	 *
 	 * @var int
 	 * @readonly
@@ -3075,7 +3075,7 @@ class KalturaFlavorAsset extends KalturaAsset
 
 	/**
 	 * The frame rate (in FPS) of the Flavor Asset
-	 * 
+	 *
 	 *
 	 * @var int
 	 * @readonly
@@ -3084,7 +3084,7 @@ class KalturaFlavorAsset extends KalturaAsset
 
 	/**
 	 * True if this Flavor Asset is the original source
-	 * 
+	 *
 	 *
 	 * @var bool
 	 * @readonly
@@ -3093,7 +3093,7 @@ class KalturaFlavorAsset extends KalturaAsset
 
 	/**
 	 * True if this Flavor Asset is playable in KDP
-	 * 
+	 *
 	 *
 	 * @var bool
 	 * @readonly
@@ -3102,7 +3102,7 @@ class KalturaFlavorAsset extends KalturaAsset
 
 	/**
 	 * The container format
-	 * 
+	 *
 	 *
 	 * @var string
 	 * @readonly
@@ -3111,7 +3111,7 @@ class KalturaFlavorAsset extends KalturaAsset
 
 	/**
 	 * The video codec
-	 * 
+	 *
 	 *
 	 * @var string
 	 * @readonly
@@ -3120,7 +3120,7 @@ class KalturaFlavorAsset extends KalturaAsset
 
 	/**
 	 * The status of the Flavor Asset
-	 * 
+	 *
 	 *
 	 * @var KalturaFlavorAssetStatus
 	 * @readonly

@@ -30,7 +30,7 @@ require_once(dirname(__FILE__) . '/locallib.php');
  */
 function local_kaltura_extend_navigation($navigation) {
     global $USER, $PAGE, $CFG, $SITE;
-		
+
 		//disable until functional
 		return '';
 

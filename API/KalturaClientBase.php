@@ -476,7 +476,7 @@ class KalturaClientBase
 	/**
 	 * Add parameter to array of parameters that is passed by reference
 	 *
-	 * @param arrat $params
+	 * @param array $params
 	 * @param string $paramName
 	 * @param string $paramValue
 	 */
