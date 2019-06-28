@@ -21,134 +21,110 @@
  */
 
 
- define(['jquery', 'core/url'], function($, url) {
-    
-    // selectors
-    var gridButton = "#ss-sortgrid";
-    var listButton = '#ss-sortlist';
-    var sort = '#selectorSort';
-    var uploadButton = "#uploader_open";
-    var webcamUploadButton = "#webcam_open";
-    var mediaEntry = '.mymedia.mm-media.entry';
-    var mediaEntryThumbnail = '.mymedia.mm-media.entry .mm-thumb-grp';
-    var mediaEntryMetadata = '.mymedia.mm-media.entry .mm-entry-grp';
+ define(['jquery'], function($) {
 
-    // modal selectors (located in parent.document)
-    var selectedVidThumb = '#selected_video_thumbnail';
-    var selectedVidName = '#selected_video_name';
-    var selectedVidId = '#selected_video_id';
-    var submitButton = "#submit_btn";
+    var SELECTORS = {
+        GRID_BTN: '#ss-sortgrid',
+        LIST_BTN: '#ss-sortlist',
+        SORT: '#selectorSort',
+        MEDIA_ENTRY: '.mymedia.mm-media.entry',
+        MEDIA_ENTRY_THUMBNAIL: '.mymedia.mm-media.entry .mm-thumb-grp',
+        MEDIA_ENTRY_METADATA: '.mymedia.mm-media.entry .mm-entry-grp',
+        SELECTED_MEDIA_THUMB: '#selected_video_thumbnail',
+        SELECTED_MEDIA_NAME: '#selected_video_name',
+        SELECTED_MEDIA_ID: '#selected_video_id',
+        ENTRY_ID: '#entry_id',
+        ENTRY_NAME: '#id_name',
+        ENTRY_THUMBNAIL: '#media_thumbnail',
+        ID_MEDIA_PROPERTIES: '#id_media_properties',
+        SUBMIT_MEDIA: '#submit_media',
+        SUBMIT_BTN: '.modal-footer button[data-action="save"]'
+    };
 
-    // elements in parent.document
-    var entryId = "#entry_id";
-    var entryName = "#id_name";
-    var entryThumbnail = "#media_thumbnail";
-    var idMediaProperties = "#id_media_properties"; 
-    var submitMedia = "#submit_media";
+    var _selectedMediaId = null;
+    var _selectedMediaName = null;
+    var _selectedMediaImg = null;
 
-    function init() {
-        // event listeners
-        $(gridButton).click(layoutGrid);
-        $(listButton).click(layoutList);
-        $(sort).change(sortMedia);
-        $(uploadButton).click(openUploader);
-        $(webcamUploadButton).click(openWebcamUploader);
-        $(mediaEntry).click(selectMedia);
-        $(submitButton, parent.document).click(submit);
-        $(document).on('DOMNodeRemoved','.modal-backdrop',function() {
-            if ($('.modal-backdrop').parent()) setTimeout('$(\'.modal-backdrop\').remove()',100);
-        });
-    }
+    var _registerEventListeners = function() {
+        $(SELECTORS.GRID_BTN).click(_layoutGrid);
+        $(SELECTORS.LIST_BTN).click(_layoutList);
+        $(SELECTORS.SORT).change(_sortMedia);
+        $(SELECTORS.MEDIA_ENTRY).click(_selectMedia);
+        $(SELECTORS.SUBMIT_BTN, parent.document).click(_submit);
+    };
 
-    // displays media as a grid
-    function layoutGrid() {
-        $(gridButton).addClass('active');
-        $(listButton).removeClass('active');
+    var _layoutGrid = function() {
+        $(SELECTORS.GRID_BTN).addClass('active');
+        $(SELECTORS.LIST_BTN).removeClass('active');
 
         document.cookie = "ss-sort-style=grid;expires=January 12, 2025";
-        if ($(mediaEntry).hasClass('col-sm-12')) {
-            $(mediaEntry).removeClass('col-sm-12').addClass('col-sm-4');
+        if ($(SELECTORS.MEDIA_ENTRY).hasClass('col-sm-12')) {
+            $(SELECTORS.MEDIA_ENTRY).removeClass('col-sm-12').addClass('col-sm-4');
         }
-        $(mediaEntryThumbnail).removeClass('col-sm-4').addClass('col-sm-12');
-        $(mediaEntryMetadata).removeClass('col-sm-8').addClass('col-sm-12');
-    }
+        $(SELECTORS.MEDIA_ENTRY_THUMBNAIL).removeClass('col-sm-4').addClass('col-sm-12');
+        $(SELECTORS.MEDIA_ENTRY_METADATA).removeClass('col-sm-8').addClass('col-sm-12');
+    };
 
-    // displays media as a list
-    function layoutList() {
-        $(listButton).addClass('active');
-        $(gridButton).removeClass('active');
-        
+    var _layoutList = function() {
+        $(SELECTORS.LIST_BTN).addClass('active');
+        $(SELECTORS.GRID_BTN).removeClass('active');
         document.cookie = "ss-sort-style=list;expires=January 12, 2025";
-        if ($(mediaEntry).hasClass('col-sm-4')) {
-            $(mediaEntry).removeClass('col-sm-4').addClass('col-sm-12');
+        if ($(SELECTORS.MEDIA_ENTRY).hasClass('col-sm-4')) {
+            $(SELECTORS.MEDIA_ENTRY).removeClass('col-sm-4').addClass('col-sm-12');
         }
-        $(mediaEntryThumbnail).removeClass('col-sm-12').addClass('col-sm-4');
-        $(mediaEntryMetadata).removeClass('col-sm-12').addClass('col-sm-8');
-    }
+        $(SELECTORS.MEDIA_ENTRY_THUMBNAIL).removeClass('col-sm-12').addClass('col-sm-4');
+        $(SELECTORS.MEDIA_ENTRY_METADATA).removeClass('col-sm-12').addClass('col-sm-8');
+    };
 
-    function sortMedia() {
+    var _sortMedia = function() {
         window.location.href = $(this).val();
-    }
+    };
 
-    function openUploader() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var seltype = (urlParams.get('seltype')) ? '&seltype=' + urlParams.get('seltype') : '';
-        location.href = "./../mymedia/simple_uploader.php?embedded=1" + seltype;
-    }
-
-    function openWebcamUploader() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var seltype = (urlParams.get('seltype')) ? '&seltype=' + urlParams.get('seltype') : '';
-        location.href = "./../mymedia/webcam_uploader.php?embedded=1" + seltype;
-    }
-
-    function selectMedia() {
+    var _selectMedia = function() {
         var selectedId = $(this).attr('id');
-        var selectedName = $('#th_' + selectedId).attr('alt');
-        var selectedThumbnail = $('#th_' + selectedId).attr('src');
 
-        $(mediaEntry).removeClass('selected');
+        _selectedMediaId = $(this).attr('id');
+        _selectedMediaName = $('#th_' + selectedId).attr('alt');
+        _selectedMediaImg = $('#th_' + selectedId).attr('src');
+
+        $(SELECTORS.MEDIA_ENTRY).removeClass('selected');
         $(this).addClass('selected');
-        
-        $(selectedVidId, parent.document).val(selectedId);
-        $(selectedVidThumb, parent.document).attr('src', selectedThumbnail);
-        $(selectedVidName, parent.document).text(selectedName);
+    };
 
-        $(submitButton, parent.document).prop("disabled", false);
-    }
+    var _submit = function() {
+        var selectedId = _selectedMediaId;
+        var selectedName = _selectedMediaName;
+        var selectedThumb = _selectedMediaImg;
 
-    function submit() {
-        var selectedId = $(selectedVidId, parent.document).val();
-        var selectedName = $(selectedVidName, parent.document).text();
-        var selectedThumb = $(selectedVidThumb, parent.document).attr('src');
-
-        if ($(entryId, parent.document) !== null) {
+        if ($(SELECTORS.ENTRY_ID, parent.document) !== null) {
             if (selectedId !== null && selectedId !== '') {
-                $(entryId, parent.document).val(selectedId);
+                $(SELECTORS.ENTRY_ID, parent.document).val(selectedId);
             }
         }
-
-        if ($(entryName, parent.document) !== null) {
+        if ($(SELECTORS.ENTRY_NAME, parent.document) !== null) {
             if (selectedName !== null && selectedName !== '') {
-                $(entryName, parent.document).val(selectedName);
+                $(SELECTORS.ENTRY_NAME, parent.document).val(selectedName);
             }
         }
-
-        if ($(entryThumbnail, parent.document !== null)) {
+        if ($(SELECTORS.ENTRY_THUMBNAIL, parent.document !== null)) {
             if (selectedThumb !== null && selectedThumb !== '') {
-                $(entryThumbnail, parent.document).attr('src', selectedThumb);
+                $(SELECTORS.ENTRY_THUMBNAIL, parent.document).attr('src', selectedThumb);
             }
         }
-        
-        if ($(idMediaProperties, parent.document) !== null) {
-            $(idMediaProperties, parent.document).css({visibility: "visible"});
+        if ($(SELECTORS.ID_MEDIA_PROPERTIES, parent.document) !== null) {
+            $(SELECTORS.ID_MEDIA_PROPERTIES, parent.document).css({visibility: "visible"});
         }
-
-        if ($(submitMedia, parent.document) !== null) {
-            $(submitMedia, parent.document).prop("disabled", false);
+        if ($(SELECTORS.SUBMIT_MEDIA, parent.document) !== null) {
+            $(SELECTORS.SUBMIT_MEDIA, parent.document).prop("disabled", false);
         }
-    }
+    };
 
-    return {init: init};
+    var init = function() {
+        _registerEventListeners();
+    };
+
+    return {
+        init: init
+    };
 
  });

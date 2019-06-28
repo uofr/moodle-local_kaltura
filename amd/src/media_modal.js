@@ -19,7 +19,7 @@
  * @module local_kaltura/properties
  */
 
-define(['jquery', 'core/modal_factory', 'core/url'], function($, modalFactory, url) {
+define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/url'], function($, modalFactory, modalEvents, url) {
 
     var SELECTORS = {
         ADD_MEDIA_BTN : '#id_add_media',
@@ -42,11 +42,16 @@ define(['jquery', 'core/modal_factory', 'core/url'], function($, modalFactory, u
         var iframeUrl = url.relativeUrl('/local/kaltura/simple_selector.php');
         var trigger = $(SELECTORS.ADD_MEDIA_BTN);
         var modalConfig = {
+            type: 'SAVE_CANCEL',
             title : 'My Media',
             body: _getIframe(iframeUrl),
             large: true
         };
-        modalFactory.create(modalConfig, trigger);
+        return modalFactory.create(modalConfig, trigger);
+    };
+
+    var _setupSelectorModal = function(modal) {
+        modal.setSaveButtonText('Select Media');
     };
 
     var _createUploadModal = function() {
@@ -57,7 +62,7 @@ define(['jquery', 'core/modal_factory', 'core/url'], function($, modalFactory, u
             body: _getIframe(iframeUrl),
             large: true
         };
-        modalFactory.create(modalConfig, trigger);
+        return modalFactory.create(modalConfig, trigger);
     };
 
     var _createRecordModal = function() {
@@ -68,11 +73,11 @@ define(['jquery', 'core/modal_factory', 'core/url'], function($, modalFactory, u
             body: _getIframe(iframeUrl),
             large: true
         };
-        modalFactory.create(modalConfig, trigger);
+        return modalFactory.create(modalConfig, trigger);
     };
 
     var init = function() {
-        _createSelectorModal();
+        _createSelectorModal().done(_setupSelectorModal);
         _createUploadModal();
         _createRecordModal();
     };
