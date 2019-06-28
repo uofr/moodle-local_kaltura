@@ -121,7 +121,7 @@ if (local_kaltura_get_mymedia_permission()) {
                                         $page,
                                         $perpage,
                                         new moodle_url('/local/kaltura/simple_selector.php', array('sort' => $sort)));
-		
+
             echo $renderer->create_options_table_upper($page);
 
             echo $renderer->create_media_table($medialist);
@@ -134,8 +134,6 @@ if (local_kaltura_get_mymedia_permission()) {
             echo $renderer->create_options_table_lower($page);
 
         }
-
-        // echo $renderer->create_selector_submit_form();
 
     } catch (Exception $ex) {
         $errormessage = 'View - error main page(' .  $ex->getMessage() . ')';

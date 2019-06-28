@@ -146,45 +146,26 @@ class local_kaltura_renderer extends \plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', ['class' => 'container-fluid']);
 
-        // upload, record search
-        $output .= html_writer::start_tag('div', ['class' => 'row']);
-
-        // upload / webcam upload
-        if (has_capability('local/mymedia:upload', $context, $USER)) {
-            $output .= html_writer::start_tag('div', ['class' => 'col-sm-4 mb-2']);
-            $output .= $this->create_upload_markup();
-            $output .= $this->create_webcam_markup();
-            $output .= html_writer::end_tag('div');
-        }
-
         // search
         if (has_capability('local/mymedia:search', $context, $USER)) {
-            $output .= html_writer::start_tag('div', ['class' => 'col-sm-8 mb-2']);
-            $output .= $this->create_search_markup();
-            $output .= html_writer::end_tag('div');
+            $output .= html_writer::tag('div', $this->create_search_markup(), ['class'=>'mb-3']);
         }
 
-        $output .= html_writer::end_tag('div');
-
         // sort and layout
-        $output .= html_writer::start_tag('div', ['class' => 'row mb-2']);
-
-         $output .= html_writer::start_tag('div', ['class' => 'col-sm-4']);
-         $output .= html_writer::end_tag('div');
 
         if (isset($_COOKIE["ss-sort-style"]) && $_COOKIE["ss-sort-style"] == 'grid') {
             $gridActive = ' active';
             $listActive = '';
-		} else {
+        }
+        else {
             $gridActive = '';
             $listActive = ' active';
         }
-        $output .= html_writer::start_tag('div', ['class' => 'col-sm-8']);
+
+        $output .= html_writer::start_tag('div');
         $output .= $this->create_sort_option();
         $output .= '<a href="#" id="ss-sortlist" class="btn btn-secondary mr-2'.$listActive.'" title="View as list"><i class="fa fa-th-list" aria-hidden="true"></i></a>';
-        $output .= '<a href="#" id="ss-sortgrid" class="btn btn-secondary mr-2'.$gridActive.'" title="View as grid"><i class="fa fa-th" aria-hidden="true"></i></a>';
-        $output .= html_writer::end_tag('div');
-
+        $output .= '<a href="#" id="ss-sortgrid" class="btn btn-secondary'.$gridActive.'" title="View as grid"><i class="fa fa-th" aria-hidden="true"></i></a>';
         $output .= html_writer::end_tag('div');
 
         // page
@@ -197,7 +178,7 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         }
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
-        
+
 
         $output .= html_writer::end_tag('div');
 
@@ -716,46 +697,6 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $output .= html_writer::empty_tag('input', $attr);
 
         $output .= html_writer::end_tag('center');
-
-        return $output;
-    }
-	
-    public function create_upload_markup() {
-
-        $output = '';
-
-        $attr = array('id' => 'uploader_open',
-                      'class' => 'mymedia simple upload btn btn-secondary mr-2',
-                      'value' => get_string('simple_upload', 'local_mymedia'),
-                      'title' => get_string('simple_upload', 'local_mymedia'));
-
-		$output .= html_writer::start_tag('a', $attr);
-		
-		$output .= '<i class="fa fa-cloud-upload"></i> '.get_string('simple_upload', 'local_mymedia');
-
-		$output .= html_writer::end_tag('a');
-
-        return $output;
-
-    }
-		
-    /**
-     * This function outputs the media upload.
-     *
-     * @return string - HTML markup of webcam upload.
-     */
-    public function create_webcam_markup() {
-        $output = '';
-
-        $attr = array('id' => 'webcam_open',
-                      'class' => 'mymedia simple webcam upload btn btn-secondary mr-2',
-                      'title' => get_string('webcam_upload', 'local_mymedia'));
-				
-		$output .= html_writer::start_tag('a', $attr);
-				
-		$output .= '<i class="fa fa-video-camera"></i> '.get_string('webcam_upload', 'local_mymedia');
-				
-        $output .= html_writer::end_tag('a');
 
         return $output;
     }
