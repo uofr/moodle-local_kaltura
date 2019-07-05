@@ -31,7 +31,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/url'], functi
         var iframeContainer = $('<div></div>');
         var iframe = $('<iframe></iframe>');
 
-        iframeContainer.addClass('embed-responsive embed-responsive-16by9');
+        iframeContainer.addClass('embed-responsive embed-responsive-1by1');
         iframe.attr('src', iframeUrl);
         iframeContainer.append(iframe);
 
