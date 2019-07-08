@@ -65,6 +65,10 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/url'], functi
         return modalFactory.create(modalConfig, trigger);
     };
 
+    var _setupUploadModal = function(modal) {
+        modal.root.attr('id', 'upload_modal');
+    };
+
     var _createRecordModal = function() {
         var iframeUrl = url.relativeUrl('/local/mymedia/webcam_uploader.php', {embedded : 1});
         var trigger = $(SELECTORS.RECORD_MEDIA_BTN);
@@ -78,7 +82,7 @@ define(['jquery', 'core/modal_factory', 'core/modal_events', 'core/url'], functi
 
     var init = function() {
         _createSelectorModal().done(_setupSelectorModal);
-        _createUploadModal();
+        _createUploadModal().done(_setupUploadModal);
         _createRecordModal();
     };
 
