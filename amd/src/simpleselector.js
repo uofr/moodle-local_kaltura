@@ -37,8 +37,7 @@
         ENTRY_NAME: '#id_name',
         ENTRY_THUMBNAIL: '#media_thumbnail',
         ID_MEDIA_PROPERTIES: '#id_media_properties',
-        SUBMIT_MEDIA: '#submit_media',
-        SUBMIT_BTN: '.modal-footer button[data-action="save"]'
+        SUBMIT_BTN: '#selector_submit'
     };
 
     var _selectedMediaId = null;
@@ -91,7 +90,7 @@
         $(this).addClass('selected');
     };
 
-    var _submit = function() {
+    var _submit = function(event) {
         var selectedId = _selectedMediaId;
         var selectedName = _selectedMediaName;
         var selectedThumb = _selectedMediaImg;
@@ -110,12 +109,6 @@
             if (selectedThumb !== null && selectedThumb !== '') {
                 $(SELECTORS.ENTRY_THUMBNAIL, parent.document).attr('src', selectedThumb);
             }
-        }
-        if ($(SELECTORS.ID_MEDIA_PROPERTIES, parent.document) !== null) {
-            $(SELECTORS.ID_MEDIA_PROPERTIES, parent.document).css({visibility: "visible"});
-        }
-        if ($(SELECTORS.SUBMIT_MEDIA, parent.document) !== null) {
-            $(SELECTORS.SUBMIT_MEDIA, parent.document).prop("disabled", false);
         }
     };
 

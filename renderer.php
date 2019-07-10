@@ -705,7 +705,7 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $href = new \moodle_url('/local/kaltura/simple_selector.php');
         $title = get_string('pluginname', 'local_mymedia');
         $footer = '';
-        $footer .= '<button class="btn btn-primary">'.get_string('confirm', 'core').'</button>';
+        $footer .= '<button id="selector_submit" class="btn btn-primary" data-dismiss="modal">'.get_string('confirm', 'core').'</button>';
         $footer .= '<button class="btn btn-secondary" data-dismiss="modal">'.get_string('cancel', 'core').'</button>';
         return $this->create_iframe_modal('selector_modal', $href, $title, $footer);
     }
@@ -714,7 +714,7 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $href = new \moodle_url('/local/mymedia/simple_uploader.php', ['embedded'=>1]);
         $title = get_string('nav_upload', 'local_mymedia');
         $footer = '';
-        $footer .= '<button class="btn btn-primary">'.get_string('confirm', 'core').'</button>';
+        $footer .= '<button class="btn btn-primary" data-dismiss="modal">'.get_string('confirm', 'core').'</button>';
         $footer .= '<button class="btn btn-secondary" data-dismiss="modal">'.get_string('cancel', 'core').'</button>';
         return $this->create_iframe_modal('upload_modal', $href, $title, $footer);
     }
