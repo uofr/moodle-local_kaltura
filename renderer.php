@@ -701,82 +701,63 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         return $output;
     }
 
-    /**
-     * @return string - Markup for video selection modal.
-     */
-    public function create_video_selector_modal() {
-        global $CFG;
+    public function create_selector_modal() {
+        $href = new \moodle_url('/local/kaltura/simple_selector.php');
+        $title = get_string('pluginname', 'local_mymedia');
+        $footer = '';
+        $footer .= '<button class="btn btn-primary">'.get_string('confirm', 'core').'</button>';
+        $footer .= '<button class="btn btn-secondary" data-dismiss="modal">'.get_string('cancel', 'core').'</button>';
+        return $this->create_iframe_modal('selector_modal', $href, $title, $footer);
+    }
 
-        $url = $CFG->wwwroot . '/local/kaltura/simple_selector.php';
+    public function create_upload_modal() {
+        $href = new \moodle_url('/local/mymedia/simple_uploader.php', ['embedded'=>1]);
+        $title = get_string('nav_upload', 'local_mymedia');
+        $footer = '';
+        $footer .= '<button class="btn btn-primary">'.get_string('confirm', 'core').'</button>';
+        $footer .= '<button class="btn btn-secondary" data-dismiss="modal">'.get_string('cancel', 'core').'</button>';
+        return $this->create_iframe_modal('upload_modal', $href, $title, $footer);
+    }
 
-        $output = '';
-
-        $output .= html_writer::start_tag('div', ['class' => 'modal', 'id' => 'video_selector_modal']);
-        $output .= html_writer::start_tag('div', ['class' => 'modal-dialog modal-dialog-centered modal-lg']);
-        $output .= html_writer::start_tag('div', ['class' => 'modal-content']);
-
-        $output .= html_writer::start_tag('div', ['class' => 'modal-header']);
-        $output .= html_writer::tag('h4', get_string('modal_header', 'local_kaltura'), null);
-        $output .= html_writer::start_tag('button', ['id' => 'modal_dismiss', 'type' => 'button', 'class' => 'close', 'data-dismiss' => 'modal']);
-        $output .= html_writer::tag('span', '&times;', null);
-        $output .= html_writer::end_tag('button');
-        $output .= html_writer::end_tag('div');
-
-        $output .= html_writer::start_tag('div', ['class' => 'modal-body', 'style' => 'padding: 0px;']);
-        $output .= html_writer::tag('iframe', '', ['id' => 'video_selector_iframe', 'src' => $url, 'style' => 'width: 100%; height: 500px; border: 0px solid transparent']);
-        $output .= html_writer::end_tag('div');
-
-        $output .= html_writer::start_tag('div', ['class' => 'modal-footer']);
-
-        $output .= html_writer::start_tag('div', ['class' => 'container']);
-        $output .= html_writer::tag('h6', 'Select a Video', ['id' => 'selected_video_name']);
-        $output .= html_writer::empty_tag('input', ['type' => 'hidden', 'id' => 'selected_video_id', 'name' => 'selected_video_id', 'value' => '']);
-        $output .= html_writer::empty_tag('img', ['src' => $CFG->wwwroot . '/local/kaltura/pix/vidThumb.png', 'id' => 'selected_video_thumbnail', 'width' => '120', 'height' => '80']);
-        $output .= html_writer::end_tag('div');
-
-        $output .= html_writer::empty_tag('input', ['type' => 'button', 'id' => 'submit_btn', 'name' => 'submit_btn', 'value' => 'OK', 'disabled' => 'true', 'class' => 'btn btn-primary', 'data-dismiss' => 'modal']);
-        $output .= html_writer::end_tag('div');
-
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
-
-        return $output;
+    public function create_record_modal() {
+        $href = new \moodle_url('/local/mymedia/webcam_uploader.php', ['embedded'=>1]);
+        $title = get_string('webcam_upload', 'local_mymedia');
+        $footer = '';
+        $footer .= '<button class="btn btn-primary">'.get_string('confirm', 'core').'</button>';
+        $footer .= '<button class="btn btn-secondary" data-dismiss="modal">'.get_string('cancel', 'core').'</button>';
+        return $this->create_iframe_modal('record_modal', $href, $title, $footer);
     }
 
     /**
-     * @return string - Markup for media properties modal
-     * Modal used in mod_kalvidres and mod_kalvidassign
+     * @param string $id - Modal ID.
+     * @param \moodle_url $href - Link to iframe page.
+     * @param string $title - Modal title.
+     * @param string $footer - HTML markup that appears inside footer.
+     * @return string - Modal HTML markup.
      */
-    public function create_video_properties_modal() {
+    private function create_iframe_modal(string $id, \moodle_url $href, string $title, string $footer) {
         $output = '';
 
-        $output .= '<div id="video_properties_modal" class="modal">
+        $output .= '<div id="'.$id.'" class="modal">';
+        $output .= '<div class="modal-dialog modal-lg">';
+        $output .= '<div class="modal-content">';
 
-                        <div class="modal-dialog">
+        $output .= '<div class="modal-header">';
+        $output .= '<h5>'.$title.'</h5>';
+        $output .= '<button class="close" data-dismiss="modal">&times;</button>';
+        $output .= '</div>';
 
-                            <div class="modal-content">
+        $output .= '<div class="modal-body embed-responsive embed-responsive-1by1">';
+        $output .= '<iframe src="'.$href.'"></iframe>';
+        $output .= '</div>';
 
-                                <div class="modal-header">
-                                    <h4>'. get_string('media_prop_header', 'local_kaltura') .'</h4>
-                                    <button type="button" class="close" data-dismiss="modal">
-                                        <span>&times;</span>
-                                    </button>
-                                </div>
+        $output .= '<div class="modal-footer">';
+        $output .= $footer;
+        $output .= '</div>';
 
-                                <div class="modal-body">'.
-                                    $this->get_media_preferences_markup()
-                                .'</div>
-
-                                <div class="modal-footer">'.
-                                    $this->create_properties_submit_markup()
-                                .'</div>
-
-                            </div>
-
-                        </div>
-
-                    </div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
 
         return $output;
     }
