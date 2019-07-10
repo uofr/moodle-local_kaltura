@@ -714,7 +714,7 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $href = new \moodle_url('/local/mymedia/simple_uploader.php', ['embedded'=>1]);
         $title = get_string('nav_upload', 'local_mymedia');
         $footer = '';
-        $footer .= '<button class="btn btn-primary" data-dismiss="modal">'.get_string('confirm', 'core').'</button>';
+        $footer .= '<button class="btn btn-primary" data-dismiss="modal">'.get_string('simple_upload', 'local_mymedia').'</button>';
         $footer .= '<button class="btn btn-secondary" data-dismiss="modal">'.get_string('cancel', 'core').'</button>';
         return $this->create_iframe_modal('upload_modal', $href, $title, $footer);
     }
@@ -723,7 +723,7 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $href = new \moodle_url('/local/mymedia/webcam_uploader.php', ['embedded'=>1]);
         $title = get_string('webcam_upload', 'local_mymedia');
         $footer = '';
-        $footer .= '<button class="btn btn-primary">'.get_string('confirm', 'core').'</button>';
+        $footer .= '<button class="btn btn-primary">'.get_string('simple_upload', 'local_mymedia').'</button>';
         $footer .= '<button class="btn btn-secondary" data-dismiss="modal">'.get_string('cancel', 'core').'</button>';
         return $this->create_iframe_modal('record_modal', $href, $title, $footer);
     }
