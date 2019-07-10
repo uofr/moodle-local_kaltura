@@ -739,7 +739,7 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $output = '';
 
         $output .= '<div id="'.$id.'" class="modal">';
-        $output .= '<div class="modal-dialog modal-lg">';
+        $output .= '<div class="modal-dialog modal-dialog-scrollable modal-lg">';
         $output .= '<div class="modal-content">';
 
         $output .= '<div class="modal-header">';
@@ -765,16 +765,15 @@ class local_kaltura_renderer extends \plugin_renderer_base {
     public function create_progress_modal() {
         $output = '';
 
-        $output .= '<div id="progress_modal" class="modal">';
-        $output .= '<div class="modal-dialog modal-lg">';
+        $output .= '<div id="kaltura_upload_modal" class="modal">';
+        $output .= '<div class="modal-dialog">';
         $output .= '<div class="modal-content">';
 
         $output .= '<div class="modal-header">';
         $output .= '<h5>'.get_string('video_uploading', 'local_kaltura').'</h5>';
-        $output .= '<button class="close" data-dismiss="modal">&times;</button>';
         $output .= '</div>';
 
-        $output .= '<div class="modal-body embed-responsive embed-responsive-1by1">';
+        $output .= '<div class="modal-body">';
         $output .= '<p>'.get_string('video_uploading_body', 'local_kaltura').'</p>';
         $output .= '<div class="progress">';
         $output .= '<div id="kaltura_upload_progress" class="progress-bar"></div>';
