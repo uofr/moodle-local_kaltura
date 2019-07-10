@@ -762,4 +762,30 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         return $output;
     }
 
+    public function create_progress_modal() {
+        $output = '';
+
+        $output .= '<div id="progress_modal" class="modal">';
+        $output .= '<div class="modal-dialog modal-lg">';
+        $output .= '<div class="modal-content">';
+
+        $output .= '<div class="modal-header">';
+        $output .= '<h5>'.get_string('video_uploading', 'local_kaltura').'</h5>';
+        $output .= '<button class="close" data-dismiss="modal">&times;</button>';
+        $output .= '</div>';
+
+        $output .= '<div class="modal-body embed-responsive embed-responsive-1by1">';
+        $output .= '<p>'.get_string('video_uploading_body', 'local_kaltura').'</p>';
+        $output .= '<div class="progress">';
+        $output .= '<div id="kaltura_upload_progress" class="progress-bar"></div>';
+        $output .= '</div>';
+        $output .= '</div>';
+
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
 }
