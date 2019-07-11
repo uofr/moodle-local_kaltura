@@ -780,6 +780,11 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $output .= '</div>';
         $output .= '</div>';
 
+        $output .= '<div class="modal-footer" style="opacity:0">';
+        $output .= '<button class="btn btn-primary" data-dismiss="modal">Upload Another</button>';
+        $output .= '<a class="btn btn-secondary" href='.new \moodle_url('/local/mymedia/mymedia.php').'>Done</a>';
+        $output .= '</div>';
+
         $output .= '</div>';
         $output .= '</div>';
         $output .= '</div>';
