@@ -774,15 +774,14 @@ class local_kaltura_renderer extends \plugin_renderer_base {
         $output .= '</div>';
 
         $output .= '<div class="modal-body">';
-        $output .= '<p>'.get_string('video_uploading_body', 'local_kaltura').'</p>';
         $output .= '<div class="progress">';
         $output .= '<div id="kaltura_upload_progress" class="progress-bar"></div>';
         $output .= '</div>';
         $output .= '</div>';
 
         $output .= '<div class="modal-footer" style="opacity:0">';
-        $output .= '<button class="btn btn-primary" data-dismiss="modal">Upload Another</button>';
-        $output .= '<a class="btn btn-secondary" href='.new \moodle_url('/local/mymedia/mymedia.php').'>Done</a>';
+        $output .= '<button class="btn btn-primary" data-dismiss="modal">Upload Another Video</button>';
+        $output .= '<a class="btn btn-secondary" href='.new \moodle_url('/local/mymedia/mymedia.php').'>Back to My Media</a>';
         $output .= '</div>';
 
         $output .= '</div>';
