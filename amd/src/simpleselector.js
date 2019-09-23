@@ -115,8 +115,8 @@
         //if mod_kalvidassign, need to enable submit button if media has been selected
         if ($(SELECTORS.ASSGN_SUBMIT_BTN, parent.document) !== null) {
             if ($(SELECTORS.ENTRY_ID, parent.document).val() != '') {
-                if ($(SELECTORS.ASSGN_SUBMIT_BTN, parent.document).attr('disabled') == 1) {
-                    $(SELECTORS.ASSGN_SUBMIT_BTN, parent.document).attr('disabled',0);
+                if ($(SELECTORS.ASSGN_SUBMIT_BTN, parent.document).prop('disabled') == true) {
+                    $(SELECTORS.ASSGN_SUBMIT_BTN, parent.document).prop('disabled', false);
                 }
             }
         }
