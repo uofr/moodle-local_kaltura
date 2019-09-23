@@ -50,6 +50,7 @@
         $(SELECTORS.LIST_BTN).click(_layoutList);
         $(SELECTORS.SORT).change(_sortMedia);
         $(SELECTORS.MEDIA_ENTRY).click(_selectMedia);
+        $(SELECTORS.MEDIA_ENTRY).dblclick(_selectMediaSubmit);
         $(SELECTORS.SUBMIT_BTN, parent.document).click(_submit);
     };
 
@@ -120,6 +121,13 @@
                 }
             }
         }
+    };
+
+    var _selectMediaSubmit = function() {
+       //console.log('process dbl click');
+       $(this).trigger('click');
+       $(SELECTORS.SUBMIT_BTN, parent.document).trigger('click');
+       //console.log('triggered');
     };
 
     var init = function() {
