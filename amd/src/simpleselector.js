@@ -37,7 +37,8 @@
         ENTRY_NAME: '#id_name',
         ENTRY_THUMBNAIL: '#media_thumbnail',
         ID_MEDIA_PROPERTIES: '#id_media_properties',
-        SUBMIT_BTN: '#selector_submit'
+        SUBMIT_BTN: '#selector_submit',
+        ASSGN_SUBMIT_BTN: '#submit_media'
     };
 
     var _selectedMediaId = null;
@@ -108,6 +109,15 @@
         if ($(SELECTORS.ENTRY_THUMBNAIL, parent.document !== null)) {
             if (selectedThumb !== null && selectedThumb !== '') {
                 $(SELECTORS.ENTRY_THUMBNAIL, parent.document).attr('src', selectedThumb);
+            }
+        }
+
+        //if mod_kalvidassign, need to enable submit button if media has been selected
+        if ($(SELECTORS.ASSGN_SUBMIT_BTN, parent.document) !== null) {
+            if ($(SELECTORS.ENTRY_ID, parent.document).val() != '') {
+                if ($(SELECTORS.ASSGN_SUBMIT_BTN, parent.document).attr('disabled') == 1) {
+                    $(SELECTORS.ASSGN_SUBMIT_BTN, parent.document).attr('disabled',0);
+                }
             }
         }
     };
