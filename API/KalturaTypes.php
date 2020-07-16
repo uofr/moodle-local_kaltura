@@ -2923,6 +2923,24 @@ class KalturaMediaEntry extends KalturaPlayableEntry
 
 }
 
+class KalturaExternalMediaEntry extends KalturaMediaEntry {
+
+	/**
+	 * Comma separated asset params ids that exist of this external media entry.
+	 * @var string
+	 * @readonly
+	 */
+	public $assetParamsIds = null;
+
+	/**
+	 * The source type of the external media.
+	 * 
+	 * @var string
+	 * @readonly
+	 */
+	public $externalSourceType = null;
+}
+
 class KalturaAsset extends KalturaObjectBase
 {
 	/**
