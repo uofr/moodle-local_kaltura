@@ -17,12 +17,10 @@
 /**
  * kaltura_connection class file.
  * 
- * @package local_mymedia
+ * @package local_kaltura
  */
 
 namespace local_kaltura;
-
-use KalturaConfiguration;
 
 defined('MOODLE_INTERNAL') || die();
 
