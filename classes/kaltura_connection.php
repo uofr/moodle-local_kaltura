@@ -34,7 +34,7 @@ class kaltura_connection {
     /**
      * Sets up and returns a KalturaConfiguration object.
      * 
-     * @return KalturaConfiguration
+     * @return \KalturaConfiguration
      */
     public static function get_config() {
         global $CFG;
@@ -60,7 +60,7 @@ class kaltura_connection {
     }
 
     /**
-     * Creates KalturaClient with a new session.
+     * Creates \KalturaClient with a new session.
      * 
      * @param \KalturaConfiguration $config
      * @return \KalturaClient
