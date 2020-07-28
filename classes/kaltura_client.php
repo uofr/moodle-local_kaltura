@@ -14,22 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * kaltura_connection class file.
- * 
- * @package local_kaltura
- */
-
 namespace local_kaltura;
+
+use KalturaClient;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../API/KalturaClient.php');
 
-/**
- * Static functions for connecting to the Kaltura API.
- */
-class kaltura_connection {
+class kaltura_client {
 
     /**
      * Sets up and returns a KalturaConfiguration object.
@@ -59,20 +52,15 @@ class kaltura_connection {
         return $config;
     }
 
-    /**
-     * Creates \KalturaClient with a new session.
-     * 
-     * @param \KalturaConfiguration $config
-     * @return \KalturaClient
-     */
-    public static function get_client(\KalturaConfiguration $config, int $timeout = 10800) {
+    public static function get_client() {
         global $USER;
 
-        $secret = get_config('local_kaltura', 'adminsecret');
+        $admin_secret = get_config('local_kaltura', 'adminsecret');
         $partner_id = get_config('local_kaltura', 'partner_id');
 
-        $client = new \KalturaClient($config);
-        $session = $client->generateSession($secret, $USER->username, \KalturaSessionType::ADMIN, $partner_id, $timeout);
+        $config = self::get_config();
+        $client = new KalturaClient($config);
+        $session = $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::USER, $partner_id, 10800, '');
         $client->setKs($session);
         return $client;
     }

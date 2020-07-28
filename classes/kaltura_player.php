@@ -50,14 +50,14 @@ class kaltura_player {
      * Returns player embed link.
      * @return string
      */
-    public static function get_embed_url() {
+    public static function get_embed_url($entry_id) {
         $server_url = get_config('local_kaltura', 'uri');
         $partner_id = get_config('local_kaltura', 'partner_id');
         $uiconf_id = get_config('local_kaltura', 'player_resource');
         if (empty($uiconf_id)) {
             $uiconf_id = get_config('local_kaltura', 'player_resource_custom');
         }
-        return "{$server_url}/index.php/kwidget/wid/_{$partner_id}/uiconf_id/{$uiconf_id}/entry_id/{$entry->id}/v/flash";
+        return "{$server_url}/index.php/kwidget/wid/_{$partner_id}/uiconf_id/{$uiconf_id}/entry_id/{$entry_id}/v/flash";
     }
 
     /**
