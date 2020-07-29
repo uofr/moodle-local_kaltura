@@ -95,6 +95,7 @@ $string['pres_uploader'] = 'Video Presentation KCW uploader';
 $string['mymedia_uploader'] = 'My Media KCW uploader';
 $string['custom_player_upload'] = 'Custom upload widget';
 $string['nine'] = '9';
+$string['twelve'] = '12';
 $string['eighteen'] = '18';
 $string['twentyone'] = '21';
 $string['twentyfour'] = '24';

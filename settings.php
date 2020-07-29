@@ -355,7 +355,7 @@ if ($hassiteconfig) {
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
-    $perpage  = array(9 => get_string('nine', 'local_kaltura'),
+    $perpage  = array(12 => get_string('twelve', 'local_kaltura'),
                       18 => get_string('eighteen', 'local_kaltura'),
                       21 => get_string('twentyone', 'local_kaltura'),
                       24 => get_string('twentyfour', 'local_kaltura'),
@@ -365,7 +365,7 @@ if ($hassiteconfig) {
     $adminsetting = new admin_setting_configselect('mymedia_items_per_page',
                                                    get_string('mymedia_items_per_page', 'local_kaltura'),
                                                    get_string('mymedia_items_per_page_desc', 'local_kaltura'),
-                                                   9, $perpage);
+                                                   12, $perpage);
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
