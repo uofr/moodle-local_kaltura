@@ -16,8 +16,6 @@
 
 namespace local_kaltura;
 
-use KalturaClient;
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../API/KalturaClient.php');
@@ -58,11 +56,46 @@ class kaltura_client {
         $admin_secret = get_config('local_kaltura', 'adminsecret');
         $partner_id = get_config('local_kaltura', 'partner_id');
 
-        $config = self::get_config();
-        $client = new KalturaClient($config);
+        $client = new \KalturaClient(self::get_config());
         $session = $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::USER, $partner_id, 10800, '');
         $client->setKs($session);
         return $client;
+    }
+
+    public static function get_entries($search, $sort, $page, $per_page) {
+        $client = self::get_client();
+
+        $filter = new \KalturaMediaEntryFilter();
+        if (!empty($search)) {
+            $search_terms = preg_replace('/(\s+)/', ',', $search);
+            $filter->freeText = $search_terms;
+        }
+        if ($sort == 'recent') {
+            $filter->orderBy = \KalturaBaseEntryOrderBy::CREATED_AT_DESC;
+        } else if ($sort == 'oldest') {
+            $filter->orderBy = \KalturaBaseEntryOrderBy::CREATED_AT_ASC;
+        } else if ($sort == 'medianameasc') {
+             $filter->orderBy = \KalturaBaseEntryOrderBy::NAME_ASC;
+        } else if ($sort == 'medianamedesc') {
+             $filter->orderBy = \KalturaBaseEntryOrderBy::NAME_DESC;
+        } else if ($sort == 'mediadurasc') {
+             $filter->orderBy = \KalturaMediaEntryOrderBy::DURATION_ASC;
+        } else if ($sort == 'mediadurdesc') {
+             $filter->orderBy = \KalturaMediaEntryOrderBy::DURATION_DESC;
+        }
+        $filter->statusIn = \KalturaEntryStatus::READY .','.
+                            \KalturaEntryStatus::PRECONVERT .','.
+                            \KalturaEntryStatus::IMPORT;
+
+        $pager = new \KalturaFilterPager();
+        $pager->pageIndex = $page + 1;
+        $pager->pageSize = $per_page;
+
+        $client = \local_kaltura\kaltura_client::get_client();
+        $entries = $client->media->listAction($filter, $pager);
+        $client->session->end();
+
+        return $entries;
     }
 
 }
