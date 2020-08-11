@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../API/KalturaClient.php');
 
 /**
- * Static functions related to the Kaltura player.
+ * Kaltura player utility functions.
  */
 class kaltura_player {
 
