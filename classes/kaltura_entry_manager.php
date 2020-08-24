@@ -42,7 +42,10 @@ class kaltura_entry_manager {
      * @return \KalturaMediaListResponse
      */
     public static function get_entries($search, $sort, $page, $per_page) {
+        global $USER;
+
         $filter = new \KalturaMediaEntryFilter();
+        $filter->userIdEqual = $USER->username;
         if (!empty($search)) {
             $search_terms = preg_replace('/(\s+)/', ',', $search);
             $filter->freeText = $search_terms;
