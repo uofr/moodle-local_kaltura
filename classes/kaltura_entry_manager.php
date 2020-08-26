@@ -35,13 +35,14 @@ class kaltura_entry_manager {
     /**
      * Get the current user's entries.
      * 
+     * @param KalturaClient $client
      * @param string $search
      * @param string $sort
      * @param int $page
      * @param int $per_page
      * @return \KalturaMediaListResponse
      */
-    public static function get_entries($search, $sort, $page, $per_page) {
+    public static function get_entries($client, $search, $sort, $page, $per_page) {
         global $USER;
 
         $filter = new \KalturaMediaEntryFilter();
@@ -71,9 +72,7 @@ class kaltura_entry_manager {
         $pager->pageIndex = $page + 1;
         $pager->pageSize = $per_page;
 
-        $client = \local_kaltura\kaltura_client::get_client();
         $entries = $client->media->listAction($filter, $pager);
-        $client->session->end();
 
         return $entries;
     }
@@ -81,16 +80,15 @@ class kaltura_entry_manager {
     /**
      * Gets the specified entry. Throws exception if entry does not belong to user.
      * 
+     * @param KalturaClient $client
      * @param string $entryid
      * @return \KalturaMediaEntry
      * @throws moodle_exception
      */
-    public static function get_entry($entryid) {
+    public static function get_entry($client, $entryid) {
         global $USER;
 
-        $client = \local_kaltura\kaltura_client::get_client();
         $entry = \KalturaStaticEntries::getEntry($entryid, $client->baseEntry, true);
-        $client->session->end();
 
         if ($entry->userId !== $USER->username) {
             throw new \moodle_exception('error_entry_permission', 'local_mymedia');

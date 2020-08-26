@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../API/KalturaClient.php');
 
 /**
- * Kaltura player utility functions.
+ * Kaltura player static class.
  */
 class kaltura_player {
 
@@ -37,12 +37,9 @@ class kaltura_player {
      * @return \moodle_url
      */
     public static function get_js_url() {
-        $host = get_config('local_kaltura', 'uri');
-        $partner_id = get_config('local_kaltura', 'partner_id');
-        $uiconf_id = get_config('local_kaltura', 'player_resource');
-        if (empty($uiconf_id)) {
-            $uiconf_id = get_config('local_kaltura', 'player_resource_custom');
-        }
+        $host = \local_kaltura\kaltura_config::get_kaltura_url();
+        $partner_id = \local_kaltura\kaltura_config::get_partner_id();
+        $uiconf_id = \local_kaltura\kaltura_config::get_uiconf_id();
 
         return new \moodle_url("{$host}/p/{$partner_id}/sp/{$partner_id}00/embedIframeJs/uiconf_id/{$uiconf_id}/partner_id/{$partner_id}");
     }
