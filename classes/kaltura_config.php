@@ -54,4 +54,8 @@ class kaltura_config {
     public static function entries_per_page() {
         return get_config('local_kaltura', 'mymedia_items_per_page');
     }
+
+    public static function get_root_category_id() {
+        return get_config('local_kaltura', 'rootcategory_id');
+    }
 }
