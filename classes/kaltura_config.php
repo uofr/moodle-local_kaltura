@@ -39,6 +39,7 @@ class kaltura_config {
         return get_config('local_kaltura', 'uri');
     }
 
+
     public static function get_partner_id() {
         return get_config('local_kaltura', 'partner_id');
     }
@@ -58,4 +59,25 @@ class kaltura_config {
     public static function get_root_category_id() {
         return get_config('local_kaltura', 'rootcategory_id');
     }
+
+    public static function get_version() {
+        return get_config('local_kaltura', 'version');
+    }
+
+    public static function get_admin_secret() {
+        return get_config('local_kaltura', 'adminsecret');
+    }
+
+    public static function get_legacy_host() {
+        return 'https://urcourses-video.uregina.ca';
+    }
+
+    public static function get_legacy_partnerid() {
+        return 104;
+    }
+
+    public static function get_legacy_secret() {
+        return '5797ccb7ce30a75213d7e049419663f5';
+    }
+
 }

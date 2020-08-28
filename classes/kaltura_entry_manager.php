@@ -32,10 +32,19 @@ require_once(__DIR__ . '/../API/KalturaClient.php');
  */
 class kaltura_entry_manager {
 
+    public static $order_by = [
+        'recent' => \KalturaBaseEntryOrderBy::CREATED_AT_DESC,
+        'oldest' => \KalturaBaseEntryOrderBy::CREATED_AT_ASC,
+        'medianameasc' => \KalturaBaseEntryOrderBy::NAME_ASC,
+        'medianamedesc' => \KalturaBaseEntryOrderBy::NAME_DESC,
+        'mediadurasc' => \KalturaMediaEntryOrderBy::DURATION_ASC,
+        'mediadurdesc' => \KalturaMediaEntryOrderBy::DURATION_DESC,
+    ];
+
     /**
      * Get the current user's entries.
      * 
-     * @param KalturaClient $client
+     * @param \KalturaClient $client
      * @param string $search
      * @param string $sort
      * @param int $page
@@ -51,19 +60,7 @@ class kaltura_entry_manager {
             $search_terms = preg_replace('/(\s+)/', ',', $search);
             $filter->freeText = $search_terms;
         }
-        if ($sort == 'recent') {
-            $filter->orderBy = \KalturaBaseEntryOrderBy::CREATED_AT_DESC;
-        } else if ($sort == 'oldest') {
-            $filter->orderBy = \KalturaBaseEntryOrderBy::CREATED_AT_ASC;
-        } else if ($sort == 'medianameasc') {
-             $filter->orderBy = \KalturaBaseEntryOrderBy::NAME_ASC;
-        } else if ($sort == 'medianamedesc') {
-             $filter->orderBy = \KalturaBaseEntryOrderBy::NAME_DESC;
-        } else if ($sort == 'mediadurasc') {
-             $filter->orderBy = \KalturaMediaEntryOrderBy::DURATION_ASC;
-        } else if ($sort == 'mediadurdesc') {
-             $filter->orderBy = \KalturaMediaEntryOrderBy::DURATION_DESC;
-        }
+        $filter->orderBy = self::$order_by[$sort];
         $filter->statusIn = \KalturaEntryStatus::READY .','.
                             \KalturaEntryStatus::PRECONVERT .','.
                             \KalturaEntryStatus::IMPORT;
@@ -72,9 +69,19 @@ class kaltura_entry_manager {
         $pager->pageIndex = $page + 1;
         $pager->pageSize = $per_page;
 
-        $entries = $client->media->listAction($filter, $pager);
+        return  $client->media->listAction($filter, $pager);
+    }
 
-        return $entries;
+    public static function count_entries(\KalturaClient $client) {
+        global $USER;
+
+        $filter = new \KalturaMediaEntryFilter();
+        $filter->userIdEqual = $USER->username;
+        $filter->statusIn = \KalturaEntryStatus::READY .','.
+                            \KalturaEntryStatus::PRECONVERT .','.
+                            \KalturaEntryStatus::IMPORT;
+        
+        return $client->media->count($filter);
     }
 
     /**

@@ -39,14 +39,36 @@ class kaltura_client {
     public static function get_config() {
         global $CFG;
 
-        $partner_id = get_config('local_kaltura',  'partner_id');
-        $server_url = get_config('local_kaltura', 'uri');
-        $version = get_config('local_kaltura', 'version');
+        $partner_id = \local_kaltura\kaltura_config::get_partner_id();
+        $server_url = \local_kaltura\kaltura_config::get_host();
+        $version = \local_kaltura\kaltura_config::get_version();
 
         $config = new \KalturaConfiguration($partner_id);
         $config->serviceUrl = $server_url;
         $config->cdnUrl = $server_url;
         $config->clientTag = 'moodle_kaltura_' . $version;
+
+        if (!empty($CFG->proxyhost)) {
+            $config->proxyHost = $CFG->proxyhost;
+            $config->proxyPort = $CFG->proxyport;
+            $config->proxyType = $CFG->proxytype;
+            $config->proxyUser = ($CFG->proxyuser) ? $CFG->proxyuser : null;
+            $config->proxyPassword = ($CFG->proxypassword && $CFG->proxyuser) ? $CFG->proxypassword : null;
+        }
+
+        return $config;
+    }
+
+    public static function get_legacy_config() {
+        global $CFG;
+
+        $partner_id = \local_kaltura\kaltura_config::get_legacy_partnerid();
+        $server_url = \local_kaltura\kaltura_config::get_legacy_host();
+
+        $config = new \KalturaConfiguration($partner_id);
+        $config->serviceUrl = $server_url;
+        $config->cdnUrl = $server_url;
+        $config->clientTag = 'moodle_kaltura_legacy';
 
         if (!empty($CFG->proxyhost)) {
             $config->proxyHost = $CFG->proxyhost;
@@ -66,6 +88,18 @@ class kaltura_client {
         $partner_id = get_config('local_kaltura', 'partner_id');
 
         $client = new \KalturaClient(self::get_config());
+        $session = $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::USER, $partner_id, 10800, '');
+        $client->setKs($session);
+        return $client;
+    }
+
+    public static function get_legacy_client() {
+        global $USER;
+
+        $admin_secret = \local_kaltura\kaltura_config::get_legacy_secret();
+        $partner_id = \local_kaltura\kaltura_config::get_legacy_partnerid();
+
+        $client = new \KalturaClient(self::get_legacy_config());
         $session = $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::USER, $partner_id, 10800, '');
         $client->setKs($session);
         return $client;
