@@ -80,4 +80,44 @@ class kaltura_config {
         return '5797ccb7ce30a75213d7e049419663f5';
     }
 
+    public static function get_metadata_id() {
+        return get_config('kaltura', 'metadata_profile_id');
+    }
+
+    public static function get_terms($entry_term = '') {
+        $terms = [];
+
+        $curyr = $countyr = date('Y');
+        $curmo = date('m');
+        $endyr = $curyr + 1;
+
+        $term_opts = array('Winter','Spring/Summer','Fall');
+
+        if ($curmo < 5) {
+            $current_index = 0;
+        } else if ($curmo < 9) {
+            $current_index = 1;
+        } else {
+            $current_index = 2;
+        }
+
+        while ($countyr <= $endyr) {
+            for ($i = $current_index; $i < 3; $i++) {
+                $terms[] = [
+                    'term' => $countyr . ' ' . $term_opts[$i],
+                    'selected' => $entry_term === $countyr . ' ' . $term_opts[$i]
+                ];
+            }
+            $countyr++;
+            $current_index = 0;
+        }
+
+        $terms[] = [
+            'term' => 'Multiple Terms',
+            'selected' => $entry_term === 'Multiple Terms'
+        ];
+
+        return $terms;
+    }
+
 }
