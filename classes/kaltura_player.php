@@ -79,4 +79,16 @@ class kaltura_player {
 
         return $output;
     }
+
+    public static function get_player_legacy($entryobj) {
+        $host = \local_kaltura\kaltura_config::get_legacy_host();
+        $uiconf = 23448572;
+
+        $uid  = floor(microtime(true));
+        $uid .= '_' . mt_rand();
+		
+		$output = "<iframe id=\"kaltura_player_{$uid}\" src=\"{$host}/p/{$entryobj->partnerId}/sp/{$entryobj->partnerId}00/embedIframeJs/uiconf_id/{$uiconf}/partner_id/{$entryobj->partnerId}?iframeembed=true&playerId=kaltura_player_{$uid}&entry_id={$entryobj->id}\" width=\"560\" height=\"395\" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow=\"autoplay *; fullscreen *; encrypted-media *\" frameborder=\"0\"></iframe>";
+
+        return $output;
+    }
 }
