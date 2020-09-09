@@ -42,4 +42,17 @@ class kaltura_metadata_manger {
         return $metadata->objects[0];
     }
 
+    public static function update_custom_metadata($client, $metaid, $course_share, $store_media, $student_content, $assessment) {
+        $xml = '<metadata>';
+        foreach($course_share as $courseid) {
+            $xml .= "<CourseShare>{$courseid}</CourseShare>";
+        }
+        $xml .= "<StoreMedia>{$store_media}</StoreMedia>";
+        $xml .= "<StudentContent>{$student_content}</StudentContent>";
+        $xml .= "<Assessment>{$assessment}</Assessment>";
+        $xml .= '</metadata>';
+
+        return $client->metadata->update($metaid, $xml);
+    }
+
 }
