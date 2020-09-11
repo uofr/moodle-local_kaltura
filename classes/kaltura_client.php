@@ -81,28 +81,15 @@ class kaltura_client {
         return $config;
     }
 
-    public static function get_client() {
-        global $USER;
-
-        $admin_secret = get_config('local_kaltura', 'adminsecret');
-        $partner_id = get_config('local_kaltura', 'partner_id');
-
-        $client = new \KalturaClient(self::get_config());
-        $session = $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::USER, $partner_id, 10800, '');
-        $client->setKs($session);
-        return $client;
-    }
-
-    public static function get_legacy_client() {
-        global $USER;
-
-        $admin_secret = \local_kaltura\kaltura_config::get_legacy_secret();
-        $partner_id = \local_kaltura\kaltura_config::get_legacy_partnerid();
-
-        $client = new \KalturaClient(self::get_legacy_config());
-        $session = $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::USER, $partner_id, 10800, '');
-        $client->setKs($session);
-        return $client;
+    /**
+     * @param $type - 'kaltura' or 'ce'
+     */
+    public static function get_client($type = 'kaltura') {
+        if ($type === 'kaltura') {
+            return new \KalturaClient(self::get_config());
+        } else if ($type === 'ce') {
+            return new \KalturaClient(self::get_legacy_config());
+        }
     }
 
 }

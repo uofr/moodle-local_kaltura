@@ -37,9 +37,7 @@ class kaltura_metadata_manger {
         $filter->objectIdEqual = $entryid;
         $filter->metadataProfileIdEqual = \local_kaltura\kaltura_config::get_metadata_id();
 
-        $metadata = $client->metadata->listaction($filter);
-
-        return $metadata->objects[0];
+        return $client->metadata->listaction($filter);
     }
 
     public static function update_custom_metadata($client, $metaid, $course_share, $store_media, $student_content, $assessment) {

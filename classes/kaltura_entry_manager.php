@@ -95,13 +95,20 @@ class kaltura_entry_manager {
     public static function get_entry($client, $entryid) {
         global $USER;
 
-        $entry = \KalturaStaticEntries::getEntry($entryid, $client->baseEntry, true);
+        $entry_filter = new \KalturaMediaEntryFilter();
+        $entry_filter->idEqual = $entryid;
+        $entry_filter->userIdEqual = $USER->username;
 
-        if ($entry->userId !== $USER->username) {
-            throw new \moodle_exception('error_entry_permission', 'local_mymedia');
-        }
+        return $client->media->listAction($entry_filter);
+    }
 
-        return $entry;
+    public static function update_entry($client, $entryid, $name, $tags, $desc) {
+        $entry_update = new \KalturaMediaEntry();
+        $entry_update->name = $name;
+        $entry_update->tags = $tags;
+        $entry_update->desc = $desc;
+
+        return $client->media->update($entryid, $entry_update);
     }
 
 }
