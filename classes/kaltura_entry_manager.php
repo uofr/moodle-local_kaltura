@@ -106,7 +106,7 @@ class kaltura_entry_manager {
         $entry_update = new \KalturaMediaEntry();
         $entry_update->name = $name;
         $entry_update->tags = $tags;
-        $entry_update->desc = $desc;
+        $entry_update->description = $desc;
 
         return $client->media->update($entryid, $entry_update);
     }
