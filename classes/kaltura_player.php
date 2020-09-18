@@ -82,12 +82,14 @@ class kaltura_player {
 
     public static function get_player_legacy($entryobj) {
         $host = \local_kaltura\kaltura_config::get_legacy_host();
-        $uiconf = 23448572;
+        $uiconf = \local_kaltura\kaltura_config::get_uiconf_id_legacy();
+        $client = \local_kaltura\kaltura_client::get_client('ce');
+        $ks = \local_kaltura\kaltura_session_manager::get_user_session_legacy($client);
 
         $uid  = floor(microtime(true));
         $uid .= '_' . mt_rand();
-		
-		$output = "<iframe id=\"kaltura_player_{$uid}\" src=\"{$host}/p/{$entryobj->partnerId}/sp/{$entryobj->partnerId}00/embedIframeJs/uiconf_id/{$uiconf}/partner_id/{$entryobj->partnerId}?iframeembed=true&playerId=kaltura_player_{$uid}&entry_id={$entryobj->id}\" width=\"560\" height=\"395\" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow=\"autoplay *; fullscreen *; encrypted-media *\" frameborder=\"0\"></iframe>";
+
+        $output = "<iframe id=\"kaltura_player_{$uid}\" src=\"{$host}/p/{$entryobj->partnerId}/sp/{$entryobj->partnerId}00/embedIframeJs/uiconf_id/{$uiconf}/partner_id/{$entryobj->partnerId}?iframeembed=true&playerId=kaltura_player_{$uid}&entry_id={$entryobj->id}&ks={$ks}\" width=\"560\" height=\"395\" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow=\"autoplay *; fullscreen *; encrypted-media *\" frameborder=\"0\"></iframe>";
 
         return $output;
     }

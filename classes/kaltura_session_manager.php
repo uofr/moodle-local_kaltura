@@ -32,7 +32,7 @@ require_once(__DIR__ . '/../API/KalturaClient.php');
  */
 class kaltura_session_manager {
     
-    public static function get_user_session(\KalturaClient $client, int $timeout = 10800, $privileges = '') {
+    public static function get_user_session(\KalturaClient $client, int $timeout = 10800, string $privileges = '') {
         global $USER;
         $admin_secret = \local_kaltura\kaltura_config::get_admin_secret();
         $partner_id = \local_kaltura\kaltura_config::get_partner_id();
@@ -46,6 +46,13 @@ class kaltura_session_manager {
         $partner_id = \local_kaltura\kaltura_config::get_legacy_partnerid();
 
         return $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::USER, $partner_id, $timeout, $privileges);
+    }
+
+    public static function get_preview_session(\KalturaClient $client, int $timeout = 10800, string $privileges = '') {
+        $admin_secret = \local_kaltura\kaltura_config::get_admin_secret();
+        $partner_id = \local_kaltura\kaltura_config::get_partner_id();
+
+        return $client->generateSessionV2($admin_secret, '', \KalturaSessionType::USER, $partner_id, $timeout, $privileges);
     }
 
 }

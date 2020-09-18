@@ -52,6 +52,10 @@ class kaltura_config {
         return $uiconf_id;
     }
 
+    public static function get_uiconf_id_legacy() {
+        return 23448572;
+    }
+
     public static function entries_per_page() {
         return get_config('local_kaltura', 'mymedia_items_per_page');
     }
