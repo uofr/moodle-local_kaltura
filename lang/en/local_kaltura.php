@@ -83,6 +83,8 @@ $string['player_filter_desc'] = 'Player used by the Kaltura filter plug-in when 
 $string['kaltura_filter_title'] = 'Embedded player used via the File Picker (Kaltura Filter) settings';
 $string['player_filter_audio'] =  'Embedded player (Audio)';
 $string['player_filter_audio_desc'] =  'Player used by the Kaltura filter plug-in when embedding audio on the page';
+$string['no_selected_entry'] = 'No entry selected';
+$string['selected_entry'] = 'Selected entry: {$a}';
 
 $string['assign_uploader_desc'] = 'Uploader widget when a user is uploading a submission';
 $string['res_uploader_desc'] = 'Uploader widget when a user is uploading a video resource';
@@ -202,14 +204,19 @@ $string['kaltura:search_selector'] = 'Search media';
 $string['search'] = 'Search';
 $string['search_clear'] = 'Clear';
 $string['search_text_tooltip'] = 'Enter media name or tags';
+$string['search_filter_clear'] = 'Clear Search Filter';
+$string['showing_results_for'] = 'Showing results for: {$a}';
+$string['no_results'] = 'No results found for: {$a}';
 
-// Sorting.
+// Sorting. col-md
 $string['sortby'] = 'Sort by';
 $string['sort'] = 'Sort';
 $string['mostrecent'] = 'Most recent';
 $string['oldest'] = 'Oldest';
 $string['medianameasc'] = 'Media name (ascending)';
 $string['medianamedesc'] = 'Media name (descending)';
+$string['mediadurasc'] = 'Duration (ascending)';
+$string['mediadurdesc'] = 'Duration (descending)';
 
 // Kaltura reports.
 $string['kaltura_report_navbar'] = 'Kaltura Course Media Reports';

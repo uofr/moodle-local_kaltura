@@ -1,0 +1,20 @@
+<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3" data-entry="{{id}}">
+    <div class="card h-100">
+
+        <label for="checkbox_{{id}}" class="kaltura-entry-checkbox-label">
+            <input id="checkbox_{{id}}" type="checkbox" class="kaltura-entry-checkbox" autocomplete="off"/>
+        </label>
+
+        <div class="mymedia-thumb">
+            <img src="{{{thumbnailUrl}}}/width/360/height/200/type/3" class="card-img-top"/>
+            <small class="mymedia-thumb-dur">{{duration}}</small>
+        </div>
+
+        <div class="card-body">
+            <h5 class="card-title text-truncate mb-0">{{name}}</h5>
+            <div>
+                <small> {{views}} views | {{#userdate}} {{createdAt}}, %b %e, %Y %I:%M %p {{/userdate}} </small>
+            </div>
+        </div>
+    </div>
+</div>

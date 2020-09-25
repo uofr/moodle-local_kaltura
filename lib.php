@@ -58,3 +58,8 @@ function local_kaltura_extend_navigation($navigation) {
     }
 }
 
+function local_kaltura_get_fontawesome_icon_map() {
+    return [
+        'local_kaltura:i/search' => 'fa-search'
+    ];
+}

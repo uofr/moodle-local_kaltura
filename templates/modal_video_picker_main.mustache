@@ -1,0 +1,20 @@
+<div data-region="search-result-header">
+    {{#search_result_str}}
+        <div class="mt-3">
+            <h5 class="mb-0">{{search_result_str}}</h5>
+            <a data-action="kaltura-clear-search" href="#">&times {{#str}}search_filter_clear, local_kaltura{{/str}}</a>
+        </div>
+    {{/search_result_str}}
+</div>
+
+<div data-region="paging-bar">
+    {{> local_kaltura/kaltura_paging_bar }}
+</div>
+
+<div class="kaltura-entry-list" data-region="entry-list">
+    {{> local_kaltura/kaltura_entry_list }}
+</div>
+
+<div data-region="paging-bar">
+    {{> local_kaltura/kaltura_paging_bar }}
+</div>

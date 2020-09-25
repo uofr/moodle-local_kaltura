@@ -1,0 +1,23 @@
+{{#paging_bar}}
+    {{#has_pages}}
+       <nav aria-label="{{#str}}page, core{{/str}}">
+          <ul class="pagination justify-content-end">
+              <li class="page-item">
+                  <a class="page-link" href="#" aria-label="{{#str}}previous, core{{/str}}" data-action="prev-page">
+                      <span aria-hidden="true">&laquo;</span>
+                  </a>
+              </li>
+              {{#pages}}
+                  <li class="page-item {{#active}}active{{/active}}">
+                      <a class="page-link" href="#" data-page-index="{{page_index}}" data-action="switch-page">{{page}}</a>
+                  </li>
+              {{/pages}}
+              <li class="page-item">
+                  <a class="page-link" href="#" aria-label="{{#str}}next, core{{/str}}" data-action="next-page">
+                      <span aria-hidden="true">&raquo;</span>
+                  </a>
+              </li>
+          </ul>
+       </nav>
+    {{/has_pages}}
+{{/paging_bar}}

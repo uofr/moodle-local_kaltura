@@ -1,0 +1,27 @@
+.kaltura-entry-list {
+    position: relative;
+}
+
+.kaltura-entry-checkbox-label {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 5px;
+    left: 5px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.kaltura-entry-checkbox {
+    cursor: pointer;
+}
+
+.video-picker-main {
+    min-height: 400px;
+    position: relative;
+}
+
+.kaltura-selected-thumb {
+    max-height: 81px;
+    max-width: 144px;
+}

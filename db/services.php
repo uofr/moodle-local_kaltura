@@ -15,19 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura Media Local Libraries version file
+ * External functions/services description.
  *
- * @package    local_kaltura
- * @subpackage kaltura
- * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_mymedia
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020092401;
-$plugin->component = 'local_kaltura';
-$plugin->release = 'Kaltura Media Local Libraries 1.1.1';
-$plugin->requires = 2015051100;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->system_version = 2.1; // Used to send information to Kaltura.
+$functions = [
+    'local_kaltura_get_video_picker_data' => [
+        'classname'     => 'local_kaltura_external',
+        'methodname'    => 'get_video_picker_data',
+        'classpath'     => 'local/kaltura/classes/external.php',
+        'description'   => 'Gets kaltura entries for the current user.',
+        'type'          => 'read',
+        'ajax'          => true
+    ]
+];

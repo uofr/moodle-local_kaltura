@@ -1,0 +1,112 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * External functions for mymedia.
+ *
+ * @package    local_mymedia
+ */
+
+require_once("$CFG->libdir/externallib.php");
+
+defined ('MOODLE_INTERNAL') || die();
+
+class local_kaltura_external extends external_api {
+
+    public static function get_video_picker_data_parameters() {
+        return new external_function_parameters([
+            'contextid' => new external_value(PARAM_INT),
+            'search' => new external_value(PARAM_TEXT),
+            'sort' => new external_value(PARAM_TEXT),
+            'page' => new external_value(PARAM_INT),
+            'source' => new external_value(PARAM_INT)
+        ]);
+    }
+
+    public static function get_video_picker_data($contextid, $search, $sort, $page, $source) {
+        global $PAGE;
+
+        $params = self::validate_parameters(self::get_video_picker_data_parameters(), [
+            'contextid' => $contextid,
+            'search' => $search,
+            'sort' => $sort,
+            'page' => $page,
+            'source' => $source
+        ]);
+
+        $context = context::instance_by_id($params['contextid']);
+        self::validate_context($context);
+
+        $renderer = $PAGE->get_renderer('local_kaltura');
+
+        $per_page = \local_kaltura\kaltura_config::entries_per_page();
+
+        if ($params['source'] === 1) {
+            $client = \local_kaltura\kaltura_client::get_client('kaltura');
+            $client->setKs(\local_kaltura\kaltura_session_manager::get_user_session($client));
+        } else if ($params['source'] === 0) {
+            $client = \local_kaltura\kaltura_client::get_client('ce');
+            $client->setKs(\local_kaltura\kaltura_session_manager::get_user_session_legacy($client));
+        }
+        $entries = \local_kaltura\kaltura_entry_manager::get_entries($client, $params['search'], $params['sort'], $params['page'], $per_page);
+        $client->session->end();
+
+        $entries_renderable = new \local_kaltura\output\kaltura_entries($entries->objects);
+
+        $paging_bar = new \local_kaltura\output\kaltura_paging_bar($entries->totalCount, $per_page, $params['page']);
+
+        $search_result_str = '';
+        if ($params['search']) {
+            if ($entries->totalCount)
+                $search_result_str = get_string('showing_results_for', 'local_kaltura', $params['search']);
+            else 
+                $search_result_str = get_string('no_results', 'local_kaltura', $params['search']);
+        }
+
+        return [
+            'entries' => $entries_renderable->export_for_template($renderer),
+            'paging_bar' => $paging_bar->export_for_template($renderer),
+            'search_result_str' => $search_result_str
+        ];
+    }
+
+    public static function get_video_picker_data_returns() {
+        return new external_single_structure([
+            'entries' => new external_multiple_structure(new external_single_structure([
+                'thumbnailUrl' => new external_value(PARAM_TEXT),
+                'name' => new external_value(PARAM_TEXT),
+                'description' => new external_value(PARAM_RAW),
+                'id' => new external_value(PARAM_TEXT),
+                'createdAt' => new external_value(PARAM_INT),
+                'tags' => new external_value(PARAM_TEXT),
+                'views' => new external_value(PARAM_INT),
+                'duration' => new external_value(PARAM_TEXT),
+                'downloadUrl' => new external_value(PARAM_TEXT),
+                'entry_ready' => new external_value(PARAM_BOOL),
+            ])),
+            'paging_bar' => new external_single_structure([
+                'has_pages' => new external_value(PARAM_BOOL),
+                'pages' => new external_multiple_structure(new external_single_structure([
+                    'active' => new external_value(PARAM_BOOL, '', VALUE_OPTIONAL),
+                    'page' => new external_value(PARAM_INT, '', VALUE_OPTIONAL),
+                    'page_index' => new external_value(PARAM_INT, '', VALUE_OPTIONAL)
+                ]))
+            ]),
+            'search_result_str' => new external_value(PARAM_TEXT, '', VALUE_OPTIONAL)
+        ]);
+    }
+
+}
