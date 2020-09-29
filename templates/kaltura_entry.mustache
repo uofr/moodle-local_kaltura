@@ -6,12 +6,12 @@
         </label>
 
         <div class="mymedia-thumb">
-            <img src="{{{thumbnailUrl}}}/width/360/height/200/type/3" class="card-img-top"/>
+            <img src="{{{thumbnailUrl}}}/width/360/height/200/type/3" class="card-img-top" data-region="entry-thumbnail"/>
             <small class="mymedia-thumb-dur">{{duration}}</small>
         </div>
 
         <div class="card-body">
-            <h5 class="card-title text-truncate mb-0">{{name}}</h5>
+            <h5 class="card-title text-truncate mb-0" data-region="entry-name">{{name}}</h5>
             <div>
                 <small> {{views}} views | {{#userdate}} {{createdAt}}, %b %e, %Y %I:%M %p {{/userdate}} </small>
             </div>

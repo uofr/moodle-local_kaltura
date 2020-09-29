@@ -7,43 +7,10 @@
     {{/title}}
 
     {{$body}}
-        <div class="container">
-
-            <div class="form-row">
-
-                <div class="col-12 col-md">
-                    <form data-action="kaltura-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="kaltura_search_box" name="search" autocomplete="off" placeholder="{{#str}}search, local_kaltura{{/str}}"/>
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-outline-primary">
-                                    {{#pix}} i/search, local_kaltura {{/pix}}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="col-12 col-md">
-                  <select class="custom-select" name="kaltura_sort" id="kaltura_sort">
-                    <option value="recent" selected>{{#str}}mostrecent, local_kaltura{{/str}}</option>
-                    <option value="oldest">{{#str}}oldest, local_kaltura{{/str}}</option>
-                    <option value="medianameasc">{{#str}}medianameasc, local_kaltura{{/str}}</option>
-                    <option value="medianamedesc">{{#str}}medianamedesc, local_kaltura{{/str}}</option>
-                    <option value="mediadurasc">{{#str}}mediadurasc, local_kaltura{{/str}}</option>
-                    <option value="mediadurdesc">{{#str}}mediadurdesc, local_kaltura{{/str}}</option>
-                  </select>
-                </div>
-
-            </div>
-
-            <div class="video-picker-main" data-region="video-picker-main">
-            </div>
-
-        </div>
     {{/body}}
 
     {{$footer}}
+        <h5 class="text-truncate" data-region="selected_entry_name">{{#str}}no_selected_entry, local_kaltura{{/str}}</h5>
         <button class="btn btn-primary" data-action="confirm-entry-selection" disabled>{{#str}}confirm, core{{/str}}</button>
     {{/footer}}
 

@@ -84,7 +84,7 @@ $string['kaltura_filter_title'] = 'Embedded player used via the File Picker (Kal
 $string['player_filter_audio'] =  'Embedded player (Audio)';
 $string['player_filter_audio_desc'] =  'Player used by the Kaltura filter plug-in when embedding audio on the page';
 $string['no_selected_entry'] = 'No entry selected';
-$string['selected_entry'] = 'Selected entry: {$a}';
+$string['selected_entry'] = 'Selected Entry: {$a}';
 
 $string['assign_uploader_desc'] = 'Uploader widget when a user is uploading a submission';
 $string['res_uploader_desc'] = 'Uploader widget when a user is uploading a video resource';

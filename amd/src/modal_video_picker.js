@@ -1,19 +1,22 @@
 import $ from 'jquery';
-import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import {get_string as getString} from 'core/str';
+import {publish, subscribe} from 'core/pubsub';
 
 import Modal from 'core/modal';
 import ModalRegistry from 'core/modal_registry';
 import ModalEvents from 'core/modal_events';
+import ModalVideoPickerEvents from 'local_kaltura/modal_video_picker_events';
 
 import KalturaAjax from 'local_kaltura/kaltura_ajax';
 
 const SELECTORS = {
-    VIDEO_PICKER_MAIN: '[data-region="video-picker-main"]',
+    VIDEO_PICKER_ENTRY_LIST: '[data-region="video-picker-entry-list"]',
     ENTRY_LIST: '[data-region="entry-list"]',
     ENTRY: '[data-entry]',
+    ENTRY_NAME: '[data-region="entry-name"]',
+    ENTRY_THUMBNAIL: '[data-region="entry-thumbnail"]',
     PAGING_BAR: '[data-region="paging-bar"]',
     PAGE_ITEM: '.page-item',
     PAGE_LINK: '[data-region="paging-bar"] [data-action="switch-page"]',
@@ -25,16 +28,13 @@ const SELECTORS = {
     SORT: '#kaltura_sort',
     ENTRY_CHECKBOX: '.kaltura-entry-checkbox',
     CONFIRM: '[data-action="confirm-entry-selection"]',
-    ENTRY_ID: '#entry_id',
-    ENTRY_NAME: '#id_name',
-    ENTRY_THUMB: '#media_thumbnail',
-    ENTRY_SELECTED_HDR: '[data-region="selected-entry-header"]',
-    VIDEO_TITLE: '#video_title'
+    SELECTED_ENTRY_NAME: '[data-region="selected_entry_name"]'
 };
 
 const TEMPLATES = {
     OVERLAY_LOADING: 'core/overlay_loading',
-    VIDEO_PICKER_MAIN: 'local_kaltura/modal_video_picker_main'
+    VIDEO_PICKER_BODY: 'local_kaltura/modal_video_picker_body',
+    VIDEO_PICKER_ENTRY_LIST: 'local_kaltura/modal_video_picker_entry_list'
 };
 
 export default class ModalVideoPicker extends Modal {
@@ -48,86 +48,113 @@ export default class ModalVideoPicker extends Modal {
         this.source = 1;
         this.selectedEntryId = null;
         this.selectedEntryName = null;
-        this.selectedEntryThumb = null;
+        this.selectedEntryThumbnail = null;
     }
 
     registerEventListeners() {
         super.registerEventListeners();
 
-        this.getRoot().on(ModalEvents.shown, () => {
-            this.refreshModal();
+        this.getRoot().on(ModalEvents.shown, async () => {
+            this.renderBody();
+            if (this.selectedEntryId && this.selectedEntryName && this.selectedEntryThumbnail) {
+                const selectedEntryText = await getString('selected_entry', 'local_kaltura', this.selectedEntryName);
+                $(SELECTORS.SELECTED_ENTRY_NAME).text(selectedEntryText);
+            }
+        });
+
+        this.getRoot().on(ModalEvents.bodyRendered, () => {
+            $(`[data-entry="${this.selectedEntryId}"]`).find(SELECTORS.ENTRY_CHECKBOX).prop('checked', true);
         });
 
         this.getRoot().on(ModalEvents.hidden, () => {
-            $(SELECTORS.VIDEO_PICKER_MAIN).html('');
-            this.reset();
-            if (this.selectedEntryId && this.selectedEntryName && this.selectedEntryThumb) {
-                this.setSelectedEntry(this.selectedEntryId, this.selectedEntryName, this.selectedEntryThumb);
+            this.setBody('');
+            if (this.selectedEntryId && this.selectedEntryName && this.selectedEntryThumbnail) {
+                publish(ModalVideoPickerEvents.entrySelected, {
+                    entryId: this.selectedEntryId,
+                    entryName: this.selectedEntryName,
+                    entryThumbnail: this.selectedEntryThumbnail
+                });
             }
+        });
+
+        this.getRoot().on('click', SELECTORS.CONFIRM, () => {
+            this.hide();
         });
 
         this.getRoot().on('click', SELECTORS.PAGE_LINK, (e) => {
             this.setPage($(e.currentTarget).attr('data-page-index'));
-            this.refreshModal();
+            this.refreshEntryList();
         });
 
         this.getRoot().on('click', SELECTORS.NEXT_PAGE, () => {
             const lastPage = $(SELECTORS.PAGE_LINK).last().attr('data-page-index');
             if (this.page == lastPage) return;
             this.setPage(++this.page);
-            this.refreshModal();
+            this.refreshEntryList();
         });
 
         this.getRoot().on('click', SELECTORS.PREV_PAGE, () => {
             if (this.page == 0) return;
             this.setPage(--this.page);
-            this.refreshModal();
+            this.refreshEntryList();
         });
 
         this.getRoot().on('submit', SELECTORS.SEARCH_FORM, (e) => {
             e.preventDefault();
             this.search = $(SELECTORS.SEARCH_INPUT).val();
             this.setPage(0);
-            this.refreshModal();
+            this.refreshEntryList();
         });
 
         this.getRoot().on('click', SELECTORS.SEARCH_CLEAR, () => {
             this.search = '';
             $(SELECTORS.SEARCH_INPUT).val('');
             this.setPage(0);
-            this.refreshModal();
+            this.refreshEntryList();
         });
 
         this.getRoot().on('change', SELECTORS.SORT, (e) => {
             e.preventDefault();
             this.setPage(0);
             this.sort = $(e.currentTarget).val();
-            this.refreshModal();
+            this.refreshEntryList();
         });
 
-        this.getRoot().on('change', SELECTORS.ENTRY_CHECKBOX, (e) => {
+        this.getRoot().on('change', SELECTORS.ENTRY_CHECKBOX, async (e) => {
             $(SELECTORS.ENTRY_CHECKBOX).not($(e.currentTarget)).prop('checked', false);
             $(SELECTORS.CONFIRM).prop('disabled', !$(e.currentTarget).prop('checked'));
-
+            const entry = $(e.currentTarget).closest(SELECTORS.ENTRY);
             if ($(e.currentTarget).prop('checked')) {
-                const entry = $(e.currentTarget).closest(SELECTORS.ENTRY);
-                const entryId = entry.attr('data-entry');
-                const entryName = entry.find('.card-title').text();
-                const entryThumb = entry.find('img').attr('src');
-                this.selectedEntryId = entryId;
-                this.selectedEntryName = entryName;
-                this.selectedEntryThumb = entryThumb;
+                this.selectedEntryId = entry.attr('data-entry');
+                this.selectedEntryName = entry.find(SELECTORS.ENTRY_NAME).text();
+                this.selectedEntryThumbnail = entry.find(SELECTORS.ENTRY_THUMBNAIL).attr('src');
+                const selectedEntryText = await getString('selected_entry', 'local_kaltura', this.selectedEntryName);
+                $(SELECTORS.SELECTED_ENTRY_NAME).text(selectedEntryText);
             } else {
                 this.selectedEntryId = null;
                 this.selectedEntryName = null;
-                this.selectedEntryThumb = null;
+                this.selectedEntryThumbnail = null;
+                const selectedEntryText = await getString('no_selected_entry', 'local_kaltura');
+                $(SELECTORS.SELECTED_ENTRY_NAME).text(selectedEntryText);
             }
         });
 
-        this.getRoot().on('click', SELECTORS.CONFIRM, () => {
-            this.setSelectedEntry(this.selectedEntryId, this.selectedEntryName, this.selectedEntryThumb);
-            this.hide();
-        });
+    }
+
+    async renderBody() {
+        const data = await KalturaAjax.getVideoPickerData(this.contextid, this.search, this.sort, this.page, this.source);
+        const renderPromise = Templates.render(TEMPLATES.VIDEO_PICKER_BODY, data);
+        this.setBody(renderPromise);
+    }
+
+    async refreshEntryList() {
+        const promise = KalturaAjax.getVideoPickerData(this.contextid, this.search, this.sort, this.page, this.source)
+            .then(response => this.replace(response, TEMPLATES.VIDEO_PICKER_ENTRY_LIST, SELECTORS.VIDEO_PICKER_ENTRY_LIST))
+            .then(() => $(`[data-entry="${this.selectedEntryId}"]`).find(SELECTORS.ENTRY_CHECKBOX).prop('checked', true))
+            .catch(Notification.exception);
+
+        this.loadUntilPromiseDone(SELECTORS.VIDEO_PICKER_ENTRY_LIST, promise)
+            .catch(Notification.exception);
     }
 
     setPage(pageIndex) {
@@ -139,26 +166,14 @@ export default class ModalVideoPicker extends Modal {
         });
     }
 
-    async refreshModal() {
-        const promises = Ajax.call([
-            KalturaAjax.getVideoPickerData(this.contextid, this.search, this.sort, this.page, this.source),
-        ]);
-        promises[0]
-            .then(response => this.replace(response, TEMPLATES.VIDEO_PICKER_MAIN, SELECTORS.VIDEO_PICKER_MAIN))
-            .then(() => $(`[data-entry="${this.selectedEntryId}"]`).find(SELECTORS.ENTRY_CHECKBOX).prop('checked', true))
-            .catch(Notification.exception);
-        this.loadUntilPromisesDone(SELECTORS.VIDEO_PICKER_MAIN, promises)
-            .catch(Notification.exception);
-    }
-
-    loadUntilPromisesDone(areaSelector, promises) {
+    loadUntilPromiseDone(areaSelector, promise) {
         return Templates.render(TEMPLATES.OVERLAY_LOADING, {})
             .then((html) => {
                 const loadingIcon = $(html);
                 $(areaSelector).append(loadingIcon);
                 loadingIcon.fadeIn(150);
 
-                return $.when(loadingIcon.promise(), Promise.all(promises));
+                return $.when(loadingIcon.promise(), promise);
             })
             .then((loadingIcon) => {
                 loadingIcon.fadeOut(100);
@@ -168,27 +183,9 @@ export default class ModalVideoPicker extends Modal {
             });
     }
 
-    setSelectedEntry(entryid, entryname, entrythumb) {
-        $(SELECTORS.ENTRY_ID).val(entryid);
-        $(SELECTORS.ENTRY_NAME).val(entryname);
-        $(SELECTORS.ENTRY_THUMB).attr('src', entrythumb);
-        $(SELECTORS.VIDEO_TITLE).val(entryname);
-        getString('selected_entry', 'local_kaltura', entryname)
-        .then(string => $(SELECTORS.ENTRY_SELECTED_HDR).text(string));
-    }
-
     replace(data, template, areaSelector) {
         return Templates.render(template, data)
         .then((html, js) => Templates.replaceNodeContents(areaSelector, html, js));
-    }
-
-    reset() {
-        this.search = '';
-        $(SELECTORS.SEARCH_INPUT).val('');
-        this.sort = 'recent';
-        $(SELECTORS.SORT).prop('selectedIndex', 0);
-        this.setPage(0);
-        this.source = 1;
     }
 
     static getType() {

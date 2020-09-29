@@ -1,0 +1,35 @@
+<div class="container">
+
+    <div class="form-row mb-3">
+
+        <div class="col-12 col-md mb-2 mb-md-0">
+            <form data-action="kaltura-search">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="kaltura_search_box" name="search" autocomplete="off" placeholder="{{#str}}search, local_kaltura{{/str}}"/>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-primary">
+                            {{#pix}} i/search, local_kaltura {{/pix}}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-12 col-md">
+          <select class="custom-select" name="kaltura_sort" id="kaltura_sort">
+            <option value="recent" selected>{{#str}}mostrecent, local_kaltura{{/str}}</option>
+            <option value="oldest">{{#str}}oldest, local_kaltura{{/str}}</option>
+            <option value="medianameasc">{{#str}}medianameasc, local_kaltura{{/str}}</option>
+            <option value="medianamedesc">{{#str}}medianamedesc, local_kaltura{{/str}}</option>
+            <option value="mediadurasc">{{#str}}mediadurasc, local_kaltura{{/str}}</option>
+            <option value="mediadurdesc">{{#str}}mediadurdesc, local_kaltura{{/str}}</option>
+          </select>
+        </div>
+
+    </div>
+
+    <div class="video-picker-entry-list" data-region="video-picker-entry-list">
+        {{> local_kaltura/modal_video_picker_entry_list }}
+    </div>
+
+</div>
