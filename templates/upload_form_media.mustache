@@ -1,0 +1,35 @@
+{{< local_kaltura/upload_form_base }}
+
+    {{$id}}upload_form_media_{{uniqid}}{{/id}}
+
+    {{$upload_field}}
+        <label>{{#str}}file_header, local_kaltura{{/str}}</label>
+
+        <div class="mb-3">
+            <div class="kaltura-file-uploader" data-region="file-drop-area">
+                <div class="mb-2">
+                    <h4>{{#str}}drag_and_drop, local_kaltura{{/str}}</h4>
+                    <span>{{#str}}drag_and_drop_or, local_kaltura{{/str}}</span>
+                </div>
+
+                <input type="file" id="entry_file" class="hidden" autocomplete="off" />
+                <label for="entry_file" class="btn btn-primary">
+                    {{#pix}}i/add_new, local_kaltura{{/pix}}
+                    {{#str}}choose_file, local_kaltura{{/str}}
+               </label>
+
+               <div class="font-weight-bold text-truncate" data-region="file-info">{{#str}}no_file_selected, local_kaltura{{/str}}</div>
+            </div>
+
+            <small class="form-text text-danger" data-region="file-error"></small>
+        </div>
+
+    {{/upload_field}}
+
+{{/ local_kaltura/upload_form_base }}
+
+{{#js}}
+    require(['local_kaltura/upload_form_media'], function(Main) {
+        Main.init('#upload_form_media_{{uniqid}}');
+    });
+{{/js}}

@@ -60,6 +60,9 @@ function local_kaltura_extend_navigation($navigation) {
 
 function local_kaltura_get_fontawesome_icon_map() {
     return [
-        'local_kaltura:i/search' => 'fa-search'
+        'local_kaltura:i/search' => 'fa-search',
+        'local_kaltura:i/add_new' => 'fa-plus',
+        'local_kaltura:i/media_upload' => 'fa-film',
+        'local_kaltura:i/record' => 'fa-video-camera'
     ];
 }

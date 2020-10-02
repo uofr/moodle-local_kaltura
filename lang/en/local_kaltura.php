@@ -187,6 +187,8 @@ $string['custom_size_info'] = 'Width and height must be between 200 and 1280.';
 $string['selected_media'] = 'Selected Media';
 $string['modal_header'] = 'Please Make a Selection';
 $string['upload_record'] = 'Upload New';
+$string['media_upload'] = 'Media Upload';
+$string['webcam_upload'] = 'Record';
 
 // Troubles.
 $string['no_media'] = 'No media found';
@@ -238,3 +240,29 @@ $string['search_courses_display_limit_desc'] = 'The limit of the number of cours
 $string['repo_not_installed'] = 'The Kaltura repository needs to be installed to view this file';
 $string['video_uploading'] = 'Uploading...';
 $string['video_uploading_body'] = 'Your video is uploading.';
+
+
+// Upload Form
+$string['name_header'] = 'Name';
+$string['name_required'] = 'Please give your upload a name.';
+$string['tags_header'] = 'Tags';
+$string['use_commas'] = 'Tags must be 3 or more characters. Use commas to separate tags (eg: CLS 100, Fall 2017)';
+$string['desc_header'] = 'Description';
+$string['student_content_header'] = 'Student Content';
+$string['student_content_required'] = 'Please indicate whether this video contains student content, likeness, or voice.';
+$string['student_content_help'] = 'Does this media contain student content, likeness, or voice? Media with student content will be deleted at the end of the semester.';
+$string['term_header'] = 'Term';
+$string['term_help'] = 'Meida will be deleted after the selected term. If you do not want this media deleted, select "Multiple Terms."';
+$string['upload'] = 'Upload';
+$string['reset'] = 'Reset';
+$string['file_header'] = 'File';
+$string['choose_file'] = 'Choose a file';
+$string['drag_and_drop'] = 'Drag and drop a file here';
+$string['drag_and_drop_or'] = 'or';
+$string['no_file_selected'] = 'No File Selected';
+$string['file_selected'] = 'File: {$a}';
+$string['video_required'] = 'Please select a video to upload.';
+$string['video_valid_type'] = 'Invalid file type. Please select a video.';
+$string['video_too_large'] = 'Video exceeds max size of 2GB.';
+$string['video_no_size'] = 'The file you are trying to upload is empty.';
+$string['uploading_header'] = 'Uploading...';

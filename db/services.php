@@ -30,5 +30,29 @@ $functions = [
         'description'   => 'Gets kaltura entries for the current user.',
         'type'          => 'read',
         'ajax'          => true
-    ]
+    ],
+    'local_kaltura_get_upload_modal_data' => [
+        'classname'     => 'local_kaltura_external',
+        'methodname'    => 'get_upload_modal_data',
+        'classpath'     => 'local/kaltura/classes/external.php',
+        'description'   => 'Gets data needed to render modal_kaltura_upload',
+        'type'          => 'read',
+        'ajax'          => true
+    ],
+    'local_kaltura_get_upload_credentials' => [
+        'classname'     => 'local_kaltura_external',
+        'methodname'    => 'get_upload_credentials',
+        'classpath'     => 'local/kaltura/classes/external.php',
+        'description'   => 'Gets data needed to upload video.',
+        'type'          => 'read',
+        'ajax'          => true
+    ],
+    'local_kaltura_get_entry' => [
+        'classname'     => 'local_kaltura_external',
+        'methodname'    => 'get_entry',
+        'classpath'     => 'local/kaltura/classes/external.php',
+        'description'   => 'Gets entry specified by entryid',
+        'type'          => 'read',
+        'ajax'          => true
+    ],
 ];

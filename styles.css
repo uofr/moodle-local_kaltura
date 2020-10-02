@@ -25,3 +25,21 @@
     max-width: 210px;
     max-height: 118px;
 }
+
+.kaltura-file-uploader {
+    text-align: center;
+    outline: #d9d9d9 dashed;
+    padding: 1em;
+}
+
+.kaltura-file-uploader.highlighted {
+    outline-color: #848889;
+}
+
+.kaltura-file-uploader.file-error {
+    outline-color: red;
+}
+
+.hide-x-button .close {
+    display: none;
+}

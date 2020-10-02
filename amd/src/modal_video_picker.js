@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import {get_string as getString} from 'core/str';
-import {publish, subscribe} from 'core/pubsub';
+import {publish} from 'core/pubsub';
 
 import Modal from 'core/modal';
 import ModalRegistry from 'core/modal_registry';

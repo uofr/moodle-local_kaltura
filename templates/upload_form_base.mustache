@@ -1,0 +1,15 @@
+<form id="{{$id}}{{/id}}">
+
+    <div data-region="upload-part-1">
+        {{$upload_field}}
+        {{/upload_field}}
+    </div>
+
+    <div class="hidden" data-region="upload-part-2">
+        {{> local_kaltura/upload_form_fields }}
+
+        <button type="submit" class="btn btn-primary">{{#str}}upload, local_kaltura{{/str}}</button>
+        <button type="reset" class="btn btn-secondary">{{#str}}reset, local_kaltura{{/str}}</button>
+    </div>
+
+</form>

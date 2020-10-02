@@ -1,0 +1,66 @@
+<div class="form-group">
+    <label for="entry_name">
+        {{#str}} name_header, local_kaltura {{/str}}
+    </label>
+
+    <input type="text" class="form-control" name="name" id="entry_name" required value="{{{name}}}"
+        autocomplete="off"/>
+
+    <div class="invalid-feedback">{{#str}}name_required, local_kaltura{{/str}}</div>
+</div>
+
+<div class="form-group">
+    <label for="entry_tags">{{#str}} tags_header, local_kaltura {{/str}}</label>
+
+    <input type="text" class="form-control" name="tags" id ="entry_tags" value="{{{tags}}}" autocomplete="off"
+        aria-describedby="edit_entry_tags_help"/>
+
+    <small id="edit_entry_tags_help" class="form-text text-muted">{{#str}} use_commas, local_kaltura {{/str}}</small>
+
+    <div class="invalid-feedback"></div>
+</div>
+
+<div class="form-group">
+    <label for="entry_desc">{{#str}} desc_header, local_kaltura {{/str}}</label>
+
+    <textarea class="form-control" name="desc" id="entry_desc" rows="3">{{{desc}}}</textarea>
+
+    <div class="invalid-feedback"></div>
+</div>
+
+<div class="form-group">
+    <div>{{#str}}student_content_header, local_kaltura{{/str}}</div>
+
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="entry_student_yes" name="student" value="Yes" required
+            autocomplete="off"/>
+
+        <label class="form-check-label" for="entry_student_yes">{{#str}}yes, core{{/str}}</label>
+    </div>
+
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="entry_student_no" name="student" value="No" required
+            autocomplete="off"/>
+
+        <label class="form-check-label" for="entry_student_no">{{#str}}no, core{{/str}}</label>
+
+        <div class="invalid-feedback">{{#str}}student_content_required, local_kaltura{{/str}}</div>
+    </div>
+
+    <small id="" class="form-text text-muted">{{#str}}student_content_help, local_kaltura{{/str}}</small>
+</div>
+
+<div class="form-group">
+
+    <label for="entry_term">{{#str}} term_header, local_kaltura {{/str}}</label>
+
+    <select id="entry_term" name="term" class="custom-select w-100" data-action="change-term" autocomplete="off"
+        aria-describedby="entry_term_help" {{$term_properties}}{{/term_properties}}>
+        {{#terms}}
+            <option value="{{term}}" {{#selected}}selected="selected"{{/selected}}>{{term}}</option>
+        {{/terms}}
+    </select>
+
+    <small id="entry_term_help" class="form-text text-muted">{{#str}}term_help, local_kaltura{{/str}}</small>
+
+</div>

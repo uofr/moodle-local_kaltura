@@ -1,0 +1,13 @@
+{{< local_kaltura/upload_form_base }}
+
+    {{$upload_field}}
+        <p>Upload Form Record</p>
+    {{/upload_field}}
+
+{{/ local_kaltura/upload_form_base }}
+
+{{#js}}
+    require(['local_kaltura/upload_form_record'], function(Main) {
+        Main.init();
+    });
+{{/js}}

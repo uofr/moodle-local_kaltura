@@ -109,4 +109,110 @@ class local_kaltura_external extends external_api {
         ]);
     }
 
+    public static function get_upload_modal_data_parameters() {
+        return new external_function_parameters([
+            'contextid' => new external_value(PARAM_INT)
+        ]);
+    }
+
+    public static function get_upload_modal_data($contextid) {
+        global $PAGE;
+
+        $params = self::validate_parameters(self::get_upload_modal_data_parameters(), ['contextid' => $contextid]);
+
+        $context = context::instance_by_id($params['contextid']);
+        self::validate_context($context);
+
+        $renderer = $PAGE->get_renderer('local_kaltura');
+
+        $terms = new \local_kaltura\output\terms();
+
+        return [
+            'terms' => $terms->export_for_template($renderer)
+        ];
+    }
+
+    public static function get_upload_modal_data_returns() {
+        return new external_single_structure([
+            'terms' => new external_multiple_structure(new external_single_structure([
+                'term' => new external_value(PARAM_TEXT),
+                'selected' => new external_value(PARAM_BOOL)
+            ]))
+        ]);
+    }
+
+    public static function get_upload_credentials_parameters() {
+        return new external_function_parameters([]);
+    }
+
+    public static function get_upload_credentials() {
+        global $USER;
+
+        self::validate_parameters(self::get_upload_credentials_parameters(), []);
+
+        $client = \local_kaltura\kaltura_client::get_client();
+
+        return [
+            'serverhost' => \local_kaltura\kaltura_config::get_host(),
+            'ks' => \local_kaltura\kaltura_session_manager::get_user_session($client),
+            'categoryid' => \local_kaltura\kaltura_config::get_root_category_id(),
+            'creatorid' => $USER->username,
+            'metadataid' => \local_kaltura\kaltura_config::get_metadata_id()
+        ];
+    }
+
+    public static function get_upload_credentials_returns() {
+        return new external_single_structure([
+            'serverhost' => new external_value(PARAM_TEXT),
+            'ks' => new external_value(PARAM_TEXT),
+            'categoryid' => new external_value(PARAM_INT),
+            'creatorid' => new external_value(PARAM_TEXT),
+            'metadataid' => new external_value(PARAM_INT)
+        ]);
+    }
+
+    public static function get_entry_parameters() {
+        return new external_function_parameters([
+            'contextid' => new external_value(PARAM_INT),
+            'entryid' => new external_value(PARAM_TEXT)
+        ]);
+    }
+
+    public static function get_entry($contextid, $entryid) {
+        global $PAGE;
+
+        $params = self::validate_parameters(self::get_entry_parameters(), [
+            'contextid' => $contextid,
+            'entryid' => $entryid
+        ]);
+
+        $context = context::instance_by_id($params['contextid']);
+        self::validate_context($context);
+
+        $client = \local_kaltura\kaltura_client::get_client();
+        $client->setKs(\local_kaltura\kaltura_session_manager::get_user_session($client));
+        $entry = \local_kaltura\kaltura_entry_manager::get_entry($client, $params['entryid']);
+        $client->session->end();
+
+        $renderer = $PAGE->get_renderer('local_kaltura');
+        $entry_renderable = new \local_kaltura\output\kaltura_entry($entry->objects[0]);
+
+        return $entry_renderable->export_for_template($renderer);
+    }
+
+    public static function get_entry_returns() {
+        return new external_single_structure([
+            'thumbnailUrl' => new external_value(PARAM_TEXT),
+            'name' => new external_value(PARAM_TEXT),
+            'description' => new external_value(PARAM_RAW),
+            'id' => new external_value(PARAM_TEXT),
+            'createdAt' => new external_value(PARAM_INT),
+            'tags' => new external_value(PARAM_TEXT),
+            'views' => new external_value(PARAM_INT),
+            'duration' => new external_value(PARAM_TEXT),
+            'downloadUrl' => new external_value(PARAM_TEXT),
+            'entry_ready' => new external_value(PARAM_BOOL)
+        ]);
+    }
+
 }

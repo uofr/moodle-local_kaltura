@@ -1,0 +1,17 @@
+<div class="dropdown open">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+                {{#pix}}i/add_new, local_kaltura{{/pix}}
+                {{#str}}upload_record, local_kaltura{{/str}}
+            </button>
+    <div class="dropdown-menu" aria-labelledby="triggerId">
+        <a class="dropdown-item" href="#" data-action="upload" data-upload-type="media">
+            {{#pix}}i/media_upload, local_kaltura{{/pix}}
+            {{#str}}media_upload, local_kaltura{{/str}}
+        </a>
+        <a class="dropdown-item" href="#" data-action="upload" data-upload-type="record">
+            {{#pix}}i/record, local_kaltura{{/pix}}
+            {{#str}}webcam_upload, local_kaltura{{/str}}
+        </a>
+    </div>
+</div>
