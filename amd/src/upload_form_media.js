@@ -184,10 +184,10 @@ const getFormData = () => {
     return {
         file: selectedFile,
         name: root.find(SELECTORS.NAME).val().trim(),
-        tags: root.find(SELECTORS.TERM).val().trim(),
+        tags: root.find(SELECTORS.TAGS).val().trim(),
         desc: root.find(SELECTORS.DESC).val().trim(),
-        studentContent: root.find(SELECTORS.STUDENT_CONTENT).val(),
-        term: root.find(SELECTORS.TERM).val(),
+        studentContent: root.find(SELECTORS.STUDENT_CONTENT + ':checked').val(),
+        term: root.find(SELECTORS.STUDENT_CONTENT + ':checked').val() === 'Yes' ? '' : root.find(SELECTORS.TERM).val(),
         assessment: 'No'
     };
 };
