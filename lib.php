@@ -63,6 +63,12 @@ function local_kaltura_get_fontawesome_icon_map() {
         'local_kaltura:i/search' => 'fa-search',
         'local_kaltura:i/add_new' => 'fa-plus',
         'local_kaltura:i/media_upload' => 'fa-film',
-        'local_kaltura:i/record' => 'fa-video-camera'
+        'local_kaltura:i/record' => 'fa-video-camera',
+        'local_kaltura:i/audio-settings'    => 'fa-microphone',
+        'local_kaltura:i/video-settings'    => 'fa-video-camera',
+        'local_kaltura:i/record-again'      => 'fa-refresh',
+        'local_kaltura:i/webcam_start'      => 'fa-circle',
+        'local_kaltura:i/webcam_stop'       => 'fa-square',
+        'local_kaltura:i/exp_capture'       => 'fa-video-camera',
     ];
 }

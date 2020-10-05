@@ -1,13 +1,73 @@
 {{< local_kaltura/upload_form_base }}
 
+    {{$id}}upload_form_record_{{uniqid}}{{/id}}
+    {{$classes}}kaltura-form-record{{/classes}}
+
     {{$upload_field}}
-        <p>Upload Form Record</p>
+        <div class="mb-3 kaltura-form-record">
+            <div class="recorder-wrap mb-2">
+                <div class="recorder">
+                    <div class="kaltura-recorder" data-region="kaltura-recorder">
+
+                        <div class="kaltura-settings p-3 d-flex justify-content-end">
+                            <div class="btn-group kaltura-audio-settings mr-2">
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="kaltura_audio_settings" data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false">
+                                            {{#pix}}i/audio-settings, local_kaltura{{/pix}}
+                                            {{#str}}audio_settings, local_kaltura{{/str}}
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="kaltura_audio_settings" data-region="audio-options">
+                                </div>
+                            </div>
+                            <div class="btn-group kaltura-video-settings">
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="kaltura_video_settings" data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false">
+                                            {{#pix}}i/video-settings, local_kaltura{{/pix}}
+                                            {{#str}}video_settings, local_kaltura{{/str}}
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="kaltura_video_settings" data-region="video-options">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kaltura-video-wrap">
+                            <video id="entry_preview" class="kaltura-video" autoplay playsinline></video>
+                        </div>
+
+                        <div class="kaltura-video-controls p-3">
+                            <button class="btn btn-danger kaltura-webcam-start" type="button" data-action="start-recording">
+                                {{#pix}} i/webcam_start, local_kaltura {{/pix}}
+                                {{#str}} webcam_start, local_kaltura {{/pix}}
+                            </button>
+                            <div>
+                                <div class="mb-2">
+                                    <span data-region="kaltura-recorder-time" class="kaltura-recorder-time">00:00</span>
+                                </div>
+                                <button class="btn btn-primary kaltura-webcam-stop" type="button" data-action="stop-recording">
+                                    {{#pix}} i/webcam_stop, local_kaltura {{/pix}}
+                                    {{#str}} webcam_stop, local_kaltura {{/pix}}
+                                </button>
+                            </div>
+                            <button class="btn btn-primary kaltura-webcam-preview-start" type="button" data-action="start-preview">
+                                {{#pix}} i/exp_capture, local_kaltura {{/pix}}
+                                {{#str}} preview_start, local_kaltura {{/pix}}
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary kaltura-record-again" type="reset">
+                {{#pix}} i/record-again, local_kaltura {{/pix}}
+                {{#str}} record_again, local_kaltura {{/pix}}
+            </button>
+        </div>
     {{/upload_field}}
 
 {{/ local_kaltura/upload_form_base }}
 
 {{#js}}
     require(['local_kaltura/upload_form_record'], function(Main) {
-        Main.init();
+        Main.init('#upload_form_record_{{uniqid}}');
     });
 {{/js}}

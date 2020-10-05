@@ -24,12 +24,14 @@
 import $ from 'jquery';
 import Templates from 'core/templates';
 import {get_string as getString} from 'core/str';
+import {publish} from 'core/pubsub';
 
 import Modal from 'core/modal';
 import ModalRegistry from 'core/modal_registry';
 import ModalEvents from 'core/modal_events';
 
 import KalturaAjax from 'local_kaltura/kaltura_ajax';
+import KalturaEvents from 'local_kaltura/kaltura_events';
 
 const templates = {
     media: 'local_kaltura/upload_form_media',
@@ -65,7 +67,9 @@ export default class ModalKalturaUpload extends Modal {
 
         this.getRoot().on(ModalEvents.hidden, () => {
             this.setBody('');
+            publish(KalturaEvents.uploadModalClose);
         });
+
     }
 
     /**

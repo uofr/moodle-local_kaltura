@@ -43,3 +43,147 @@
 .hide-x-button .close {
     display: none;
 }
+
+.recorder-wrap {
+    text-align: center;
+    text-align: -webkit-center;
+    text-align: -moz-center
+}
+
+.recorder {
+    width: 858px;
+    height: 483px;
+    background-color: black;
+}
+
+@media only screen and (max-width: 979px) {
+    .recorder {
+        max-width: 676px;
+        width: 100%;
+        height: 380px;
+    }
+}
+
+.kaltura-recorder {
+    background-color: black;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+
+.kaltura-video-wrap {
+    width: 100%;
+    height: 100%;
+}
+
+.kaltura-video {
+    width: 100%;
+    height: 100%;
+}
+
+.kaltura-form-record .kaltura-record-again {
+    display: none;
+}
+
+.kaltura-form-record .kaltura-webcam-stop {
+    display: none;
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.5);
+}
+
+.kaltura-form-record .kaltura-webcam-start {
+    display: inline-block;
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.5);
+}
+
+.kaltura-video-settings {
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.kaltura-audio-settings {
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.kaltura-form-record.kaltura-recording .kaltura-webcam-stop {
+    display: inline-block;
+}
+
+.kaltura-form-record.kaltura-recording .kaltura-webcam-start {
+    display: none;
+}
+
+.kaltura-form-record.kaltura-recording .kaltura-record-again {
+    display: none;
+}
+
+.kaltura-form-record.kaltura-recording .kaltura-settings {
+    display: none !important;
+}
+
+.kaltura-form-record.kaltura-form-record.kaltura-recording-complete .kaltura-settings {
+    display: none !important;
+}
+
+.kaltura-form-record.kaltura-recording-complete .kaltura-record-again {
+    display: inline-block;
+}
+
+.kaltura-form-record.kaltura-recording-complete .kaltura-webcam-start {
+    display: none;
+}
+
+.kaltura-form-record.kaltura-recording-complete .kaltura-webcam-stop {
+    display: none;
+}
+
+.kaltura-form-record.kaltura-recording-complete .kaltura-recorder-time {
+    display: none;
+}
+
+.kaltura-form-record.kaltura-recording-complete .kaltura-record-again {
+    display: inline-block;
+}
+
+.kaltura-form-record .kaltura-webcam-preview-start {
+    display: none;
+}
+
+.kaltura-form-record.kaltura-no-stream .kaltura-webcam-preview-start {
+    display: inline-block;
+}
+
+.kaltura-form-record.kaltura-no-stream .kaltura-webcam-start {
+    display: none;
+}
+
+.kaltura-recorder-time {
+    display: none;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem;
+}
+
+.kaltura-form-record.kaltura-recording .kaltura-recorder-time {
+    display: inline;
+}
+
+.kaltura-video-controls {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.kaltura-settings {
+    position: absolute;
+    width: 100%;
+}
+
+.kaltura-dismissible-alert {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    z-index: 2;
+    text-align: initial;
+}
