@@ -68,6 +68,10 @@ export default class ModalVideoPicker extends Modal {
 
         this.getRoot().on(ModalEvents.hidden, () => {
             this.setBody('');
+            this.search = '';
+            this.sort = 'recent';
+            this.page = 0;
+            this.source = 1;
             if (this.selectedEntryId && this.selectedEntryName && this.selectedEntryThumbnail) {
                 publish(ModalVideoPickerEvents.entrySelected, {
                     entryId: this.selectedEntryId,
@@ -153,7 +157,7 @@ export default class ModalVideoPicker extends Modal {
             .then(() => $(`[data-entry="${this.selectedEntryId}"]`).find(SELECTORS.ENTRY_CHECKBOX).prop('checked', true))
             .catch(Notification.exception);
 
-        this.loadUntilPromiseDone(SELECTORS.VIDEO_PICKER_ENTRY_LIST, promise)
+        this.loadUntilPromiseDone(this.getModal(), promise)
             .catch(Notification.exception);
     }
 
@@ -166,11 +170,11 @@ export default class ModalVideoPicker extends Modal {
         });
     }
 
-    loadUntilPromiseDone(areaSelector, promise) {
+    loadUntilPromiseDone(area, promise) {
         return Templates.render(TEMPLATES.OVERLAY_LOADING, {})
             .then((html) => {
                 const loadingIcon = $(html);
-                $(areaSelector).append(loadingIcon);
+                area.append(loadingIcon);
                 loadingIcon.fadeIn(150);
 
                 return $.when(loadingIcon.promise(), promise);
