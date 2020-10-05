@@ -86,7 +86,10 @@ export default class ModalVideoPicker extends Modal {
         });
 
         this.getRoot().on('click', SELECTORS.PAGE_LINK, (e) => {
-            this.setPage($(e.currentTarget).attr('data-page-index'));
+            const page = $(e.currentTarget).attr('data-page-index');
+            if (this.page === page) return;
+
+            this.setPage(page);
             this.refreshEntryList();
         });
 
