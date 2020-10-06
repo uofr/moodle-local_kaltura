@@ -239,6 +239,7 @@ const updateDeviceOptions = async () => {
     const audioDevices = devices.filter(device => device.kind === 'audioinput');
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
+    console.log(devices);
     console.log(audioDevices);
     console.log(videoDevices);
 
