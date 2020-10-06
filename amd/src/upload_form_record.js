@@ -80,6 +80,10 @@ const registerEventListeners = () => {
         updateDeviceOptions();
     });
 
+    navigator.mediaDevices.addEventListener('devicechange', () => {
+        updateDeviceOptions();
+    });
+
     root.on('click', SELECTORS.SWITCH_DEVICE, async (e) => {
         const deviceOption = $(e.currentTarget);
         const deviceType = deviceOption.attr('data-device-type');
@@ -136,6 +140,7 @@ const registerEventListeners = () => {
 const startStream = async () => {
     try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
+        console.log(stream.getTracks());
         root.removeClass(CSS.NO_STREAM);
         publish(KalturaEvents.mediaStreamStart, stream);
     } catch (error) {
