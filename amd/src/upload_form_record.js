@@ -133,6 +133,7 @@ const startStream = async () => {
         const preview = $(SELECTORS.PREVIEW)[0];
         preview.autoplay = true;
         preview.controls = false;
+        preview.muted = true;
         if (preview.src) {
             URL.revokeObjectURL(preview.src);
             preview.src = null;
@@ -195,6 +196,7 @@ const previewVideo = (url) => {
     preview.src = url;
     preview.autoplay = false;
     preview.controls = true;
+    preview.muted = false;
 };
 
 const updateTime = (time) => {
@@ -265,10 +267,10 @@ const getFormData = () => {
     return {
         file: file,
         name: root.find(SELECTORS.NAME).val().trim(),
-        tags: root.find(SELECTORS.TERM).val().trim(),
+        tags: root.find(SELECTORS.TAGS).val().trim(),
         desc: root.find(SELECTORS.DESC).val().trim(),
-        studentContent: root.find(SELECTORS.STUDENT_CONTENT).val(),
-        term: root.find(SELECTORS.TERM).val(),
+        studentContent: root.find(SELECTORS.STUDENT_CONTENT + ':checked').val(),
+        term: root.find(SELECTORS.STUDENT_CONTENT + ':checked').val() === 'Yes' ? '' : root.find(SELECTORS.TERM).val(),
         assessment: 'No'
     };
 };

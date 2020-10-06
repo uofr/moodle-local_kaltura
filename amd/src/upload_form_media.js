@@ -45,8 +45,6 @@ const ALLOWED_TYPES = [
     'video/x-matroska'
 ];
 
-const MAX_SIZE = 2000000000;
-
 const CSS = {
     HIDDEN: 'hidden',
     HOVER: 'highlighted',
@@ -140,10 +138,6 @@ const getFileError = (file) => {
         return {key: 'video_required', component: 'local_kaltura'};
     } else if (ALLOWED_TYPES.indexOf(file.type) === -1) {
         return {key: 'video_valid_type', component: 'local_kaltura'};
-    } else if (file.size > MAX_SIZE) {
-        return {key: 'video_too_large', component: 'local_kaltura'};
-    } else if (file.size <= 0) {
-        return {key: 'video_no_size', component: 'local_kaltura'};
     } else {
         return null;
     }
