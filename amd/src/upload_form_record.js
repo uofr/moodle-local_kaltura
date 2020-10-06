@@ -70,12 +70,16 @@ const TEMPLATES = {
 
 export const init = async (rootSelector) => {
     root = $(rootSelector);
-    await startStream();
-    await updateDeviceOptions();
     registerEventListeners();
+    startStream();
 };
 
 const registerEventListeners = () => {
+    subscribe(KalturaEvents.mediaStreamStart, (stream) => {
+        previewStream(stream);
+        updateDeviceOptions();
+    });
+
     root.on('click', SELECTORS.SWITCH_DEVICE, async (e) => {
         const deviceOption = $(e.currentTarget);
         const deviceType = deviceOption.attr('data-device-type');
@@ -90,6 +94,7 @@ const registerEventListeners = () => {
         stopStream();
         await startStream();
     });
+
 
     root.on('click', SELECTORS.RECORD_BUTTON, () => {
         if (!stream) return;
@@ -130,20 +135,12 @@ const registerEventListeners = () => {
 
 const startStream = async () => {
     try {
-        const preview = $(SELECTORS.PREVIEW)[0];
-        preview.autoplay = true;
-        preview.controls = false;
-        preview.muted = true;
-        if (preview.src) {
-            URL.revokeObjectURL(preview.src);
-            preview.src = null;
-        }
         stream = await navigator.mediaDevices.getUserMedia(constraints);
-        preview.srcObject = stream;
         root.removeClass(CSS.NO_STREAM);
+        publish(KalturaEvents.mediaStreamStart, stream);
     } catch (error) {
-        errorHandler(error);
         root.addClass(CSS.NO_STREAM);
+        errorHandler(error);
     }
 };
 
@@ -191,6 +188,19 @@ const stopRecording = () => {
     recorder.stop();
 };
 
+const previewStream = (stream) => {
+    const preview = $(SELECTORS.PREVIEW)[0];
+    preview.autoplay = true;
+    preview.controls = false;
+    preview.muted = true;
+    if (preview.src) {
+        URL.revokeObjectURL(preview.src);
+        preview.src = null;
+    }
+    preview.srcObject = stream;
+
+};
+
 const previewVideo = (url) => {
     const preview = $(SELECTORS.PREVIEW)[0];
     preview.src = url;
@@ -226,12 +236,11 @@ const renderAlert = (title, message) => {
 
 const updateDeviceOptions = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
-
     const audioDevices = devices.filter(device => device.kind === 'audioinput');
-    audioDevices[0].selected = true;
-
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    videoDevices[0].selected = true;
+
+    console.log(audioDevices);
+    console.log(videoDevices);
 
     Templates.render(TEMPLATES.DEVICE_OPTIONS, {devices: audioDevices})
         .then((html, js) => Templates.replaceNodeContents(SELECTORS.AUDIO_OPTIONS, html, js))
