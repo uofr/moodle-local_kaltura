@@ -140,7 +140,6 @@ const registerEventListeners = () => {
 const startStream = async () => {
     try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
-        console.log(stream.getTracks());
         root.removeClass(CSS.NO_STREAM);
         publish(KalturaEvents.mediaStreamStart, stream);
     } catch (error) {
@@ -244,9 +243,15 @@ const updateDeviceOptions = async () => {
     const audioDevices = devices.filter(device => device.kind === 'audioinput');
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
-    console.log(devices);
-    console.log(audioDevices);
-    console.log(videoDevices);
+    const tracks = stream.getTracks();
+    const audioDeviceId = tracks.find(track => track.kind === 'audio').getSettings().deviceId;
+    const videoDeviceId = tracks.find(track => track.kind === 'video').getSettings().deviceId;
+
+    const activeAudioIndex = audioDevices.findIndex(device => device.deviceId === audioDeviceId);
+    const activeVideoIndex = videoDevices.findIndex(device => device.deviceId === videoDeviceId);
+
+    audioDevices[activeAudioIndex].selected = true;
+    videoDevices[activeVideoIndex].selected = true;
 
     Templates.render(TEMPLATES.DEVICE_OPTIONS, {devices: audioDevices})
         .then((html, js) => Templates.replaceNodeContents(SELECTORS.AUDIO_OPTIONS, html, js))
