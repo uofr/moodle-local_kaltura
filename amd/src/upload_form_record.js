@@ -60,26 +60,22 @@ const SELECTORS = {
     VIDEO_OPTIONS: '[data-region="video-options"]',
     SWITCH_DEVICE: '[data-action="switch-device"]:not(.active)',
     DEVICE_OPTION: '[data-action="switch-device"]',
-    UPLOAD_PART_2: '[data-region="upload-part-2"]'
+    UPLOAD_PART_2: '[data-region="upload-part-2"]',
+    KALTURA_RECORDER_ERROR: '.kaltura-recorder-alert'
 };
 
 const TEMPLATES = {
-    DISMISSABLE_ALERT: 'local_kaltura/kaltura_dismissable_alert',
+    RECORDER_ALERT: 'local_kaltura/kaltura_recorder_alert',
     DEVICE_OPTIONS: 'local_kaltura/kaltura_device_options'
 };
 
-export const init = async (rootSelector) => {
+export const init = (rootSelector) => {
     root = $(rootSelector);
     registerEventListeners();
     startStream();
 };
 
 const registerEventListeners = () => {
-    subscribe(KalturaEvents.mediaStreamStart, (stream) => {
-        previewStream(stream);
-        updateDeviceOptions();
-    });
-
     navigator.mediaDevices.addEventListener('devicechange', () => {
         updateDeviceOptions();
     });
@@ -119,6 +115,8 @@ const registerEventListeners = () => {
     });
 
     root.on('reset', () => {
+        resetPreview();
+        hideError();
         root.find(SELECTORS.UPLOAD_PART_2).addClass(CSS.HIDDEN);
         root.find(SELECTORS.TERM).prop('disabled', false);
         root.removeClass(CSS.RECORDING_DONE);
@@ -140,8 +138,10 @@ const registerEventListeners = () => {
 const startStream = async () => {
     try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
+        updateDeviceOptions();
+        previewStream(stream);
         root.removeClass(CSS.NO_STREAM);
-        publish(KalturaEvents.mediaStreamStart, stream);
+        hideError();
     } catch (error) {
         root.addClass(CSS.NO_STREAM);
         errorHandler(error);
@@ -149,12 +149,14 @@ const startStream = async () => {
 };
 
 const stopStream = () => {
-    const preview = $(SELECTORS.PREVIEW)[0];
+    const preview = root.find(SELECTORS.PREVIEW)[0];
     for (const track of stream.getTracks()) {
         track.stop();
     }
     stream = null;
-    preview.srcObject = null;
+    if (preview) {
+        preview.srcObject = null;
+    }
 };
 
 const startRecording = (stream) => {
@@ -180,11 +182,11 @@ const startRecording = (stream) => {
             updateTime('00:00');
         };
         recorder.onerror = (e) => {
-            errorHandler(e.error);
+            Notification.exception(e.error);
         };
         recorder.start();
     } catch (error) {
-        errorHandler(error);
+        Notification.exception(error);
     }
 };
 
@@ -202,7 +204,6 @@ const previewStream = (stream) => {
         preview.src = null;
     }
     preview.srcObject = stream;
-
 };
 
 const previewVideo = (url) => {
@@ -213,8 +214,24 @@ const previewVideo = (url) => {
     preview.muted = false;
 };
 
+const resetPreview = () => {
+    const preview = $(SELECTORS.PREVIEW)[0];
+    preview.autoplay = true;
+    preview.controls = false;
+    preview.muted = true;
+    if (preview.src) {
+        URL.revokeObjectURL(preview.src);
+        preview.src = null;
+    }
+    preview.srcObject = null;
+};
+
 const updateTime = (time) => {
     $(SELECTORS.TIME).text(time);
+};
+
+const hideError = () => {
+    root.find(SELECTORS.KALTURA_RECORDER_ERROR).remove();
 };
 
 const errorHandler = async (error) => {
@@ -230,7 +247,7 @@ const errorHandler = async (error) => {
 };
 
 const renderAlert = (title, message) => {
-    return Templates.render(TEMPLATES.DISMISSABLE_ALERT, {
+    return Templates.render(TEMPLATES.RECORDER_ALERT, {
         title: title,
         message: message
     })
@@ -243,15 +260,17 @@ const updateDeviceOptions = async () => {
     const audioDevices = devices.filter(device => device.kind === 'audioinput');
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
-    const tracks = stream.getTracks();
-    const audioDeviceId = tracks.find(track => track.kind === 'audio').getSettings().deviceId;
-    const videoDeviceId = tracks.find(track => track.kind === 'video').getSettings().deviceId;
+    if (stream && stream.active) {
+        const tracks = stream.getTracks();
+        const audioDeviceId = tracks.find(track => track.kind === 'audio').getSettings().deviceId;
+        const videoDeviceId = tracks.find(track => track.kind === 'video').getSettings().deviceId;
 
-    const activeAudioIndex = audioDevices.findIndex(device => device.deviceId === audioDeviceId);
-    const activeVideoIndex = videoDevices.findIndex(device => device.deviceId === videoDeviceId);
+        const activeAudioIndex = audioDevices.findIndex(device => device.deviceId === audioDeviceId);
+        const activeVideoIndex = videoDevices.findIndex(device => device.deviceId === videoDeviceId);
 
-    audioDevices[activeAudioIndex].selected = true;
-    videoDevices[activeVideoIndex].selected = true;
+        audioDevices[activeAudioIndex].selected = true;
+        videoDevices[activeVideoIndex].selected = true;
+    }
 
     Templates.render(TEMPLATES.DEVICE_OPTIONS, {devices: audioDevices})
         .then((html, js) => Templates.replaceNodeContents(SELECTORS.AUDIO_OPTIONS, html, js))

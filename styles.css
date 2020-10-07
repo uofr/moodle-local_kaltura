@@ -180,10 +180,14 @@
     width: 100%;
 }
 
-.kaltura-dismissible-alert {
+.kaltura-recorder-alert {
     position: absolute;
     top: 0px;
     width: 100%;
     z-index: 2;
     text-align: initial;
+}
+
+.kaltura-form-record.kaltura-form-record.kaltura-recording-complete .kaltura-video-controls{
+    z-index: -1;
 }
