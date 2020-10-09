@@ -215,4 +215,30 @@ class local_kaltura_external extends external_api {
         ]);
     }
 
+    public static function get_entry_player_parameters() {
+        return new external_function_parameters([
+            'entryid' => new external_value(PARAM_TEXT)
+        ]);
+    }
+
+    public static function get_entry_player($entryid) {
+        $params = self::validate_parameters(self::get_entry_player_parameters(), ['entryid' => $entryid]);
+
+        $client = \local_kaltura\kaltura_client::get_client();
+        $client->setKs(\local_kaltura\kaltura_session_manager::get_admin_session($client));
+        $entry = \local_kaltura\kaltura_entry_manager::get_entry($client, $params['entryid'], false);
+        $player = \local_kaltura\kaltura_player::get_player($entry->objects[0]);
+        $client->session->end();
+
+        return [
+            'player' => $player
+        ];
+    }
+
+    public static function get_entry_player_returns() {
+        return new external_single_structure([
+            'player' => new external_value(PARAM_RAW)
+        ]);
+    }
+
 }

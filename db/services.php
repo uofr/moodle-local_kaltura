@@ -55,4 +55,12 @@ $functions = [
         'type'          => 'read',
         'ajax'          => true
     ],
+    'local_kaltura_get_entry_player' => [
+        'classname'     => 'local_kaltura_external',
+        'methodname'    => 'get_entry_player',
+        'classpath'     => 'local/kaltura/classes/external.php',
+        'description'   => 'Gets player for specified entry.',
+        'type'          => 'read',
+        'ajax'          => true
+    ],
 ];

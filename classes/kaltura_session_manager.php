@@ -55,4 +55,12 @@ class kaltura_session_manager {
         return $client->generateSessionV2($admin_secret, '', \KalturaSessionType::USER, $partner_id, $timeout, $privileges);
     }
 
+    public static function get_admin_session(\KalturaClient $client, int $timeout = 10800, string $privileges = '') {
+        global $USER;
+        $admin_secret = \local_kaltura\kaltura_config::get_admin_secret();
+        $partner_id = \local_kaltura\kaltura_config::get_partner_id();
+
+        return $client->generateSessionV2($admin_secret, $USER->username, \KalturaSessionType::ADMIN, $partner_id, $timeout, $privileges);
+    }
+
 }

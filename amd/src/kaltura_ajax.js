@@ -90,5 +90,13 @@ export default {
                 entryid: entryid
             }
         }])[0];
+    },
+    getEntryPlayer: (entryid) => {
+        return Ajax.call([{
+            methodname: 'local_kaltura_get_entry_player',
+            args: {
+                entryid: entryid
+            }
+        }])[0];
     }
 };

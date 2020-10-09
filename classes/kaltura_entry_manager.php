@@ -85,19 +85,22 @@ class kaltura_entry_manager {
     }
 
     /**
-     * Gets the specified entry. Throws exception if entry does not belong to user.
+     * Gets the specified entry.
      * 
      * @param KalturaClient $client
      * @param string $entryid
+     * @param bool $check_user
      * @return \KalturaMediaEntry
      * @throws moodle_exception
      */
-    public static function get_entry($client, $entryid) {
+    public static function get_entry($client, $entryid, $check_user = true) {
         global $USER;
 
         $entry_filter = new \KalturaMediaEntryFilter();
         $entry_filter->idEqual = $entryid;
-        $entry_filter->userIdEqual = $USER->username;
+        if ($check_user) {
+            $entry_filter->userIdEqual = $USER->username;
+        }
 
         return $client->media->listAction($entry_filter);
     }
