@@ -65,17 +65,15 @@ class kaltura_player {
      * @return string
      */
     public static function get_player($entryobj) {
-        $host = get_config('local_kaltura', 'uri');
-
-        $uiconf = get_config('local_kaltura', 'player_resource');
-        if (empty($uiconf)) {
-              $uiconf = get_config('local_kaltura', 'player_resource_custom');
-        }
+        $host = \local_kaltura\kaltura_config::get_host();
+        $uiconf = \local_kaltura\kaltura_config::get_uiconf_id();
+        $client = \local_kaltura\kaltura_client::get_client();
+        $ks = \local_kaltura\kaltura_session_manager::get_user_session($client, 10800, 'sview:'.$entryobj->id);
 
         $uid  = floor(microtime(true));
         $uid .= '_' . mt_rand();
-		
-		$output = "<iframe id=\"kaltura_player_{$uid}\" src=\"{$host}/p/{$entryobj->partnerId}/sp/{$entryobj->partnerId}00/embedIframeJs/uiconf_id/{$uiconf}/partner_id/{$entryobj->partnerId}?iframeembed=true&playerId=kaltura_player_{$uid}&entry_id={$entryobj->id}\" width=\"560\" height=\"395\" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow=\"autoplay *; fullscreen *; encrypted-media *\" frameborder=\"0\"></iframe>";
+
+        $output = "<iframe id=\"kaltura_player_{$uid}\" src=\"{$host}/p/{$entryobj->partnerId}/sp/{$entryobj->partnerId}00/embedIframeJs/uiconf_id/{$uiconf}/partner_id/{$entryobj->partnerId}?iframeembed=true&playerId=kaltura_player_{$uid}&entry_id={$entryobj->id}&ks={$ks}\" width=\"560\" height=\"395\" allowfullscreen webkitallowfullscreen mozAllowFullScreen allow=\"autoplay *; fullscreen *; encrypted-media *\" frameborder=\"0\"></iframe>";
 
         return $output;
     }
@@ -84,7 +82,7 @@ class kaltura_player {
         $host = \local_kaltura\kaltura_config::get_legacy_host();
         $uiconf = \local_kaltura\kaltura_config::get_uiconf_id_legacy();
         $client = \local_kaltura\kaltura_client::get_client('ce');
-        $ks = \local_kaltura\kaltura_session_manager::get_user_session_legacy($client);
+        $ks = \local_kaltura\kaltura_session_manager::get_user_session_legacy($client, 10800, 'sview:'.$entryobj->id);
 
         $uid  = floor(microtime(true));
         $uid .= '_' . mt_rand();
