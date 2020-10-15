@@ -11,6 +11,17 @@
     {{> local_kaltura/kaltura_paging_bar }}
 </div>
 
+{{#has_ce}}
+    <nav class="nav nav-tabs">
+        <a class="nav-link {{#source}}active{{/source}}" data-action="switch-tab" data-source="1" data-toggle="tab" href="#">
+            {{#str}}kaltura_prem_hdr, local_kaltura{{/str}}
+        </a>
+        <a class="nav-link {{^source}}active{{/source}}" data-action="switch-tab" data-source="0" data-toggle="tab" href="#">
+            {{#str}}kaltura_ce_hdr, local_kaltura{{/str}}
+        </a>
+    </nav>
+{{/has_ce}}
+
 <div class="kaltura-entry-list" data-region="entry-list">
     {{> local_kaltura/kaltura_entry_list }}
 </div>

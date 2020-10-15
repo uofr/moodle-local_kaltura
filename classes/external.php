@@ -32,11 +32,12 @@ class local_kaltura_external extends external_api {
             'search' => new external_value(PARAM_TEXT),
             'sort' => new external_value(PARAM_TEXT),
             'page' => new external_value(PARAM_INT),
-            'source' => new external_value(PARAM_INT)
+            'source' => new external_value(PARAM_INT),
+            'has_ce' => new external_value(PARAM_BOOL)
         ]);
     }
 
-    public static function get_video_picker_data($contextid, $search, $sort, $page, $source) {
+    public static function get_video_picker_data($contextid, $search, $sort, $page, $source, $has_ce) {
         global $PAGE;
 
         $params = self::validate_parameters(self::get_video_picker_data_parameters(), [
@@ -44,7 +45,8 @@ class local_kaltura_external extends external_api {
             'search' => $search,
             'sort' => $sort,
             'page' => $page,
-            'source' => $source
+            'source' => $source,
+            'has_ce' => $has_ce
         ]);
 
         $context = context::instance_by_id($params['contextid']);
@@ -79,7 +81,9 @@ class local_kaltura_external extends external_api {
         return [
             'entries' => $entries_renderable->export_for_template($renderer),
             'paging_bar' => $paging_bar->export_for_template($renderer),
-            'search_result_str' => $search_result_str
+            'search_result_str' => $search_result_str,
+            'source' => $params['source'],
+            'has_ce' => $params['has_ce']
         ];
     }
 
@@ -105,7 +109,9 @@ class local_kaltura_external extends external_api {
                     'page_index' => new external_value(PARAM_INT, '', VALUE_OPTIONAL)
                 ]))
             ]),
-            'search_result_str' => new external_value(PARAM_TEXT, '', VALUE_OPTIONAL)
+            'search_result_str' => new external_value(PARAM_TEXT, '', VALUE_OPTIONAL),
+            'source' => new external_value(PARAM_INT),
+            'has_ce' => new external_value(PARAM_BOOL)
         ]);
     }
 
@@ -226,9 +232,20 @@ class local_kaltura_external extends external_api {
 
         $client = \local_kaltura\kaltura_client::get_client();
         $client->setKs(\local_kaltura\kaltura_session_manager::get_admin_session($client));
+
+        $client_legacy = \local_kaltura\kaltura_client::get_client('ce');
+        $client_legacy->setKs(\local_kaltura\kaltura_session_manager::get_admin_session_legacy($client_legacy));
+
         $entry = \local_kaltura\kaltura_entry_manager::get_entry($client, $params['entryid'], false);
-        $player = \local_kaltura\kaltura_player::get_player($entry->objects[0]);
+        if ($entry->totalCount) {
+            $player = \local_kaltura\kaltura_player::get_player($entry->objects[0]);
+        } else {
+            $entry = \local_kaltura\kaltura_entry_manager::get_entry($client_legacy, $params['entryid'], false);
+            $player = \local_kaltura\kaltura_player::get_player_legacy($entry->objects[0]);
+        }
+
         $client->session->end();
+        $client_legacy->session->end();
 
         return [
             'player' => $player

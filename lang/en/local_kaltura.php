@@ -220,6 +220,9 @@ $string['medianamedesc'] = 'Media name (descending)';
 $string['mediadurasc'] = 'Duration (ascending)';
 $string['mediadurdesc'] = 'Duration (descending)';
 
+$string['kaltura_prem_hdr'] = 'Kaltura';
+$string['kaltura_ce_hdr'] = 'Kaltura CE';
+
 // Kaltura reports.
 $string['kaltura_report_navbar'] = 'Kaltura Course Media Reports';
 $string['header_kaltura_reports'] = 'Kaltura Reports';

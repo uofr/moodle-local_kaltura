@@ -21,7 +21,6 @@
  * @author John Lane
  */
 
-import $ from 'jquery';
 import Templates from 'core/templates';
 import {get_string as getString} from 'core/str';
 import {publish} from 'core/pubsub';

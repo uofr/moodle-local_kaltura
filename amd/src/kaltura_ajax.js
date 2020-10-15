@@ -33,9 +33,10 @@ export default {
      * @param {String} sort
      * @param {Number} page
      * @param {Number} source
+     * @param {Boolean} hasCe
      * @returns {Promise}
      */
-    getVideoPickerData: (contextid, search, sort, page, source) => {
+    getVideoPickerData: (contextid, search, sort, page, source, hasCe) => {
         return Ajax.call([{
             methodname: 'local_kaltura_get_video_picker_data',
             args: {
@@ -43,7 +44,8 @@ export default {
                 search: search,
                 sort: sort,
                 page: page,
-                source: source
+                source: source,
+                has_ce: hasCe
             }
         }])[0];
     },

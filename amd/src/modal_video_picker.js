@@ -26,6 +26,7 @@ const SELECTORS = {
     SEARCH_INPUT: '#kaltura_search_box',
     SEARCH_CLEAR: '[data-action="kaltura-clear-search"]',
     SORT: '#kaltura_sort',
+    SWITCH_TAB: '[data-action="switch-tab"]',
     ENTRY_CHECKBOX: '.kaltura-entry-checkbox',
     CONFIRM: '[data-action="confirm-entry-selection"]',
     SELECTED_ENTRY_NAME: '[data-region="selected_entry_name"]'
@@ -46,6 +47,7 @@ export default class ModalVideoPicker extends Modal {
         this.sort = 'recent';
         this.page = 0;
         this.source = 1;
+        this.hasCe = false;
         this.selectedEntryId = null;
         this.selectedEntryName = null;
         this.selectedEntryThumbnail = null;
@@ -59,6 +61,7 @@ export default class ModalVideoPicker extends Modal {
             if (this.selectedEntryId && this.selectedEntryName && this.selectedEntryThumbnail) {
                 const selectedEntryText = await getString('selected_entry', 'local_kaltura', this.selectedEntryName);
                 $(SELECTORS.SELECTED_ENTRY_NAME).text(selectedEntryText);
+                $(SELECTORS.CONFIRM).prop('disabled', false);
             }
         });
 
@@ -67,11 +70,6 @@ export default class ModalVideoPicker extends Modal {
         });
 
         this.getRoot().on(ModalEvents.hidden, () => {
-            this.setBody('');
-            this.search = '';
-            this.sort = 'recent';
-            this.page = 0;
-            this.source = 1;
             if (this.selectedEntryId && this.selectedEntryName && this.selectedEntryThumbnail) {
                 publish(ModalVideoPickerEvents.entrySelected, {
                     entryId: this.selectedEntryId,
@@ -79,6 +77,11 @@ export default class ModalVideoPicker extends Modal {
                     entryThumbnail: this.selectedEntryThumbnail
                 });
             }
+            this.setBody('');
+            this.search = '';
+            this.sort = 'recent';
+            this.page = 0;
+            this.source = 1;
         });
 
         this.getRoot().on('click', SELECTORS.CONFIRM, () => {
@@ -127,6 +130,14 @@ export default class ModalVideoPicker extends Modal {
             this.refreshEntryList();
         });
 
+        this.root.on('click', SELECTORS.SWITCH_TAB, (e) => {
+            this.page = 0;
+            this.resetSearch();
+            this.resetSort();
+            this.source = parseInt($(e.currentTarget).attr('data-source'));
+            this.refreshEntryList();
+        });
+
         this.getRoot().on('change', SELECTORS.ENTRY_CHECKBOX, async (e) => {
             $(SELECTORS.ENTRY_CHECKBOX).not($(e.currentTarget)).prop('checked', false);
             $(SELECTORS.CONFIRM).prop('disabled', !$(e.currentTarget).prop('checked'));
@@ -148,14 +159,24 @@ export default class ModalVideoPicker extends Modal {
 
     }
 
+    resetSearch() {
+        $(SELECTORS.SEARCH_INPUT).val('');
+        this.search = '';
+    }
+
+    resetSort() {
+        $(SELECTORS.SORT).val('recent');
+        this.sort = 'recent';
+    }
+
     async renderBody() {
-        const data = await KalturaAjax.getVideoPickerData(this.contextid, this.search, this.sort, this.page, this.source);
+        const data = await KalturaAjax.getVideoPickerData(this.contextid, this.search, this.sort, this.page, this.source, this.hasCe);
         const renderPromise = Templates.render(TEMPLATES.VIDEO_PICKER_BODY, data);
         this.setBody(renderPromise);
     }
 
     async refreshEntryList() {
-        const promise = KalturaAjax.getVideoPickerData(this.contextid, this.search, this.sort, this.page, this.source)
+        const promise = KalturaAjax.getVideoPickerData(this.contextid, this.search, this.sort, this.page, this.source, this.hasCe)
             .then(response => this.replace(response, TEMPLATES.VIDEO_PICKER_ENTRY_LIST, SELECTORS.VIDEO_PICKER_ENTRY_LIST))
             .then(() => $(`[data-entry="${this.selectedEntryId}"]`).find(SELECTORS.ENTRY_CHECKBOX).prop('checked', true))
             .catch(Notification.exception);
