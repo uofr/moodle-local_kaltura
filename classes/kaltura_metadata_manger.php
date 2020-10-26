@@ -53,4 +53,10 @@ class kaltura_metadata_manger {
         return $client->metadata->update($metaid, $xml);
     }
 
+    public static function add_custom_metadata($client, $entryid, $xml) {
+        $metadata_profile_id = \local_kaltura\kaltura_config::get_metadata_id();
+        return $client->metadata->add($metadata_profile_id, \KalturaMetadataObjectType::ENTRY, $entryid, $xml);
+    }
+
+
 }

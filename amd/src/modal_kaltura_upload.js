@@ -55,7 +55,6 @@ export default class ModalKalturaUpload extends Modal {
      */
     constructor(root) {
         super(root);
-        this.contextid = null;
     }
 
     /**
@@ -74,15 +73,18 @@ export default class ModalKalturaUpload extends Modal {
     /**
      * Renders the specified upload form.
      * @param {String} type - Type of upload form to render (media, recording, youtube, etc).
+     * @param {Number} contextid
      */
-    async renderUploadForm(type) {
-        const data = await KalturaAjax.getUploadModalData(this.contextid);
+    async renderUploadForm(type, contextid) {
+        const data = await KalturaAjax.getUploadModalData(contextid);
 
         const renderPromise = Templates.render(templates[type], data);
         this.setBody(renderPromise);
 
         const title = await getString(titles[type], 'local_kaltura');
         this.setTitle(title);
+
+        this.show();
     }
 
     /**
