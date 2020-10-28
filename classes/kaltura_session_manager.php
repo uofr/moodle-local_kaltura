@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,6 +30,21 @@ require_once(__DIR__ . '/../API/KalturaClient.php');
  * Kaltura session utility functions.
  */
 class kaltura_session_manager {
+
+    const SESSION_TYPES = [
+        'user' => \KalturaSessionType::USER,
+        'admin' => \KalturaSessionType::ADMIN
+    ];
+
+    public static function get_session(\KalturaClient $client, $client_type = 'kaltura', $session_type = 'user',
+            int $timeout = 10800, string $privileges = '') {
+        global $USER;
+        $admin_secret = \local_kaltura\kaltura_config::get_admin_secret($client_type);
+        $partner_id = \local_kaltura\kaltura_config::get_partner_id($client_type);
+
+        return $client->generateSessionV2($admin_secret, $USER->username, self::SESSION_TYPES[$session_type], $partner_id,
+            $timeout, $privileges);
+    }
     
     public static function get_user_session(\KalturaClient $client, int $timeout = 10800, string $privileges = '') {
         global $USER;

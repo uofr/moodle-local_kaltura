@@ -1,5 +1,5 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,8 +40,14 @@ class kaltura_config {
     }
 
 
-    public static function get_partner_id() {
-        return get_config('local_kaltura', 'partner_id');
+    /**
+     * Gets partner id.
+     * @param string $type Use 'kaltura' for premium, 'ce' for legacy.
+     * @returns string Partner id.
+     */
+    public static function get_partner_id($type = 'kaltura') {
+        if ($type === 'kaltura') return get_config('local_kaltura', 'partner_id');
+        else if ($type === 'ce') return 104;
     }
 
     public static function get_uiconf_id() {
@@ -68,8 +74,14 @@ class kaltura_config {
         return get_config('local_kaltura', 'version');
     }
 
-    public static function get_admin_secret() {
-        return get_config('local_kaltura', 'adminsecret');
+    /**
+     * Gets admin secret.
+     * @param string $type Use 'kaltura' for premium, 'ce' for legacy.
+     * @returns string Admin secret.
+     */
+    public static function get_admin_secret($type = 'kaltura') {
+        if ($type === 'kaltura') return get_config('local_kaltura', 'adminsecret');
+        else if ($type === 'ce') return '5797ccb7ce30a75213d7e049419663f5';
     }
 
     public static function get_legacy_host() {
