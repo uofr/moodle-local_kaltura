@@ -34,12 +34,14 @@ import KalturaEvents from 'local_kaltura/kaltura_events';
 
 const templates = {
     media: 'local_kaltura/upload_form_media',
-    record: 'local_kaltura/upload_form_record'
+    record: 'local_kaltura/upload_form_record',
+    capture: 'local_kaltura/upload_form_capture'
 };
 
 const titles = {
     media: 'media_upload',
-    record: 'webcam_upload'
+    record: 'webcam_upload',
+    capture: 'k_capture'
 };
 
 /**
@@ -76,7 +78,7 @@ export default class ModalKalturaUpload extends Modal {
      * @param {Number} contextid
      */
     async renderUploadForm(type, contextid) {
-        const data = await KalturaAjax.getUploadModalData(contextid);
+        const data = await KalturaAjax.getUploadModalData(contextid, type);
 
         const renderPromise = Templates.render(templates[type], data);
         this.setBody(renderPromise);

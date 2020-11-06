@@ -117,14 +117,18 @@ class local_kaltura_external extends external_api {
 
     public static function get_upload_modal_data_parameters() {
         return new external_function_parameters([
-            'contextid' => new external_value(PARAM_INT)
+            'contextid' => new external_value(PARAM_INT),
+            'type' => new external_value(PARAM_TEXT)
         ]);
     }
 
-    public static function get_upload_modal_data($contextid) {
+    public static function get_upload_modal_data($contextid, $type) {
         global $PAGE;
 
-        $params = self::validate_parameters(self::get_upload_modal_data_parameters(), ['contextid' => $contextid]);
+        $params = self::validate_parameters(self::get_upload_modal_data_parameters(), [
+            'contextid' => $contextid,
+            'type' => $type
+        ]);
 
         $context = context::instance_by_id($params['contextid']);
         self::validate_context($context);
@@ -133,8 +137,25 @@ class local_kaltura_external extends external_api {
 
         $terms = new \local_kaltura\output\terms();
 
+        if ($params['type'] === 'capture') {
+            $client = \local_kaltura\kaltura_client::get_client('kaltura', 'admin');
+
+            $filter = new KalturaUiConfFilter();
+            $filter->nameLike = "KalturaCaptureVersioning";
+
+            $ui_confs = $client->uiConf->listTemplates($filter);
+
+            $config = json_decode($ui_confs->objects[0]->config);
+            $windows = $config->win_downloadUrl;
+            $osx = $config->osx_downloadUrl;
+
+            $client->session->end();
+        }
+
         return [
-            'terms' => $terms->export_for_template($renderer)
+            'terms' => $terms->export_for_template($renderer),
+            'k_capture_download_link_windows' => $windows,
+            'k_capture_download_link_mac' => $osx
         ];
     }
 
@@ -143,7 +164,9 @@ class local_kaltura_external extends external_api {
             'terms' => new external_multiple_structure(new external_single_structure([
                 'term' => new external_value(PARAM_TEXT),
                 'selected' => new external_value(PARAM_BOOL)
-            ]))
+            ])),
+            'k_capture_download_link_windows' => new external_value(PARAM_URL, '', VALUE_OPTIONAL),
+            'k_capture_download_link_mac' => new external_value(PARAM_URL, '', VALUE_OPTIONAL)
         ]);
     }
 

@@ -1,0 +1,20 @@
+{{< local_kaltura/upload_form_base }}
+
+    {{$upload_field}}
+        <div class="jumbotron text-center">
+            <h1>{{#str}}k_capture_title, local_kaltura{{/str}}</h1>
+            <p class="lead">{{#str}}k_capture_lead, local_kaltura{{/str}}</p>
+
+            <hr class="my-4">
+
+                <p class="mb-0">{{#str}}k_capture_download_header, local_kaltura{{/str}}</p>
+
+            <div class="row-fluid justify-content-center">
+                <a href="{{{k_capture_download_link_windows}}}">{{#str}}k_capture_download_windows, local_kaltura{{/str}}</a>
+                <span class="mr-1 ml-1"> | </span>
+                <a href="{{{k_capture_download_link_mac}}}">{{#str}}k_capture_download_mac, local_kaltura{{/str}}</a>
+            </div>
+        </div>
+    {{/upload_field}}
+
+{{/ local_kaltura/upload_form_base }}

@@ -54,13 +54,15 @@ export default {
      *
      * @method getUploadModalData
      * @param {Number} contextid
+     * @param {Text} type
      * @returns {Promise}
      */
-    getUploadModalData: (contextid) => {
+    getUploadModalData: (contextid, type) => {
         return Ajax.call([{
             methodname: 'local_kaltura_get_upload_modal_data',
             args: {
-                contextid: contextid
+                contextid: contextid,
+                type: type
             }
         }])[0];
     },
