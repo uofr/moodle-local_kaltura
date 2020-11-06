@@ -2440,3 +2440,19 @@ function local_kaltura_validate_entry_id($kalvidres) {
         $kalvidres->uiconf_id = local_kaltura_get_player_uiconf('player_resource');
     }
 }
+
+/**
+ * This function gets the local configuration and sanitizes the settings.
+ * @return object Returns object containing configuration settings for kaltura local plugin.
+ */
+function local_kaltura_get_config() {
+    $configsettings = get_config(KALTURA_PLUGIN_NAME);
+    if (empty($configsettings->kaf_uri)) {
+        $configsettings->kaf_uri = "";
+    }
+    // If a https url is needed for kaf_uri it should be entered into the kaf_uri setting as https://.
+    if (!empty($configsettings->kaf_uri) && !preg_match('#^https?://#', $configsettings->kaf_uri)) {
+        $configsettings->kaf_uri = 'http://'.$configsettings->kaf_uri;
+    }
+    return $configsettings;
+}
