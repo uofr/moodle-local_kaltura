@@ -15,19 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kaltura Media Local Libraries version file
+ * Kaltura LTI service script used receive data sent from the Kaltura content provider.
  *
  * @package    local_kaltura
- * @subpackage kaltura
- * @copyright  (C) 2016-2017 Yamaguchi University <info-cc@ml.cc.yamaguchi-u.ac.jp>
+ * @author     Remote-Learner.net Inc
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  (C) 2014 Remote Learner.net Inc http://www.remote-learner.net
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2020110602;
-$plugin->component = 'local_kaltura';
-$plugin->release = 'Kaltura Media Local Libraries 1.1.1';
-$plugin->requires = 2015051100;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->system_version = 2.1; // Used to send information to Kaltura.
+$PAGE->set_pagelayout('embedded');
+echo $OUTPUT->header();
+$playurl = urldecode($url);
+?>
+<script>
+    var data = {
+        'url': "<?php echo $playurl; ?>",
+        'width': <?php echo $width; ?>,
+        'height': <?php echo $height; ?>,
+        'title': "<?php echo addcslashes($title, '"'); ?>"
+    };
+    parent.kaltura_atto_embed(data);
+</script>

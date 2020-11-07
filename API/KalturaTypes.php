@@ -5085,31 +5085,84 @@ class KalturaReportTotal extends KalturaObjectBase
 
 }
 
-class KalturaReportTable extends KalturaObjectBase
+class KalturaReportTable extends KalturaObjectBase 
 {
 	/**
-	 * 
-	 *
 	 * @var string
 	 * @readonly
 	 */
-	public $header = null;
-
+	public $header;
+	
 	/**
-	 * 
-	 *
 	 * @var string
 	 * @readonly
 	 */
-	public $data = null;
-
+	public $data;
+	
+	
 	/**
-	 * 
-	 *
 	 * @var int
 	 * @readonly
 	 */
-	public $totalCount = null;
+	public $totalCount;
+	
+	public function fromReportTable (  $header ,  $data , $totalCount, $delimiter )
+	{
+		if ( ! $header ) return;
+		$this->header = implode ( $delimiter , $header );
+		
+		$data_str = "";
+		foreach ( $data as $row )
+		{
+			$row = str_replace ( $delimiter , " " , $row ); // TODO - escape the separatos
+			$row = str_replace ( ";" , " " , $row ); // TODO - escape the separatos
+			$data_str .= implode ( $delimiter , $row ) . ";";
+		}
+		
+		$this->data = $data_str;
+		
+		$this->totalCount = $totalCount;
+	}
+	
+	
+}
+
+class KalturaReportResponseOptions extends KalturaObjectBase
+{
+	/**
+	 * @var string
+	 */
+	public $delimiter;
+
+	/**
+	 * @var bool
+	 */
+	public $skipEmptyDates;
+
+	private static $map_between_objects = array
+	(
+		'delimiter',
+		'skipEmptyDates',
+	);
+
+	protected function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+	/* (non-PHPdoc)
+ 	* @see KalturaObject::toObject()
+ 	*/
+	public function toObject($reportResponseOptions = null, $skip = array())
+	{
+		if(!$reportResponseOptions)
+		{
+			$reportResponseOptions = new kReportResponseOptions();
+		}
+
+		return parent::toObject($reportResponseOptions, $skip);
+	}
+
 
 
 }
