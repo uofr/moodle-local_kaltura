@@ -287,3 +287,4 @@ $string['k_capture_lead'] = 'Kaltura Capture will launch automatically if you\'v
 $string['k_capture_download_header'] = 'First time using Kaltura Capture?';
 $string['k_capture_download_windows'] = 'Download for Windows';
 $string['k_capture_download_mac'] = 'Download for Mac';
+$string['launch'] = 'Launch';

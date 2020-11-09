@@ -136,4 +136,8 @@ class kaltura_config {
         return $terms;
     }
 
+    public static function get_kaltura_capture_version() {
+        return '4.2.83';
+    }
+
 }
