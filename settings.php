@@ -474,6 +474,17 @@ if ($hassiteconfig) {
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
+
+    $settings->add(new admin_setting_heading('kaltura_quiz_heading',
+                   get_string('quiz_settings_hdr', 'local_kaltura'), ''));
+
+    $adminsetting = new admin_setting_configtext('quiz_player',
+                                                 get_string('quiz_player_uiconf', 'local_kaltura'),
+                                                 get_string('quiz_player_uiconf_desc', 'local_kaltura'),
+                                                 '', PARAM_INT);
+    $adminsetting->plugin = KALTURA_PLUGIN_NAME;
+    $settings->add($adminsetting);
+
     $jsmodule = array(
         'name'     => 'local_kaltura',
         'fullpath' => '/local/kaltura/js/kaltura.js',

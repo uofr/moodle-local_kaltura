@@ -66,7 +66,11 @@ class kaltura_player {
      */
     public static function get_player($entryobj) {
         $host = \local_kaltura\kaltura_config::get_host();
-        $uiconf = \local_kaltura\kaltura_config::get_uiconf_id();
+        if (strpos($entryobj->capabilities, 'quiz.quiz') !== false) {
+            $uiconf = \local_kaltura\kaltura_config::get_uiconf_id_quiz();
+        } else {
+            $uiconf = \local_kaltura\kaltura_config::get_uiconf_id();
+        }
         $client = \local_kaltura\kaltura_client::get_client();
         $ks = \local_kaltura\kaltura_session_manager::get_user_session($client, 10800, 'sview:'.$entryobj->id);
 
