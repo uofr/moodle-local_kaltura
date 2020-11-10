@@ -138,16 +138,21 @@ class local_kaltura_external extends external_api {
         $terms = new \local_kaltura\output\terms();
 
         if ($params['type'] === 'capture') {
-            $client = \local_kaltura\kaltura_client::get_client('kaltura', 'admin');
+            $client = \local_kaltura\kaltura_client::get_client('kaltura', 'admin', 90);
 
-            $filter = new KalturaUiConfFilter();
-            $filter->nameLike = "KalturaCaptureVersioning";
+            $client->startMultiRequest();
+            \local_kaltura\kaltura_uiconf_manager::get_kaltura_capture_conf($client);
+            \local_kaltura\kaltura_app_token_manager::get_app_tokens($client);
+            list($ui_conf, $app_tokens) = $client->doMultiRequest();
 
-            $ui_confs = $client->uiConf->listTemplates($filter);
+            list($windows, $osx) = \local_kaltura\kaltura_uiconf_manager::get_kaltura_capture_download_urls($ui_conf->objects[0]->config);
+            $app_token = \local_kaltura\kaltura_app_token_manager::find_kaltura_capture_app_token($app_tokens);
 
-            $config = json_decode($ui_confs->objects[0]->config);
-            $windows = $config->win_downloadUrl;
-            $osx = $config->osx_downloadUrl;
+            if (!$app_token) {
+                $app_token = \local_kaltura\kaltura_app_token_manager::add_kaltura_capture_app_token($client);
+            }
+
+            $launch_url = \local_kaltura\kaltura_app_token_manager::get_kaltura_capture_launch_url($app_token);
 
             $client->session->end();
         }
@@ -155,7 +160,8 @@ class local_kaltura_external extends external_api {
         return [
             'terms' => $terms->export_for_template($renderer),
             'k_capture_download_link_windows' => $windows,
-            'k_capture_download_link_mac' => $osx
+            'k_capture_download_link_mac' => $osx,
+            'launch_url' => $launch_url
         ];
     }
 
@@ -166,7 +172,8 @@ class local_kaltura_external extends external_api {
                 'selected' => new external_value(PARAM_BOOL)
             ])),
             'k_capture_download_link_windows' => new external_value(PARAM_URL, '', VALUE_OPTIONAL),
-            'k_capture_download_link_mac' => new external_value(PARAM_URL, '', VALUE_OPTIONAL)
+            'k_capture_download_link_mac' => new external_value(PARAM_URL, '', VALUE_OPTIONAL),
+            'launch_url' => new external_value(PARAM_TEXT, '', VALUE_OPTIONAL)
         ]);
     }
 

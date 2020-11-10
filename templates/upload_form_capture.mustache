@@ -14,7 +14,15 @@
                 <span class="mr-1 ml-1"> | </span>
                 <a href="{{{k_capture_download_link_mac}}}">{{#str}}k_capture_download_mac, local_kaltura{{/str}}</a>
             </div>
+
+            <a id="launch_k_capture" class="d-none" href="kaltura-pc:{{{launch_url}}}">
+                {{#str}}launch, local_kaltura{{/str}}
+            </a>
         </div>
     {{/upload_field}}
 
 {{/ local_kaltura/upload_form_base }}
+
+{{#js}}
+    document.getElementById('launch_k_capture').click();
+{{/js}}

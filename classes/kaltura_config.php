@@ -62,6 +62,10 @@ class kaltura_config {
         return 23448572;
     }
 
+    public static function get_uiconf_id_quiz() {
+        return get_config('local_kaltura', 'quiz_player');
+    }
+
     public static function entries_per_page() {
         return get_config('local_kaltura', 'mymedia_items_per_page');
     }
@@ -134,6 +138,10 @@ class kaltura_config {
         ];
 
         return $terms;
+    }
+
+    public static function get_kaltura_capture_version() {
+        return '4.2.83';
     }
 
 }

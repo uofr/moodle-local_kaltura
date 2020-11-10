@@ -85,6 +85,9 @@ $string['player_filter_audio'] =  'Embedded player (Audio)';
 $string['player_filter_audio_desc'] =  'Player used by the Kaltura filter plug-in when embedding audio on the page';
 $string['no_selected_entry'] = 'No entry selected';
 $string['selected_entry'] = 'Selected Entry: {$a}';
+$string['quiz_settings_hdr'] = 'Video Quiz Settings';
+$string['quiz_player_uiconf'] = 'Quiz Player UIConf';
+$string['quiz_player_uiconf_desc'] = 'UIConf ID for quiz player.';
 
 $string['assign_uploader_desc'] = 'Uploader widget when a user is uploading a submission';
 $string['res_uploader_desc'] = 'Uploader widget when a user is uploading a video resource';
@@ -287,3 +290,4 @@ $string['k_capture_lead'] = 'Kaltura Capture will launch automatically if you\'v
 $string['k_capture_download_header'] = 'First time using Kaltura Capture?';
 $string['k_capture_download_windows'] = 'Download for Windows';
 $string['k_capture_download_mac'] = 'Download for Mac';
+$string['launch'] = 'Launch';

@@ -77,6 +77,216 @@ class KalturaAccessControl extends KalturaObjectBase
 
 }
 
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
+class KalturaAppToken extends KalturaObjectBase
+{
+	/**
+	 * The id of the application token
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $id = null;
+
+	/**
+	 * The application token
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $token = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $partnerId = null;
+
+	/**
+	 * Creation time as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $createdAt = null;
+
+	/**
+	 * Update time as Unix timestamp (In seconds)
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $updatedAt = null;
+
+	/**
+	 * Application token status
+	 *
+	 * @var KalturaAppTokenStatus
+	 * @readonly
+	 */
+	public $status = null;
+
+	/**
+	 * Expiry time of current token (unix timestamp in seconds)
+	 *
+	 * @var int
+	 */
+	public $expiry = null;
+
+	/**
+	 * Type of KS (Kaltura Session) that created using the current token
+	 *
+	 * @var KalturaSessionType
+	 */
+	public $sessionType = null;
+
+	/**
+	 * User id of KS (Kaltura Session) that created using the current token
+	 *
+	 * @var string
+	 */
+	public $sessionUserId = null;
+
+	/**
+	 * Expiry duration of KS (Kaltura Session) that created using the current token (in seconds)
+	 *
+	 * @var int
+	 */
+	public $sessionDuration = null;
+
+	/**
+	 * Comma separated privileges to be applied on KS (Kaltura Session) that created using the current token
+	 *
+	 * @var string
+	 */
+	public $sessionPrivileges = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAppTokenHashType
+	 */
+	public $hashType = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $description = null;
+
+
+}
+
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
+abstract class KalturaAppTokenBaseFilter extends KalturaFilter {
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $idIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $createdAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtGreaterThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 */
+	public $updatedAtLessThanOrEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var KalturaAppTokenStatus
+	 */
+	public $statusEqual = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $statusIn = null;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	public $sessionUserIdEqual = null;
+
+
+}
+
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
+class KalturaAppTokenFilter extends KalturaAppTokenBaseFilter {
+
+}
+
+
+/**
+ * @package Kaltura
+ * @subpackage Client
+ */
+class KalturaAppTokenListResponse extends KalturaObjectBase
+{
+	/**
+	 * 
+	 *
+	 * @var array of KalturaAppToken
+	 * @readonly
+	 */
+	public $objects;
+
+	/**
+	 * 
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $totalCount = null;
+
+}
+
 abstract class KalturaSearchItem extends KalturaObjectBase
 {
 
