@@ -208,6 +208,27 @@ define('KALTURA_LTI_ADMIN_ROLE', 'urn:lti:sysrole:ims/lis/Administrator');
 //define('KALTURA_REPO_NAME', 'kaltura');
 
 
+/**
+ * This function validates whether a requested KAF module is valid.
+ * @param string $module The name of the module.
+ * @return bool True if valid, otherwise false.
+ */
+function local_kaltura_validate_kaf_module_request($module) {
+    $valid = false;
+
+    switch ($module) {
+        case KAF_MYMEDIA_MODULE:
+            $valid = true;
+            break;
+        case KAF_MEDIAGALLERY_MODULE:
+            $valid = true;
+            break;
+        case KAF_BROWSE_EMBED_MODULE:
+            $valid = true;
+            break;
+    }
+    return $valid;
+}
 
 
 /**
@@ -2305,13 +2326,14 @@ function local_kaltura_get_report($entryIds) {
  */
 function local_kaltura_get_config() {
     $configsettings = get_config(KALTURA_PLUGIN_NAME);
-    if (empty($configsettings->kaf_uri)) {
+    //if (empty($configsettings->kaf_uri)) {
         $configsettings->kaf_uri = "https://regina-moodle-dev.kaf.ca.kaltura.com";
-    }
+		//}
     // If a https url is needed for kaf_uri it should be entered into the kaf_uri setting as https://.
     if (!empty($configsettings->kaf_uri) && !preg_match('#^https?://#', $configsettings->kaf_uri)) {
-        $configsettings->kaf_uri = 'http://'.$configsettings->kaf_uri;
+        $configsettings->kaf_uri = 'https://'.$configsettings->kaf_uri;
     }
+	//error_log('config:'.print_r($configsettings,1));
     return $configsettings;
 }
 
@@ -2368,6 +2390,45 @@ function local_kaltura_get_lti_launch_container($withblocks = true) {
 
 
 /**
+ * This function validates the parameters to see if all of the requirements for the module are met.
+ * @param array $params An array of parameters
+ * @return bool true if valid, otherwise false
+ */
+function local_kaltura_validate_browseembed_required_params($params) {
+    $valid = true;
+
+    $expectedkeys = array(
+        // The activity instance id
+        'id' => '',
+        // The KAL module requested
+        'module' => '',
+        'course' => new stdClass(),
+        'title' => '',
+        'width' => '',
+        'height' => '',
+        'cmid' => '',
+        'custom_publishdata' => '',
+    );
+
+    // Get keys that reside in both parameters and expectedkeys
+    $matchingkeys = array_intersect_key($params, $expectedkeys);
+
+    // The number of keys in the result should equal the number of expectedkeys
+    if (count($expectedkeys) != count($matchingkeys)) {
+        return false;
+    }
+
+    $invalid = !is_numeric($params['id']) || !is_numeric($params['width']) || !is_numeric($params['height']) || !is_numeric($params['cmid']) || !is_object($params['course']);
+
+    if ($invalid) {
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
  * This function returns the endpoint URL belonging to the module that was requested.
  * @param string $module The name of the module being requested.
  * @param string Part of the URL that makes up the endpoint pertaining to the module requested.
@@ -2389,6 +2450,20 @@ function local_kaltura_get_endpoint($module) {
 }
 
 /**
+ * This function replaces the KALTURA_TOKEN_URI in a source URL with KAF URI domain.
+ * @param string $url A url which need the kaf_uri added.
+ * @return string Returns url with added KAF URI domain.
+ */
+function local_kaltura_add_kaf_uri_token($url) {
+    $configsettings = local_kaltura_get_config();
+    // For records that have been migrated from old kaf uri to token format by search and replace.
+    if (preg_match('/https?:\/\/'.KALTURA_URI_TOKEN.'/', $url)) {
+        $url = preg_replace('/https?:\/\/'.KALTURA_URI_TOKEN.'/', $configsettings->kaf_uri, $url);
+    }
+    return $url;
+}
+
+/**
  * This function formats and returns an object that will be passed to mod_lti locallib.php functions.
  * @param array $ltirequest An array of parameters to be converted into a properly formatted mod_lti instance.
  * @return object Returns an object that meets the requirements for use with mod_lti locallib.php functions.
@@ -2398,7 +2473,7 @@ function local_kaltura_format_lti_instance_object($ltirequest) {
 
     // Convert request parameters into mod_lti friendly format for consumption.
     $lti = new stdClass();
-    $lti->course = isset($ltirequest['course']->id) ? $ltirequest['course']->id : 1;
+    $lti->course = $ltirequest['course']->id;
     $lti->id = $ltirequest['id'];
     $lti->name = $ltirequest['title'];
     $lti->intro = isset($ltirequest['intro']) ? $ltirequest['intro'] : '';
@@ -2489,7 +2564,7 @@ function local_kaltura_request_lti_launch($ltirequest, $withblocks = true, $edit
     $returnurlparams['url'] = $endpoint;
     $returnurlparams['width'] = '100%';
     $returnurlparams['height'] = '600px';
-    $returnurlparams['entry_id'] = $ltirequest['entry_id'];
+//    $returnurlparams['entry_id'] = $ltirequest['entry_id'];
     $returnurlparams['title'] = $ltirequest['title'];
 
     // Add the return URL. We send the launch container along to help us avoid frames-within-frames when the user returns.
@@ -2708,6 +2783,45 @@ function local_kaltura_validate_mymedia_required_params($params) {
 
     return true;
 }
+
+/**
+ * This function validates the parameters to see if all of the requirements for the module are met.
+ * @param array $params An array of parameters
+ * @return bool true if valid, otherwise false
+ */
+function local_kaltura_validate_mediagallery_required_params($params) {
+    $valid = true;
+
+    $expectedkeys = array(
+        // The activity instance id
+        'id' => '',
+        // The KAL module requested
+        'module' => '',
+        'course' => new stdClass(),
+        'title' => '',
+        'width' => '',
+        'height' => '',
+        'cmid' => '',
+        'custom_publishdata' => '',
+    );
+
+    // Get keys that reside in both parameters and expectedkeys
+    $matchingkeys = array_intersect_key($params, $expectedkeys);
+
+    // The number of keys in the result should equal the number of expectedkeys
+    if (count($expectedkeys) != count($matchingkeys)) {
+        return false;
+    }
+
+    $invalid = !is_numeric($params['id']) || !is_numeric($params['width']) || !is_numeric($params['height']) || !is_numeric($params['cmid']) || !is_object($params['course']);
+
+    if ($invalid) {
+        return false;
+    }
+
+    return true;
+}
+
 
 /**
  * This function searlizes an object or array and base 64 encodes it for storage into a table.
