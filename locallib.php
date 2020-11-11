@@ -206,7 +206,7 @@ define('KALTURA_LTI_LEARNER_ROLE', 'Learner');
 define('KALTURA_LTI_INSTRUCTOR_ROLE', 'Instructor');
 define('KALTURA_LTI_ADMIN_ROLE', 'urn:lti:sysrole:ims/lis/Administrator');
 //define('KALTURA_REPO_NAME', 'kaltura');
-
+define('KALTURA_URI_TOKEN', 'kaltura-kaf-uri.com');
 
 /**
  * This function validates whether a requested KAF module is valid.
@@ -612,6 +612,26 @@ function local_kaltura_get_player_override() {
 function local_kaltura_get_host() {
 
     $uri = get_config(KALTURA_PLUGIN_NAME, 'uri');
+
+    // Remove trailing slash
+    $trailing_slash = strrpos($uri, '/') + 1;
+    $length         = strlen($uri);
+
+    if ($trailing_slash == $length) {
+        $uri = rtrim($uri, '/');
+    }
+
+    return $uri;
+}
+
+/**
+ * Return the host URI and removes trailing slash
+ *
+ * @return string - host URI
+ */
+function local_kaltura_get_legacy_host() {
+
+    $uri = \local_kaltura\kaltura_config::get_legacy_host();
 
     // Remove trailing slash
     $trailing_slash = strrpos($uri, '/') + 1;
