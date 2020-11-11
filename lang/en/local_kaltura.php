@@ -36,6 +36,12 @@ $string['hosted_login'] = 'Hosted account login';
 $string['hosted_login_desc'] = 'Login username that is used to log into the Kaltura site';
 $string['hosted_password'] = 'Hosted account password';
 $string['hosted_password_desc'] = 'Password that is used to log into the Kaltura site';
+
+$string['legacy_login'] = 'Legacy account login';
+$string['legacy_login_desc'] = 'Login username that is used to log into the legacy Kaltura CE site';
+$string['legacy_password'] = 'Legacy account password';
+$string['legacy_password_desc'] = 'Password that is used to log into the legacy Kaltura CE site';
+
 $string['player_regular_light'] = 'Player light (6709421)';
 $string['player_regular_dark'] = 'Player dark (6709411)';
 $string['custom_player'] = 'Custom player';

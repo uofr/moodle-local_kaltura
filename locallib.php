@@ -413,6 +413,77 @@ function local_kaltura_login($admin = false, $privileges = '', $expiry = 10800, 
     }
 }
 
+
+/**
+ * Log in with the user's credentials.  General a kaltura session locally
+ *
+ * @param boolean $admin - true to login as an administrator or false to login as user.
+ * @param string $privileges - privleges give to the user.
+ * @param int $expiry - number of seconds to keep the session alive.
+ * @param boolean $testconn - use of test connection.
+ *
+ * @return obj - KalturaClient
+ */
+function local_kaltura_legacy_login($admin = false, $privileges = '', $expiry = 10800, $test_conn = false) {
+    global $USER;
+
+    list($login, $password) = local_kaltura_get_legacy_credentials();
+
+    if (empty($login) || empty($password)) {
+        return false;
+    }
+
+    $config_obj = local_kaltura_get_legacy_configuration_obj();
+
+    if (empty($config_obj) || !($config_obj instanceof KalturaConfiguration)) {
+        return false;
+    }
+
+    $client_obj = new KalturaClient($config_obj);
+
+    if (empty($client_obj)) {
+        return false;
+    }
+
+    $partner_id = $client_obj->getConfig()->partnerId;
+    $secret     = get_config(KALTURA_PLUGIN_NAME, 'adminsecret_legacy');
+
+    if (isloggedin()) {
+        $username = $USER->username;
+    } else {
+        $username = null;
+    }
+
+    if ($admin) {
+
+        $session = $client_obj->generateSession($secret, $username, KalturaSessionType::ADMIN,
+                                     $partner_id, $expiry, $privileges);
+    } else {
+
+        $session = $client_obj->generateSession($secret, $username, KalturaSessionType::USER,
+                                     $partner_id, $expiry, $privileges);
+    }
+
+    if (!empty($session)) {
+
+        $client_obj->setKs($session);
+
+        if ($test_conn) {
+            $result = local_kaltura_test_connection($client_obj);
+
+            if (empty($result)) {
+                return false;
+            }
+        }
+
+        return $client_obj;
+
+    } else {
+        return false;
+    }
+}
+
+
 /**
  * This function is refactored code from login(). It only generates and
  * returns a user Kaltura session. The session value returned is mainly used for
@@ -452,6 +523,45 @@ function local_kaltura_generate_kaltura_session($video_list = array()) {
     return $session;
 }
 
+
+/**
+ * This function is refactored code from login(). It only generates and
+ * returns a user Kaltura session. The session value returned is mainly used for
+ * inclusion into the video markup flashvars query string.
+ *
+ * @param string $medialist - privilege string.
+ * @return array - an array of Kaltura media entry ids
+ */
+function local_kaltura_generate_legacy_kaltura_session($video_list = array()) {
+    global $USER;
+
+    $config_obj = local_kaltura_get_legacy_configuration_obj();
+
+    if (empty($config_obj) || !($config_obj instanceof KalturaConfiguration)) {
+        return false;
+    }
+
+    $client_obj = new KalturaClient($config_obj);
+
+    if (empty($client_obj) || empty($video_list)) {
+        return false;
+    }
+
+    $privilege  = 'sview:' . implode(',sview:', $video_list);
+
+    $secret     = get_config(KALTURA_PLUGIN_NAME, 'adminsecret_legacy');
+    $partner_id = '104';
+
+    if (isloggedin()) {
+        $username = $USER->username;
+    } else {
+        $username = null;
+    }
+    $session = $client_obj->generateSession($secret, $username, KalturaSessionType::USER,
+                                            $partner_id, KALTURA_SESSION_LENGTH, $privilege);
+
+    return $session;
+}
 /**
  * Returns an array with the login and password as values respectively
  *
@@ -464,6 +574,22 @@ function local_kaltura_get_credentials() {
 
     $login = get_config(KALTURA_PLUGIN_NAME, 'login');
     $password = get_config(KALTURA_PLUGIN_NAME, 'password');
+
+    return array($login, $password);
+}
+
+/**
+ * Returns an array with the login and password as values respectively
+ *
+ * @return array - login, password or an array of false values if none were found.
+ */
+function local_kaltura_get_legacy_credentials() {
+
+    $login = false;
+    $password = false;
+
+    $login = get_config(KALTURA_PLUGIN_NAME, 'login_legacy');
+    $password = get_config(KALTURA_PLUGIN_NAME, 'password_legacy');
 
     return array($login, $password);
 }
@@ -486,6 +612,31 @@ function local_kaltura_get_configuration_obj() {
     $config_obj->serviceUrl = local_kaltura_get_host();
     $config_obj->cdnUrl = local_kaltura_get_host();
     $config_obj->clientTag = local_kaltura_create_client_tag();
+
+    if (!empty($CFG->proxyhost)) {
+        $config_obj->proxyHost = $CFG->proxyhost;
+        $config_obj->proxyPort = $CFG->proxyport;
+        $config_obj->proxyType = $CFG->proxytype;
+        $config_obj->proxyUser = ($CFG->proxyuser) ? $CFG->proxyuser : null;
+        $config_obj->proxyPassword = ($CFG->proxypassword && $CFG->proxyuser) ? $CFG->proxypassword : null;
+    }
+    return $config_obj;
+}
+
+
+function local_kaltura_get_legacy_configuration_obj() {
+    global $CFG;
+
+    $partner_id = \local_kaltura\kaltura_config::get_legacy_partnerid();
+
+    if (empty($partner_id)) {
+        return false;
+    }
+
+    $config_obj = new KalturaConfiguration($partner_id);
+    $config_obj->serviceUrl = \local_kaltura\kaltura_config::get_legacy_host();
+    $config_obj->cdnUrl = \local_kaltura\kaltura_config::get_legacy_host();
+    $config_obj->clientTag = 'moodle_kaltura_legacy';
 
     if (!empty($CFG->proxyhost)) {
         $config_obj->proxyHost = $CFG->proxyhost;
@@ -1011,7 +1162,7 @@ function local_kaltura_is_valid_entry_object($entry_obj) {
 function local_kaltura_get_ready_entry_object($entry_id, $ready_only = true) {
 
     try {
-        $client_obj = local_kaltura_login(true, '');
+        $client_obj = local_kaltura_legacy_login(true, '');
 
         if (empty($client_obj)) {
             return false;
@@ -1400,10 +1551,16 @@ class kaltura_connection {
 
     /** @var object - kaltura connection object */
     private static $connection  = null;
+    /** @var object - kaltura ce connection object */
+    private static $connection_ce  = null;
     /** @var int - time length until session is expired. */
     private static $timeout = 0;
     /** @var int - start time of Kaltura session. */
     private static $timestarted = 0;
+    /** @var int - time length until ce session is expired. */
+    private static $timeout_ce = 0;
+    /** @var int - start time of Kaltura ce session. */
+    private static $timestarted_ce = 0;
 
     /**
      * Constructor for Kaltura connection class.
@@ -1415,6 +1572,11 @@ class kaltura_connection {
         if (!empty(self::$connection)) {
             self::$timestarted = time();
             self::$timeout = $timeout;
+        }
+        self::$connection_ce = local_kaltura_legacy_login(true, '', $timeout);
+        if (!empty(self::$connection_ce)) {
+            self::$timestarted_ce = time();
+            self::$timeout_ce = $timeout;
         }
     }
 
@@ -1430,7 +1592,12 @@ class kaltura_connection {
         self::$connection = local_kaltura_login($admin, '', $timeout);
         return self::$connection;
     }
-
+	
+	
+	public function get_legacy_connection($admin, $timeout = 0) {
+        self::$connection_ce = local_kaltura_legacy_login($admin, '', $timeout);
+        return self::$connection_ce;
+    }
     /**
      * Return the number of seconds the session is alive for
      * @return int - number of seconds the session is set to live

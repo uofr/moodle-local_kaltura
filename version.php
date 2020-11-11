@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2020110602;
+$plugin->version = 2020111100;
 $plugin->component = 'local_kaltura';
 $plugin->release = 'Kaltura Media Local Libraries 1.1.1';
 $plugin->requires = 2015051100;

@@ -229,6 +229,22 @@ if ($hassiteconfig) {
     $adminsetting->plugin = KALTURA_PLUGIN_NAME;
     $settings->add($adminsetting);
 
+
+    // Kaltura login.
+    $adminsetting = new admin_setting_configtext('login_legacy', get_string('legacy_login', 'local_kaltura'),
+                       get_string('legacy_login_desc', 'local_kaltura'), '', PARAM_TEXT);
+    $adminsetting->plugin = KALTURA_PLUGIN_NAME;
+    $settings->add($adminsetting);
+
+    // Kaltura password.
+    $adminsetting = new admin_setting_configpasswordunmask('password_legacy',
+                       get_string('legacy_password', 'local_kaltura'),
+                       get_string('legacy_password_desc', 'local_kaltura'), '');
+    $adminsetting->plugin = KALTURA_PLUGIN_NAME;
+    $settings->add($adminsetting);
+	
+
+
     // Kaltura regular player selection.
     if ($enableapicalls) {
         $players = local_kaltura_get_custom_players();
