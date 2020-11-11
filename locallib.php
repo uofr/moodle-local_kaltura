@@ -2337,6 +2337,49 @@ function local_kaltura_get_config() {
     return $configsettings;
 }
 
+/**
+ * This functions checks if a URL contains the host name that is configiured for the plug-in.
+ * @param string $url The URL to validate.
+ * @return bool Returns true if the URL contains the configured host name.  Otherwise false.
+ */
+function local_kaltura_url_contains_configured_hostname($url) {
+    $configuration = local_kaltura_get_config();
+    $configuri = local_kaltura_format_uri($configuration->kaf_uri);
+
+    if (empty($configuri)) {
+        return false;
+    }
+    $position = strpos($url, $configuri);
+    if (false === $position) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * This function returns the URL parameter with a protocol prefixed, if non was detected.  http:// is used by default if no protocol is found.
+ * @param string $url The URL to verify.
+ * @return string Returns the URL with the protocol.  An empty string is returned in the case of an exception being thrown.
+ */
+function local_kaltura_add_protocol_to_url($url) {
+    $newurl = '';
+    if (0 === strpos($url, 'https://')) {
+        $newurl = $url;
+    } else if (0 === strpos($url, 'http://')) {
+        $newurl = $url;
+    } else {
+        $newurl = 'http://'.$url;
+    }
+
+    try {
+        $newurl = validate_param($newurl, PARAM_URL);
+    } catch (invalid_parameter_exception $e) {
+        return '';
+    }
+
+    return $newurl;
+}
 
 /**
  * This functions removes the HTTP protocol and the trailing slash from a URI.
@@ -2857,7 +2900,77 @@ function local_kaltura_decode_object_for_storage($object) {
 }
 
 
+/**
+ * This function takes a KalturaMediaEntry or KalturaDataEntry object and converts it into a Moodle metadata object.
+ * @param KalturaMediaEntry $object A KalturaMediaEntry object
+ * @return object|bool A slimed down version of the KalturaMediaEntry object, with slightly different object property names.  Or false if an error was found.
+ */
+function local_kaltura_convert_kaltura_base_entry_object($object) {
+    $metadata = new stdClass;
 
+    if ($object instanceof KalturaMediaEntry) {
+
+        $metadata->url = '';
+        $metadata->dataurl = $object->dataUrl;
+        $metadata->width = $object->width;
+        $metadata->height = $object->height;
+        $metadata->entryid = $object->id;
+        $metadata->title = $object->name;
+        $metadata->thumbnailurl = $object->thumbnailUrl;
+        $metadata->duration = $object->duration;
+        $metadata->description = $object->description;
+        $metadata->createdat = $object->createdAt;
+        $metadata->owner = $object->creatorId;
+        $metadata->tags = $object->tags;
+        $metadata->showtitle = 'on';
+        $metadata->showdescription = 'on';
+        $metadata->showowner = 'on';
+        $metadata->player = '';
+        $metadata->size = '';
+    } else if ($object instanceof KalturaDataEntry) {
+
+        $metadata->url = '';
+        $metadata->dataurl = '';
+        $metadata->url = '';
+        $metadata->width = 0;
+        $metadata->height = 0;
+        $metadata->entryid = $object->id;
+        $metadata->title = $object->name;
+        $metadata->thumbnailurl = $object->thumbnailUrl;
+        $metadata->duration = 0;
+        $metadata->description = $object->description;
+        $metadata->createdat = $object->createdAt;
+        $metadata->owner = $object->creatorId;
+        $metadata->tags = $object->tags;
+        $metadata->showtitle = 'on';
+        $metadata->showdescription = 'on';
+        $metadata->showowner = 'on';
+        $metadata->player = '';
+        $metadata->size = '';
+    } else {
+        $metadata = false;
+    }
+
+    return $metadata;
+}
+
+function local_kaltura_build_kaf_uri($source_url) {
+    $kaf_uri = local_kaltura_get_config()->kaf_uri;
+    $parsed_source_url = parse_url($source_url);
+    if ($parsed_source_url['host'] == KALTURA_URI_TOKEN) {
+        return $source_url;
+    }
+    if(!empty($parsed_source_url['path'])) {
+        $kaf_uri = parse_url($kaf_uri);
+        $source_host_and_path = $parsed_source_url['host'] . $parsed_source_url['path'];
+        $kaf_uri_host_and_path = $kaf_uri['host'] . (isset($kaf_uri['path']) ? $kaf_uri['path'] : '');
+
+        $source_url = str_replace($kaf_uri_host_and_path, '', $source_host_and_path);
+        $source_url = 'http://' . KALTURA_URI_TOKEN . $source_url;
+    }
+
+    return $source_url;
+}
 
 
 function local_kaltura_validate_entry_id($kalvidres) {
