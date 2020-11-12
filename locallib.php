@@ -746,6 +746,35 @@ function local_kaltura_get_player_uiconf($type = 'player') {
     return $uiconf;
 }
 
+function local_kaltura_get_legacy_player_uiconf($type = 'player') {
+
+    $uiconf = 0;
+
+    switch ($type) {
+        case 'player':
+        case 'player_resource':
+        case 'res_uploader':
+        case 'pres_uploader':
+        case 'presentation':
+        case 'mymedia_uploader':
+        case 'mymedia_screen_recorder':
+        case 'assign_uploader':
+        case 'player_filter':
+        case 'simple_uploader';
+
+            $uiconf = '23448572';//get_config(KALTURA_PLUGIN_NAME, $type);
+
+            if (empty($uiconf)) {
+                $uiconf = get_config(KALTURA_PLUGIN_NAME, "{$type}_custom");
+            }
+            break;
+        default:
+            break;
+    }
+
+    return $uiconf;
+}
+
 /**
  * Retrives the player resource override configuration value
  *
@@ -956,7 +985,7 @@ function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $s
         $uid .= '_' . mt_rand();
     }
 
-    $host = local_kaltura_get_host();
+    $host = local_kaltura_get_legacy_host();
     $flashvars = local_kaltura_get_kdp_flashvars($courseid, $session);
     if (KalturaMediaType::IMAGE == $entryobj->mediaType) {
         $varstr = '&amp;IframeCustomPluginCss1=' .  new moodle_url('/local/kaltura/css/hiddenPlayButton.css');
@@ -968,7 +997,7 @@ function local_kaltura_get_kdp_code($entryobj, $uiconf_id = 0, $courseid = 0, $s
 		}
 
     if (empty($uiconfid)) {
-        $uiconf = local_kaltura_get_player_uiconf('player');
+        $uiconf = local_kaltura_get_legacy_player_uiconf('player');
     } else {
         $uiconf = $uiconfid;
     }
@@ -1057,7 +1086,7 @@ function local_kaltura_get_kdp_flashvars($courseid = 0, $session = '') {
     require_once(dirname(dirname(dirname(__FILE__))) . '/repository/kaltura/locallib.php');
 
     $kaltura = new kaltura_connection();
-    $connection = $kaltura->get_connection(true, KALTURA_SESSION_LENGTH);
+    $connection = $kaltura->get_legacy_connection(true, KALTURA_SESSION_LENGTH);
 
     if (!$connection) {
         return '';
@@ -1290,6 +1319,16 @@ function local_kaltura_htm5_javascript_url($uiconf_id) {
 
 }
 
+function local_kaltura_legacy_htm5_javascript_url($uiconf_id) {
+
+    $host       = local_kaltura_get_legacy_host();
+    $partner_id = '104';
+
+    return "{$host}/p/{$partner_id}/sp/{$partner_id}00/embedIframeJs/uiconf_id/{$uiconf_id}/partner_id/{$partner_id}";
+
+}
+
+
 /**
  * Retrives the enable html 5 flavour configuration option
  *
@@ -1497,7 +1536,7 @@ function local_kaltura_get_kwidget_code($entryobj, $uiconfid = 0, $courseid = 0,
     }
 
     if (empty($uiconf_id)) {
-        $uiconf = local_kaltura_get_player_uiconf('player');
+        $uiconf = local_kaltura_get_legacy_player_uiconf('player');
     } else {
         $uiconf = $uiconf_id;
     }
