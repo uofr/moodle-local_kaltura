@@ -49,12 +49,20 @@ class kaltura_player {
      * @return string
      */
     public static function get_embed_url($entry_id) {
-        $server_url = get_config('local_kaltura', 'uri');
-        $partner_id = get_config('local_kaltura', 'partner_id');
-        $uiconf_id = get_config('local_kaltura', 'player_resource');
-        if (empty($uiconf_id)) {
-            $uiconf_id = get_config('local_kaltura', 'player_resource_custom');
-        }
+        $server_url = \local_kaltura\kaltura_config::get_host();
+        $partner_id = \local_kaltura\kaltura_config::get_partner_id();
+        $uiconf_id = \local_kaltura\kaltura_config::get_uiconf_id();
+        return "{$server_url}/index.php/kwidget/wid/_{$partner_id}/uiconf_id/{$uiconf_id}/entry_id/{$entry_id}/v/flash";
+    }
+
+    /**
+     * Returns player embed link.
+     * @return string
+     */
+    public static function get_embed_url_legacy($entry_id) {
+        $server_url = \local_kaltura\kaltura_config::get_host_legacy();
+        $partner_id = \local_kaltura\kaltura_config::get_legacy_partnerid();
+        $uiconf_id = \local_kaltura\kaltura_config::get_uiconf_id_legacy();
         return "{$server_url}/index.php/kwidget/wid/_{$partner_id}/uiconf_id/{$uiconf_id}/entry_id/{$entry_id}/v/flash";
     }
 

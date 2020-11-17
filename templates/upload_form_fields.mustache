@@ -32,14 +32,14 @@
 
     <div class="form-check">
         <input type="radio" class="form-check-input" id="entry_student_yes" name="student" value="Yes" required
-            autocomplete="off"/>
+            autocomplete="off" {{#student_content}}checked{{/student_content}}/>
 
         <label class="form-check-label" for="entry_student_yes">{{#str}}yes, core{{/str}}</label>
     </div>
 
     <div class="form-check">
         <input type="radio" class="form-check-input" id="entry_student_no" name="student" value="No" required
-            autocomplete="off"/>
+            autocomplete="off" {{^student_content}}checked{{/student_content}}/>
 
         <label class="form-check-label" for="entry_student_no">{{#str}}no, core{{/str}}</label>
 
@@ -54,7 +54,7 @@
     <label for="entry_term">{{#str}} term_header, local_kaltura {{/str}}</label>
 
     <select id="entry_term" name="term" class="custom-select w-100" data-action="change-term" autocomplete="off"
-        aria-describedby="entry_term_help" {{$term_properties}}{{/term_properties}}>
+        aria-describedby="entry_term_help" {{#student_content}}disabled{{/student_content}}>
         {{#terms}}
             <option value="{{term}}" {{#selected}}selected="selected"{{/selected}}>{{term}}</option>
         {{/terms}}

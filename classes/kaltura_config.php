@@ -39,6 +39,9 @@ class kaltura_config {
         return get_config('local_kaltura', 'uri');
     }
 
+    public static function get_host_legacy() {
+        return 'https://urcourses-video.uregina.ca';
+    }
 
     /**
      * Gets partner id.
