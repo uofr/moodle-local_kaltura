@@ -31,6 +31,18 @@ require_once(__DIR__ . '/../API/KalturaClient.php');
  */
 class kaltura_metadata_manger {
 
+    public static function build_xml($course_share, $store_media, $student_content, $assessment) {
+        $xml = '<metadata>';
+        foreach($course_share as $courseid) {
+            $xml .= "<CourseShare>{$courseid}</CourseShare>";
+        }
+        $xml .= "<StoreMedia>{$store_media}</StoreMedia>";
+        $xml .= "<StudentContent>{$student_content}</StudentContent>";
+        $xml .= "<Assessment>{$assessment}</Assessment>";
+        $xml .= '</metadata>';
+        return $xml;
+    }
+
     public static function get_custom_metadata($client, $entryid) {
         $filter = new \KalturaMetadataFilter();
         $filter->metadataObjectTypeEqual = \KalturaMetadataObjectType::ENTRY;
